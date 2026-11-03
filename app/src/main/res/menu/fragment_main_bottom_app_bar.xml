@@ -7,19 +7,19 @@
 
     <item
         android:id="@+id/reelsFragment"
-        style="@style/Theme.Glimpse.BottomAppBarOption"
+        style="@style/Theme.Images.BottomAppBarOption"
         android:icon="@drawable/ic_photo_size_select_actual"
         android:title="@string/reels_title" />
 
     <item
         android:id="@+id/albumsFragment"
-        style="@style/Theme.Glimpse.BottomAppBarOption"
+        style="@style/Theme.Images.BottomAppBarOption"
         android:icon="@drawable/ic_albums"
         android:title="@string/albums_title" />
 
     <item
         android:id="@+id/libraryFragment"
-        style="@style/Theme.Glimpse.BottomAppBarOption"
+        style="@style/Theme.Images.BottomAppBarOption"
         android:icon="@drawable/ic_library"
         android:title="@string/library_title" />
 

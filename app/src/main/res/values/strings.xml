@@ -4,7 +4,21 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Gallery</string>
+    <string name="app_name" translatable="false">Encri Images</string>
+
+    <!-- The screen in front of the gallery while the vault cannot be shown -->
+    <string name="album_vault">Vault</string>
+    <string name="vault_gate_connecting">Connecting to encri…</string>
+    <string name="vault_gate_locked">The vault is locked.</string>
+    <string name="vault_gate_not_authorized">Encri Images needs your permission, in encri, to show what is in the vault.</string>
+    <string name="vault_gate_access_off">Access for other apps is turned off in encri.</string>
+    <string name="vault_gate_not_installed">Encri Images shows what is in an encri vault, and encri is not installed.</string>
+    <string name="vault_gate_not_trusted">The encri installed here is signed by a key this app does not trust, so nothing was sent to it.</string>
+    <string name="vault_gate_too_old">The encri installed here is too old for this app. Update encri, and try again.</string>
+    <string name="vault_gate_unavailable">encri could not be reached.</string>
+    <string name="vault_gate_allow">Allow in encri</string>
+    <string name="vault_gate_unlock">Unlock</string>
+    <string name="vault_gate_retry">Try again</string>
 
     <!-- Toast messages -->
     <string name="app_permissions_toast">Permissions not granted by the user.</string>

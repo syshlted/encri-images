@@ -5,33 +5,33 @@
 -->
 <resources>
     <!-- Base application theme -->
-    <style name="Theme.Glimpse" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Images" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 
     <!-- Top app bar option -->
-    <style name="Theme.Glimpse.TopAppBarOption">
+    <style name="Theme.Images.TopAppBarOption">
         <item name="android:iconTint">?attr/colorOnSurface</item>
         <item name="iconTint">?attr/colorOnSurface</item>
     </style>
 
     <!-- Bottom app bar option -->
-    <style name="Theme.Glimpse.BottomAppBarOption">
+    <style name="Theme.Images.BottomAppBarOption">
         <item name="android:iconTint">?attr/colorOnSurface</item>
         <item name="iconTint">?attr/colorOnSurface</item>
     </style>
 
     <!-- Media viewer -->
-    <style name="Theme.Glimpse.MediaViewer" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Images.MediaViewer" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
     </style>
 
     <!-- Media viewer bottom sheet -->
-    <style name="Theme.Glimpse.MediaViewer.BottomSheet" />
+    <style name="Theme.Images.MediaViewer.BottomSheet" />
 
     <!-- Media viewer bottom sheet buttons -->
-    <style name="Theme.Glimpse.MediaViewer.BottomSheet.Button">
+    <style name="Theme.Images.MediaViewer.BottomSheet.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
@@ -47,10 +47,10 @@
     </style>
 
     <!-- Media info bottom sheet dialog -->
-    <style name="Theme.Glimpse.MediaInfoBottomSheetDialog" />
+    <style name="Theme.Images.MediaInfoBottomSheetDialog" />
 
     <!-- Media info bottom sheet dialog date/time text -->
-    <style name="Theme.Glimpse.MediaInfoBottomSheetDialog.DateTimeText">
+    <style name="Theme.Images.MediaInfoBottomSheetDialog.DateTimeText">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:letterSpacing">0.03</item>
@@ -61,13 +61,10 @@
     </style>
 
     <!-- Media info bottom sheet dialog list item -->
-    <style name="Theme.Glimpse.MediaInfoBottomSheetDialog.ListItem">
+    <style name="Theme.Images.MediaInfoBottomSheetDialog.ListItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
     <!-- Set wallpaper dialog theme -->
-    <style name="Theme.Glimpse.SetWallpaperDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog.Centered">
-        <item name="listItemLayout">@layout/set_wallpaper_dialog_item</item>
-    </style>
 </resources>

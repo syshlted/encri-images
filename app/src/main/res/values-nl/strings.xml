@@ -4,7 +4,6 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Galerij</string>
     <string name="app_permissions_toast">Machtigingen niet toegekend door de gebruiker.</string>
     <string name="reels_title">Spoelen</string>
     <string name="albums_title">Albums</string>

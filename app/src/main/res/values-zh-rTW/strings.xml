@@ -4,7 +4,6 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">相簿</string>
     <string name="app_permissions_toast">使用者未授予權限。</string>
     <string name="reels_title">Reels</string>
     <string name="albums_title">相簿</string>

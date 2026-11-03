@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-FileCopyrightText: SystemHalted
      SPDX-License-Identifier: Apache-2.0
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/useAs"
-        style="@style/Theme.Glimpse.TopAppBarOption"
-        android:contentDescription="@string/file_action_use_as"
-        android:icon="@drawable/ic_contact_page"
-        android:title="@string/file_action_use_as" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/info"
-        style="@style/Theme.Glimpse.TopAppBarOption"
+        style="@style/Theme.Images.TopAppBarOption"
         android:contentDescription="@string/file_action_information"
         android:icon="@drawable/ic_info"
-        android:title="@string/file_action_information" />
+        android:title="@string/file_action_information"
+        app:showAsAction="always" />
 
 </menu>

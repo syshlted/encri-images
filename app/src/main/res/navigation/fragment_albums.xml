@@ -11,7 +11,7 @@
 
     <fragment
         android:id="@+id/albumsFragment"
-        android:name="org.lineageos.glimpse.fragments.AlbumsFragment"
+        android:name="com.systemhalted.encri.images.fragments.AlbumsFragment"
         android:label="@string/albums_title"
         tools:layout="@layout/fragment_albums">
 

@@ -4,7 +4,6 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">גלריה</string>
     <string name="app_permissions_toast">לא הוענקו הרשאות על ידי המשתמש.</string>
     <string name="reels_title">מדיה</string>
     <string name="albums_title">אלבומים</string>

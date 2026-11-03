@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 version = 1
-SPDX-PackageName = "Glimpse"
-SPDX-PackageSupplier = "The LineageOS Project"
-SPDX-PackageDownloadLocation = "https://github.com/LineageOS/android_packages_apps_Glimpse"
+SPDX-PackageName = "Encri Images"
+SPDX-PackageSupplier = "SystemHalted"
+SPDX-PackageDownloadLocation = "https://github.com/syshlted/encri-images"
 
 [[annotations]]
 path = [".github/workflows/**", ".gitignore", "app/.gitignore"]

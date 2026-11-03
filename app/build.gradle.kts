@@ -1,23 +1,32 @@
 /*
  * SPDX-FileCopyrightText: The LineageOS Project
+ * SPDX-FileCopyrightText: SystemHalted
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+
+// Kotlin support is built into AGP since 9.0; applying org.jetbrains.kotlin.android alongside it is an
+// error, not a redundancy.
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.lineageos.generatebp)
 }
 
+val versions = libs.versions
+
 android {
-    namespace = "org.lineageos.glimpse"
-    compileSdk = 36
+    namespace = "com.systemhalted.encri.images"
+    compileSdk = versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "org.lineageos.glimpse"
-        minSdk = 30
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        // Permanent from the first build a user installs, because encri keys a grant on it (encri D120).
+        applicationId = "com.systemhalted.encri.images"
+        minSdk = versions.minSdk.get().toInt()
+        targetSdk = versions.targetSdk.get().toInt()
+        // encri D6's scheme, which this app shares: MAJOR*1000000 + MINOR*1000 + PATCH. encri keys a grant
+        // on the version code too (encri D120), so every change to it asks the user again.
+        versionCode = 1_000
+        versionName = "0.1.0"
     }
 
     buildTypes {
@@ -30,27 +39,41 @@ android {
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
-        }
-
-        debug {
-            // Append .dev to package name so we won't conflict with AOSP build.
-            applicationIdSuffix = ".dev"
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 
     lint {
         lintConfig = file("lint.xml")
     }
+
+    dependenciesInfo {
+        // encri D116: an APK signed by AGP would carry the dependency list encrypted to a key only
+        // Google holds. The bundle keeps its plaintext copy.
+        includeInApk = false
+        includeInBundle = true
+    }
+}
+
+kotlin {
+    jvmToolchain(21)
 }
 
 dependencies {
+    // The only way this app reaches the vault (encri D112): the published client, never SAF.
+    implementation(libs.encri.client)
+    implementation(libs.kotlinx.coroutines.android)
+
     implementation(libs.adobe.xmpcore)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
@@ -61,40 +84,58 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.exoplayer.dash)
-    implementation(libs.androidx.media3.exoplayer.hls)
-    implementation(libs.androidx.media3.exoplayer.rtsp)
-    implementation(libs.androidx.media3.exoplayer.smoothstreaming)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.recyclerview.selection)
     implementation(libs.androidx.viewpager2)
     implementation(libs.glide)
-    implementation(libs.glide.okhttp3.integration)
     implementation(libs.material)
-    implementation(libs.okhttp)
     implementation(libs.zoomimage.view.glide)
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // Robolectric is a JUnit 4 runner and the rest of the suite is JUnit 5, so the vintage engine runs
+    // both under one task, encri's arrangement for encri's reason.
+    testImplementation(libs.robolectric)
+    testImplementation(libs.junit4)
+    testImplementation(libs.androidx.test.core)
+    testRuntimeOnly(libs.junit.vintage.engine)
 }
 
-generateBp {
-    targetSdk = android.defaultConfig.targetSdk!!
-    minSdk = android.defaultConfig.minSdk!!
-    versionCode = android.defaultConfig.versionCode!!
-    versionName = android.defaultConfig.versionName!!
-    availableInAOSP = { module ->
-        when {
-            module.group.startsWith("androidx") -> {
-                // We provide our own androidx.media3
-                !module.group.startsWith("androidx.media3")
-            }
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    // Robolectric at SDK 36 on JDK 21 (encri-api L8).
+    jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
+}
 
-            module.group.startsWith("org.jetbrains") -> true
-            module.group == "com.google.errorprone" -> true
-            module.group == "com.google.guava" -> true
-            else -> false
+// I1: 80% of the lines written here. The screens inherited from Glimpse came with no tests, and a floor over
+// them would measure that rather than this code.
+kover {
+    reports {
+        filters {
+            includes {
+                classes("com.systemhalted.encri.images.vault.*")
+            }
+        }
+        verify {
+            rule("I1: line coverage of src/main/kotlin") { minBound(80, CoverageUnit.LINE) }
         }
     }
+}
+
+// I1: what came from Glimpse stays in src/main/java in upstream's own formatting, so a fix there can be
+// picked across; what is written here goes in src/main/kotlin and passes every gate.
+ktlint {
+    filter {
+        exclude { it.file.path.contains("/src/main/java/") }
+    }
+}
+
+detekt {
+    source.setFrom(files("src/main/kotlin", "src/test/kotlin"))
 }
