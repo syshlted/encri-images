@@ -184,6 +184,11 @@ play on. Glimpse's `ACTION_REVIEW_SECURE`, which showed media over the keyguard,
 **Asks for `READ` alone**, because this version does nothing else, and encri's screen says so to the user.
 
 **`allowBackup` is false**, and **every window has `FLAG_SECURE`**, set in one place by `SecureWindows`.
+*Amended 2026-11-03: a dialog is a window of its own, which an activity's flag does not reach, and the info sheet's
+had none (its flags on the S9 were `0x81810102`, the activity's behind it `0x81812100`). Android leaves a secure
+window out of a screen recording and shows the rest, so the sheet's name, size, date and coordinates would have been
+in one (not tried here: `screencap` on API 29 refuses the whole screen). Every dialog now goes through
+`SecureWindows.secure`, and the sheet's flags on the S9 are `0x81812102`.*
 
 *Rejected:* keeping these features and asking for confirmation, which is a design for later rather than a default to
 inherit. *Rejected:* disabling Glide's disk cache per request, where one forgotten call is a leak; with the adapter

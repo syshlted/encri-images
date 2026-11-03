@@ -4,6 +4,9 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-03
 
+**Fixed: the info sheet could be recorded** (I3, amended). A dialog's window does not take its activity's
+`FLAG_SECURE`, so a photo's name, size, date and location were outside what screenshots are kept from.
+
 **Device tests** (I6). `GateOnPhoneTest` and `WalkMeasurement` run in the app's own process, with its grant;
 `SeedLibrary` and `RemoveLibrary` write a test library from a package of their own, `:testvault`, and remove it by the
 id they wrote down. `scripts/device/instrument` runs one class on one phone, and CI now compiles their APKs.

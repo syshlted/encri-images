@@ -45,6 +45,7 @@ import com.systemhalted.encri.images.ui.recyclerview.MediaViewerAdapter
 import com.systemhalted.encri.images.ext.getParcelable
 import com.systemhalted.encri.images.ext.getSerializable
 import com.systemhalted.encri.images.vault.LinkState
+import com.systemhalted.encri.images.vault.SecureWindows
 import com.systemhalted.encri.images.viewmodels.AlbumViewModel
 import com.systemhalted.encri.images.viewmodels.LocalPlayerViewModel
 import java.text.SimpleDateFormat
@@ -348,7 +349,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
         lifecycleScope.launch {
             val exif = viewModel.exifOf(media)
             if (!isFinishing) {
-                MediaInfoBottomSheetDialog(this@ViewActivity, media, exif).show()
+                SecureWindows.secure(MediaInfoBottomSheetDialog(this@ViewActivity, media, exif)).show()
             }
         }
     }
