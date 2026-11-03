@@ -44,6 +44,8 @@ import com.systemhalted.encri.images.ui.dialogs.MediaInfoBottomSheetDialog
 import com.systemhalted.encri.images.ui.recyclerview.MediaViewerAdapter
 import com.systemhalted.encri.images.ext.getParcelable
 import com.systemhalted.encri.images.ext.getSerializable
+import com.systemhalted.encri.images.vault.Handoff
+import com.systemhalted.encri.images.vault.Handoffs
 import com.systemhalted.encri.images.vault.LinkState
 import com.systemhalted.encri.images.vault.SecureWindows
 import com.systemhalted.encri.images.viewmodels.AlbumViewModel
@@ -62,10 +64,17 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     private val bottomSheetLinearLayout by lazy { findViewById<LinearLayout>(R.id.bottomSheetLinearLayout) }
     private val infoButton by lazy { toolbar.menu.findItem(R.id.info) }
     private val motionPhotoToggleButton by lazy { findViewById<MaterialButton>(R.id.motionPhotoToggleButton) }
+    private val openWithButton by lazy { toolbar.menu.findItem(R.id.openWith) }
+    private val shareButton by lazy { findViewById<MaterialButton>(R.id.shareButton) }
     private val toolbar by lazy { findViewById<MaterialToolbar>(R.id.toolbar) }
     private val viewPager by lazy { findViewById<ViewPager2>(R.id.viewPager) }
 
     private var lastVideoUriPlayed: Uri? = null
+
+    // Through encri's handoff, said first (I10)
+    private val handoffs by lazy {
+        Handoffs(this, (application as ImagesApplication).link, lifecycleScope)
+    }
 
     // Adapter
     private val mediaViewerAdapter by lazy {
@@ -134,6 +143,11 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
                     true
                 }
 
+                R.id.openWith -> {
+                    viewModel.displayedMedia.value?.let { handoffs.offer(it, Handoff.OPEN_WITH) }
+                    true
+                }
+
                 else -> false
             }
         }
@@ -144,6 +158,10 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
 
         motionPhotoToggleButton.setOnClickListener {
             viewModel.toggleMotionPhotoEnabled()
+        }
+
+        shareButton.setOnClickListener {
+            viewModel.displayedMedia.value?.let { handoffs.offer(it, Handoff.SHARE) }
         }
 
         viewPager.offscreenPageLimit = 2
@@ -271,6 +289,10 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
 
                     // Update info button
                     infoButton.isVisible = displayedMedia != null
+
+                    // What leaves through encri's handoff
+                    openWithButton.isVisible = displayedMedia != null
+                    shareButton.isVisible = displayedMedia != null
 
                     // Reset motion photo toggle button
                     viewModel.toggleMotionPhotoEnabled(false)

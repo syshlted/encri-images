@@ -6,6 +6,7 @@
 package com.systemhalted.encri.images.vault
 
 import android.content.Context
+import android.net.Uri
 import android.os.ParcelFileDescriptor
 import com.systemhalted.encri.client.ConnectResult
 import com.systemhalted.encri.client.Encri
@@ -75,6 +76,8 @@ private class ClientSession(
     ): EncriResult<ByteArray> = session.thumbnail(documentId, width, height)
 
     override suspend fun openRead(documentId: String): EncriResult<ParcelFileDescriptor> = session.openRead(documentId)
+
+    override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> = session.handOff(documentIds)
 
     override suspend fun grant(): EncriResult<EncriGrant> = session.refreshGrant()
 

@@ -5,6 +5,7 @@
 
 package com.systemhalted.encri.images.vault
 
+import android.net.Uri
 import android.os.ParcelFileDescriptor
 import com.systemhalted.encri.client.EncriDocument
 import com.systemhalted.encri.client.EncriGrant
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.Flow
  * The part of an encri session this app uses (AGENTS.md I3).
  *
  * Narrower than the client's session on purpose, so this interface is the list of what the gallery asks
- * encri for: it reads, and nothing here changes the vault or hands a document to another app.
+ * encri for: it reads, and hands a document to another app only through encri's handoff, once the user has
+ * agreed (I10).
  */
 interface VaultSession : AutoCloseable {
     /** The folder the user let this app into, above which it cannot go. */
@@ -41,6 +43,12 @@ interface VaultSession : AutoCloseable {
 
     /** A read-only descriptor over [documentId] that seeks, which the caller owns and closes. */
     suspend fun openRead(documentId: String): EncriResult<ParcelFileDescriptor>
+
+    /**
+     * `content://` URIs another app can read [documentIds] through, granted to this app to pass on (encri D117).
+     * They name neither the document's id nor its name, and stop working when the vault locks or the session ends.
+     */
+    suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>>
 
     /**
      * The grant as encri holds it now. One small read, which a locked vault answers [Failure.LOCKED] like any

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-FileCopyrightText: SystemHalted
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
@@ -19,6 +20,15 @@
     <string name="vault_gate_allow">Allow in encri</string>
     <string name="vault_gate_unlock">Unlock</string>
     <string name="vault_gate_retry">Try again</string>
+
+    <!-- I10: a photo or video handed to another app through encri's handoff, said first, every time -->
+    <string name="file_action_open_with">Open with</string>
+    <string name="handoff_share_title">Share with another app?</string>
+    <string name="handoff_share_explain">The app you choose next gets what is in it, not encrypted, and can keep a copy: Encri Images cannot take it back, and deleting it from the vault later does not delete that copy. The app reads it from the vault, so if it waits to read until after the vault locks or Encri Images is closed, it will find nothing.</string>
+    <string name="handoff_open_title">Open in another app?</string>
+    <string name="handoff_open_explain">The app you choose next gets what is in it, not encrypted, and can keep a copy: Encri Images cannot take it back. Anything that app saves, an edited copy too, it saves outside the vault, not encrypted. It reads from the vault, so once the vault locks or Encri Images is closed, it finds nothing more.</string>
+    <string name="handoff_failed">encri would not hand this to another app.</string>
+    <string name="handoff_no_app">No app on this phone can take it.</string>
 
     <!-- Toast messages -->
     <string name="app_permissions_toast">Permissions not granted by the user.</string>

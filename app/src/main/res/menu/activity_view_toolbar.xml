@@ -15,4 +15,9 @@
         android:title="@string/file_action_information"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/openWith"
+        android:title="@string/file_action_open_with"
+        app:showAsAction="never" />
+
 </menu>

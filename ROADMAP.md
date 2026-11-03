@@ -17,8 +17,9 @@ to do, each with a design of its own rather than Glimpse's.
 2. **Subsampling for large images.** ZoomImage does not subsample a vault photo, so zooming magnifies the screen's
    decode (I8). A `SubsamplingImageGenerator` of this app's own, reading through `openRead`, with its tiles in
    Glide's memory cache, which a lock clears.
-3. **Sharing**, through encri's handoffs (encri D117), with the confirmation encri-files makes (encri-files F7).
-4. **Delete**, which asks for the `DELETE` right, and what stands in for a trash when encri has none.
+3. **Delete**, which asks for the `DELETE` right, and what stands in for a trash when encri has none.
+4. **Several at once.** Share is one photo at a time, from the viewer (I10). Glimpse's selection in the grid, which
+   was deleted with its trash, would share several through one handoff.
 5. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
    so this needs somewhere to keep the answer that is not outside the vault.
 6. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.

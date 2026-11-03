@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-FileCopyrightText: SystemHalted
      SPDX-License-Identifier: Apache-2.0
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -49,6 +50,13 @@
         <Space
             android:layout_width="16dp"
             android:layout_height="match_parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/shareButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/file_action_share"
+            android:drawableTop="@drawable/ic_share"
+            android:text="@string/file_action_share" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/motionPhotoToggleButton"

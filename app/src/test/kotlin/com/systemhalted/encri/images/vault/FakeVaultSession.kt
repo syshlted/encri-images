@@ -5,6 +5,7 @@
 
 package com.systemhalted.encri.images.vault
 
+import android.net.Uri
 import android.os.ParcelFileDescriptor
 import com.systemhalted.encri.client.EncriDocument
 import com.systemhalted.encri.client.EncriGrant
@@ -29,6 +30,10 @@ class FakeVaultSession(
     var thumbnail: EncriResult<ByteArray> = EncriResult.Ok(byteArrayOf(1, 2, 3))
     var grant: EncriResult<EncriGrant> = EncriResult.Ok(EncriGrant(setOf(Right.READ), root))
     var grantsAsked = 0
+    val handedOff = mutableListOf<List<String>>()
+
+    /** What a handoff answers; null hands one made-up URI per document. */
+    var handOff: EncriResult<List<Uri>>? = null
     var closed = false
 
     override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
@@ -50,6 +55,11 @@ class FakeVaultSession(
         opened += documentId
         val file = content[documentId] ?: return EncriResult.Failed(Failure.NOT_FOUND, "no such document")
         return EncriResult.Ok(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY))
+    }
+
+    override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> {
+        handedOff += documentIds
+        return handOff ?: EncriResult.Ok(documentIds.map { Uri.parse("content://handoff.test/$it") })
     }
 
     override suspend fun grant(): EncriResult<EncriGrant> {

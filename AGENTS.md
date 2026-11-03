@@ -19,7 +19,8 @@ and in encri-api's for the wire. It is not restated here. What this file owns is
 
 **The first version reads and shows, and nothing else (2026-11-01).** It connects to encri, asks to read, unlocks
 through encri's screen, shows Reels, Albums and Library from the vault, opens photos, and plays videos with seeking.
-It changes nothing in the vault and hands nothing to another app. Checked by hand on the A20 (API 30); see I4. Since
+It changes nothing in the vault, and hands a photo or video to another app only through encri's handoff, once
+the user has agreed (I10). Checked by hand on the A20 (API 30); see I4. Since
 2026-11-03 it starts on API 28 and 29 as well (I6), and the A20 is measured at 5,000 photos (I8).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
@@ -174,7 +175,7 @@ looking at the info sheet on the A20, the app's data directory held five empty d
 **Nothing sent about a picture.** Glimpse's info sheet gave a photo's coordinates to `Geocoder`, which on most phones
 is a network service, without asking, and offered them to a maps app. Here it shows the numbers and nothing else.
 Share, edit and *use as* are gone, because they need encri's handoffs (encri D117), and the favourite and trash
-buttons are gone because encri has neither.
+buttons are gone because encri has neither. *Amended by I10: share is back, and open with, through a handoff.*
 
 **Nothing shown while locked.** `VaultLibrary` forgets everything when the vault locks or the session goes, and Glide's
 memory is cleared. `MainActivity` hides the whole gallery behind a gate with one message and one button. **The viewer
@@ -455,3 +456,48 @@ panel, and input is given in the override, so every fling began below the screen
 
 **Not measured, and not to be assumed:** the G6, until its vault exists; API 27 and 33+; video; 20,000 photos.
 
+### I10 — Share and open with: encri's handoff, said first every time, and never back to encri
+*2026-11-03 · accepted (step 3 of the integration plan); **flagged for veto on two points** (below). **Amends I3** on
+what leaves.*
+
+**The viewer offers *Share*, in its bottom bar where Glimpse had it, and *Open with*, in the toolbar's menu.** Each
+hands the photo or video on through a handoff encri makes for it (encri D117): a `content://` URI on encri's provider
+that names neither the document's id nor its name, and stops working when the vault locks or the session ends.
+Reading is all a handoff needs, so the app still asks for `READ` alone.
+
+**Before anything is handed over, a dialog says what it costs**, every time, as encri-files F7's does: the app chosen
+gets the photo itself, not encrypted, and can keep it; and it reads from the vault, so it finds nothing once the vault
+locks or this app is closed. *Open with* says as well that whatever that app saves, an edited copy too, it saves
+outside the vault, because a handoff grants reading alone and an editor can only save somewhere else.
+
+**The intents are encri-files'** (F7): `ACTION_SEND` through `Intent.createChooser`, the URI in the stream extra and
+in a clip whose label is empty, with the read grant; *Open with* is `ACTION_VIEW` in a chooser of its own. **encri is
+left out of both**, by asking the package manager which of `Encri.PACKAGE`'s activities would take the intent. On the
+S9 encri takes a shared image (`ShareToEncri`) and not a viewed one. **Nothing is revoked when the chooser closes**,
+for F7's reason: nothing reports it, and an app may read when it sends rather than when it is picked. A handoff is
+asked through the link (I7), so one that finds the vault locked is the lock.
+
+**Not built:** several at once, which needs Glimpse's selection in the grid back (`ROADMAP.md`). *Use as* (Glimpse's
+`ATTACH_DATA`) stays out: a wallpaper or a contact's photo is a picture from the vault shown outside it for as long as
+it is set (I3). *Edit* (Glimpse's `ACTION_EDIT`) is *Open with* and its warning, since an editor given a read grant
+saves elsewhere either way.
+
+*Rejected:* a decrypted copy through a `FileProvider` of this app's own, which writes the plaintext to this app's
+storage (I3, encri-files F7). *Rejected:* `ACTION_VIEW` without a chooser, which would hand every photo opened to
+whichever app the user once made the default for images.
+
+**Verified.** Under Robolectric, eight tests: nothing handed over before the dialog's *Share* or after its *Cancel*;
+the dialog kept out of screenshots; the share sheet given the handoff in the stream and the clip, with the grant and
+an empty label; *Open with* viewing it in a titled chooser; encri's components left out and another app's not; a
+refused handoff opening nothing and saying so without naming the photo; a locked answer heard as the lock; and a phone
+with nothing to take it. Showing the dialog without `SecureWindows.secure` fails one. **On the S9, against encri
+0.1.0:** the dialog, its window with `FLAG_SECURE`; the share sheet, with one item and, in its full list of fourteen
+apps, no encri; and *Open with*, which Android passed straight to Samsung's gallery, the one app there that views an
+image, and which showed the test photo it read through the handoff. Nothing was sent to an app that uploads.
+
+**Flagged for veto:**
+
+1. **Every share and every open is confirmed**, with no way to stop being asked (encri-files F7's flag, again).
+2. **The share sheet is the platform's**, and what it offers is not this app's to choose. It records the app chosen
+   and the type in the phone's usage history (encri D118), and the S9's offers *Share as link* and *Quick Share*,
+   which upload.

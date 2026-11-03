@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-03
 
+**Share and open with** (I10), from the viewer, through encri's handoff and the platform's chooser, with encri left
+out. A dialog says what it costs first, every time. Checked on the S9, where Samsung's gallery opened a photo it
+read through the handoff.
+
 **Fixed: the info sheet could be recorded** (I3, amended). A dialog's window does not take its activity's
 `FLAG_SECURE`, so a photo's name, size, date and location were outside what screenshots are kept from.
 
