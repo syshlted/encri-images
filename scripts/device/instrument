@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: SystemHalted
+# SPDX-License-Identifier: Apache-2.0
+#
+# Runs one class of the device tests on one phone, and prints what it logged (AGENTS.md I6).
+#
+#   scripts/device/instrument <serial> app <Class> [-e <key> <value>]...
+#   scripts/device/instrument <serial> testvault <Class> [-e <key> <value>]...
+#
+#   app:        GateOnPhoneTest, WalkMeasurement               in the app's process, with its grant
+#   testvault:  SeedLibrary, RemoveLibrary                     a package of its own, which may write
+#
+# Builds the APKs (NO_BUILD=1 skips that), installs them with -r, which keeps the grant encri keyed on the
+# install, and runs the class with am instrument rather than connectedDebugAndroidTest, which uninstalls the
+# test APK when it finishes and so drops that grant (encri-api L13). A locked vault, or a test package encri has
+# not let in, needs the vault's passphrase in ENCRI_PASSPHRASE; without it, those tests skip and say why. The
+# screen must be on and not behind a secure keyguard, because encri's screens are pressed through the
+# accessibility tree.
+#
+# ADB overrides the adb command. Exit status: 0 passed or skipped, 1 failed, 2 a refusal.
+set -euo pipefail
+
+refuse() { echo "instrument: $*" >&2; exit 2; }
+
+serial=${1:-}; module=${2:-}; class=${3:-}
+[ -n "$serial" ] && [ -n "$module" ] && [ -n "$class" ] || refuse "usage: instrument <serial> app|testvault <Class> [-e key value]..."
+shift 3
+
+root=$(cd "$(dirname "$0")/../.." && pwd)
+adb=(${ADB:-$HOME/Android/Sdk/platform-tools/adb} -s "$serial")
+
+case "$module" in
+  app)
+    package=com.systemhalted.encri.images.test
+    classes=com.systemhalted.encri.images.device
+    apks=("$root/app/build/outputs/apk/debug/app-debug.apk"
+          "$root/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk")
+    ;;
+  testvault)
+    package=com.systemhalted.encri.images.testvault.test
+    classes=com.systemhalted.encri.images.testvault
+    apks=("$root/testvault/build/outputs/apk/androidTest/debug/testvault-debug-androidTest.apk")
+    ;;
+  *) refuse "no module '$module': app or testvault" ;;
+esac
+
+args=("$@")
+if [ -n "${ENCRI_PASSPHRASE:-}" ]; then
+  case "$ENCRI_PASSPHRASE" in *\'*) refuse "a passphrase with a ' cannot be passed through adb shell" ;; esac
+  args+=(-e encriPassphrase "'$ENCRI_PASSPHRASE'")
+fi
+
+if [ -z "${NO_BUILD:-}" ]; then
+  (cd "$root" && ./gradlew --quiet :app:assembleDebug :app:assembleDebugAndroidTest :testvault:assembleDebugAndroidTest)
+fi
+for apk in "${apks[@]}"; do "${adb[@]}" install -r -t "$apk" > /dev/null; done
+# A screen that timed out stops every activity, and encri's screens with them. A keyguard that is only a swipe is
+# dismissed; a secure one is not, and the run then fails waiting for a screen.
+"${adb[@]}" shell input keyevent KEYCODE_WAKEUP
+"${adb[@]}" shell wm dismiss-keyguard
+"${adb[@]}" logcat -c
+
+report=$(mktemp)
+trap 'rm -f "$report"' EXIT
+"${adb[@]}" shell am instrument -w -r "${args[@]}" -e class "$classes.$class" \
+  "$package/androidx.test.runner.AndroidJUnitRunner" > "$report" 2>&1 || true
+
+"${adb[@]}" logcat -d -s EncriImagesDevice:I | sed -n 's/^.*EncriImagesDevice: //p'
+if grep -q '^OK (' "$report"; then
+  skipped=$(grep -c 'INSTRUMENTATION_STATUS_CODE: -4' "$report" || true)
+  printf '%s: %s, %s skipped\n' "$class" "$(grep '^OK (' "$report")" "$skipped"
+  if [ "$skipped" != 0 ]; then grep -m1 'AssumptionViolatedException' "$report" | sed 's/^.*Exception: /  because: /'; fi
+  exit 0
+fi
+printf '%s: FAILED\n' "$class"
+grep -E 'stack=|INSTRUMENTATION_RESULT|shortMsg|longMsg' "$report" | head -30
+exit 1

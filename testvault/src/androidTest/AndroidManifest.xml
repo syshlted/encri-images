@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: SystemHalted
+     SPDX-License-Identifier: Apache-2.0
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Starts one of encri's screens with startActivityForResult, which encri's consent screen requires so it
+        can name the app from the system rather than from the request (encri-api PROTOCOL.md). Not exported:
+        only this package starts it.
+    -->
+    <application android:label="Encri Images test vault">
+        <activity
+            android:name="com.systemhalted.encri.images.testvault.ResultHost"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    </application>
+
+</manifest>

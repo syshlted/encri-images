@@ -58,7 +58,7 @@ every task a workflow runs (encri D7):
 ```sh
 rm gradle/verification-metadata.xml
 ./gradlew --write-verification-metadata sha256 --refresh-dependencies --rerun-tasks \
-  ktlintCheck detekt allUnitTests koverVerify koverXmlReport assemble bundleRelease
+  ktlintCheck detekt allUnitTests koverVerify koverXmlReport assemble assembleAndroidTest bundleRelease
 ```
 
 **Changing what a user receives** means updating the lockfile, which STRICT mode demands:
@@ -107,7 +107,8 @@ JDK 21, ktlint 1.8.0, detekt 1.23.8, Kover 0.9.9, JUnit 5.14.4 and Robolectric 4
 action SHAs and encri-api pin. Dependencies are pinned twice, by sha256 and by lockfile.
 
 **minSdk 27, down from Glimpse's 30**, because encri's floor is 27 and anyone on it should have a gallery. Lint finds
-no `NewApi` in what remains, and that is all that has been checked: nothing has run below API 30.
+no `NewApi` in what remains, and that is all that has been checked: nothing has run below API 30. *Amended by I6:
+it did not start below API 30, which lint could not see, and it now starts on API 28 and 29.*
 
 **AndroidX stays, where encri-files has none** (encri-files F1). Its screens are the reason to fork Glimpse.
 
@@ -268,3 +269,48 @@ key in common. I4 signed the release build with the debug key to reach an encri 
 release does not need that. A phone without encri gets it from the user.
 
 ---
+
+### I6 — Device tests: a test vault of its own, and the app measured through its own grant
+*2026-11-03 · accepted at the user's direction ("let's [go] on steps 1 and 2"); **flagged for veto on two points**
+(below). **Amends I1**'s minSdk paragraph.*
+
+**Two test APKs, because two identities.** The app's own instrumented tests, in `app/src/androidTest`, run in the
+app's process, so they reach encri as the app does, through its one `VaultLink` and with its `READ` grant, and ask
+for nothing more: `GateOnPhoneTest` and `WalkMeasurement`. What writes to the vault, seeding a library and removing
+it, runs from `:testvault`, a library module whose test APK instruments itself as
+`com.systemhalted.encri.images.testvault.test`: a uid and a grant of its own, with `READ`, `WRITE`, `CREATE` and
+`DELETE`. Seeding from the app's own tests would have asked encri to widen the app's grant.
+
+**encri's screens are pressed as encri-api's device tests press them** (encri-api L13): through the accessibility
+tree, only in encri's own window, matched on the English words encri-api's tests name. A locked vault needs its
+passphrase, as the argument `encriPassphrase`, which `scripts/device/instrument` takes from `ENCRI_PASSPHRASE`.
+
+**A seed is removed by the id it wrote down, never by a name.** `SeedLibrary` makes one new top folder and writes its
+id to the test package's own files before putting anything in it; `RemoveLibrary` deletes those ids and nothing
+else. encri never gives an id to a second document, so a line left behind names nothing.
+
+**`scripts/device/instrument` runs one class on one phone**: it builds, installs with `-r` and runs `am instrument`,
+for encri-api L13's reason (the Gradle task uninstalls the test APK, and that drops the grant encri keyed on the
+install). It wakes the phone and dismisses a keyguard that is only a swipe, because the first run on the A20 failed
+on a screen that had timed out, with every activity stopped.
+
+**CI compiles the device tests' APKs and runs none**, since CI has no encri.
+
+**What they found at once: the app did not start below API 30.** Glimpse's theme asks for the cutout mode `always`,
+which API 30 added, and API 28 and 29 refuse it when an activity starts. Lint checks an attribute against the API
+level but not an enum's value, which is how I1's check missed it. `values/` now asks for `shortEdges` and
+`values-v30/` keeps `always`. With that, the gate shows on the G6 (API 28) and the S9 (API 29), which have no encri,
+and the gallery on the A20 (API 30).
+
+*Rejected:* a stand-in encri in CI, as encri-api's `CrossProcessTest` has. Its way in, `ServiceBinding.connect`, is
+internal to the client, so an app outside encri-api cannot bind one, and this app's unit tests already stand in at
+its own seam (`VaultSession`). *Rejected:* `UiAutomator`, for L13's reason. *Rejected:* seeding by copying files in
+through encri-files' screens, which would test encri-files.
+
+**Flagged for veto:**
+
+1. **The passphrase is an instrumentation argument**, so it is in the phone's process list while a run lasts:
+   encri-api L13's flag, again, and for a test vault only.
+2. **The seed's package is let into the whole vault with the rights to write**, by pressing *Allow* itself, on
+   whichever phone it runs on. It writes only under its own top folder, but encri's grant does not know that.
+

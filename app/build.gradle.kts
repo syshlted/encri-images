@@ -27,6 +27,9 @@ android {
         // on the version code too (encri D120), so every change to it asks the user again.
         versionCode = 1_000
         versionName = "0.1.0"
+
+        // The device tests (I6), run in this app's own process, with its grant and nothing more.
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -105,6 +108,9 @@ dependencies {
     testImplementation(libs.junit4)
     testImplementation(libs.androidx.test.core)
     testRuntimeOnly(libs.junit.vintage.engine)
+
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.junit)
 }
 
 tasks.withType<Test>().configureEach {
@@ -137,5 +143,5 @@ ktlint {
 }
 
 detekt {
-    source.setFrom(files("src/main/kotlin", "src/test/kotlin"))
+    source.setFrom(files("src/main/kotlin", "src/test/kotlin", "src/androidTest/kotlin"))
 }

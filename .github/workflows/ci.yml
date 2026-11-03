@@ -55,8 +55,9 @@ jobs:
         run: scripts/hooks/gradle-task allUnitTests
 
       # The release APK, minified, as well as the debug one: the unit tests compile only the debug variant.
+      # And the device tests' APKs (I6), which only a phone runs, so that CI at least compiles them.
       - name: Build the APKs
-        run: scripts/hooks/gradle-task assemble
+        run: scripts/hooks/gradle-task assemble assembleAndroidTest
 
       - name: Coverage (Kover, I1)
         run: scripts/hooks/gradle-task koverVerify

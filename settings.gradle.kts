@@ -43,3 +43,6 @@ rootProject.name = "encri-images"
 includeBuild(providers.gradleProperty("encri.api.dir").getOrElse("../encri-api"))
 
 include(":app")
+
+// A vault for the device tests to seed and remove, from a package of its own (I6).
+include(":testvault")

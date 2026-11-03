@@ -2,6 +2,15 @@
 
 What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is next.
 
+## 2026-11-03
+
+**Device tests** (I6). `GateOnPhoneTest` and `WalkMeasurement` run in the app's own process, with its grant;
+`SeedLibrary` and `RemoveLibrary` write a test library from a package of their own, `:testvault`, and remove it by the
+id they wrote down. `scripts/device/instrument` runs one class on one phone, and CI now compiles their APKs.
+
+**Fixed: the app crashed at launch below API 30.** Glimpse's theme asked for a cutout mode API 30 added. Found by the
+gate's device test on the G6 (API 28) and the S9 (API 29), where it now passes, as it does on the A20 (API 30).
+
 ## 2026-11-02
 
 **Nothing from encri's closed repository** (I5). The phones and the code-server container are now described here rather
