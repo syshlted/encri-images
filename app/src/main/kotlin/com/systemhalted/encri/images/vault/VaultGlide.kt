@@ -8,6 +8,7 @@ package com.systemhalted.encri.images.vault
 import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.Priority
@@ -44,7 +45,14 @@ object VaultGlide {
         context: Context,
         link: VaultLink,
     ) {
-        Glide.init(context, GlideBuilder().setDiskCache(DiskCache.Factory { DiskCacheAdapter() }))
+        Glide.init(
+            context,
+            GlideBuilder()
+                .setDiskCache(DiskCache.Factory { DiskCacheAdapter() })
+                // Glide logs a failed load at WARN with its model, which here is a document's URI and so its id,
+                // and nothing that names a document may reach a log (encri D8, D85). Seen on the A20 (I8).
+                .setLogLevel(Log.ERROR),
+        )
         Glide
             .get(context)
             .registry

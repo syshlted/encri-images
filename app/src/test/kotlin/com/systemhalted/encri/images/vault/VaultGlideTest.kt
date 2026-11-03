@@ -32,6 +32,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLog
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
@@ -144,6 +145,28 @@ class VaultGlideTest {
         assertNotNull(loading.get())
         assertEquals(listOf(Triple("photo", 4, 4)), session.thumbnailsAsked)
         assertEquals(before, filesUnder(context.cacheDir) + filesUnder(context.filesDir))
+    }
+
+    @Test(timeout = 30_000)
+    fun `a load that fails is not logged with the document it was for`() {
+        VaultGlide.install(context, link)
+        session.thumbnail = EncriResult.Failed(Failure.UNSUPPORTED, "cannot render")
+        ShadowLog.clear()
+        val loading =
+            Glide
+                .with(context)
+                .asBitmap()
+                .load(VaultUris.document("a-document-id"))
+                .set(VaultGlide.PREVIEW, true)
+                .override(4, 4)
+                .submit()
+        while (!loading.isDone) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(5)
+        }
+        assertTrue("the load did not fail", runCatching { loading.get() }.isFailure)
+        val named = ShadowLog.getLogs().filter { "a-document-id" in it.msg.orEmpty() }
+        assertEquals(emptyList<String>(), named.map { "${it.tag}: ${it.msg}" })
     }
 
     private fun filesUnder(dir: File): Set<String> = dir.walkTopDown().map(File::getPath).toSet()
