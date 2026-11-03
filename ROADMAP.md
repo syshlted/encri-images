@@ -11,9 +11,11 @@ tell from a right one · **S3** wrong under a narrow race, or a cost nobody chos
 The first version shows the vault and does nothing else (I3, I4). What follows puts back what a gallery is expected
 to do, each with a design of its own rather than Glimpse's.
 
-1. **Measure a real library elsewhere.** The A20 and the S9 are measured at 5,000 photos, and the walk stays (I8,
-   I9). Still to measure: the G6 (API 28), once its vault exists; API 27 and 33+, which need encri on an emulator and
-   the S24; and a library of 20,000, where the A20's estimate is four to five seconds before Reels shows anything.
+1. **Measure a real library elsewhere.** The A20, the S9 and the G6 are measured at 5,000 photos, and the walk stays
+   (I8, I9). Still to measure: API 27 and 33+, which need encri on an emulator and the S24; and a library of 20,000,
+   where the A20's estimate is four to five seconds before Reels shows anything. On the G6 a walk is bound by the
+   CPU's clock, a second or more at 2,000 photos (I9): listing a few folders at a time would overlap encri's round
+   trips, to be measured before it is chosen.
 2. **Subsampling for large images.** ZoomImage does not subsample a vault photo, so zooming magnifies the screen's
    decode (I8). A `SubsamplingImageGenerator` of this app's own, reading through `openRead`, with its tiles in
    Glide's memory cache, which a lock clears.

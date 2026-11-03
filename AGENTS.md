@@ -20,8 +20,9 @@ and in encri-api's for the wire. It is not restated here. What this file owns is
 **The first version reads and shows, and nothing else (2026-11-01).** It connects to encri, asks to read, unlocks
 through encri's screen, shows Reels, Albums and Library from the vault, opens photos, and plays videos with seeking.
 It hands a photo or video to another app only through encri's handoff, once the user has agreed (I10), and deletes
-one the user chose, asking encri for that right the first time (I11); it changes nothing else in the vault. Checked by hand on the A20 (API 30); see I4. Since
-2026-11-03 it starts on API 28 and 29 as well (I6), and the A20 is measured at 5,000 photos (I8).
+one the user chose, asking encri for that right the first time (I11); it changes nothing else in the vault. Checked
+by hand on the A20 (API 30); see I4. Since 2026-11-03 it starts on API 28 and 29 as well (I6), and the A20, the S9
+and the G6 are measured at 5,000 photos (I8, I9).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
 ## Relationship to the others
@@ -82,6 +83,10 @@ The same machine as encri-api and encri-files.
 - **Play Protect on the S9 asks to send the test vault's APK to Google** at every `adb install` of it, and the install
   waits on the question, so `scripts/device/instrument` sits silent until *Don't send* is pressed on the phone (seen
   2026-11-03; *Don't send* was pressed both times).
+- **Measure the G6 with an opaque screen in front**, such as Settings. Its wallpaper is a live one, which takes about a
+  fifth of a core whenever the home screen shows, and `WalkMeasurement` has no screen of its own. Its CPU governor is
+  `interactive`, so anything else running raises the clock and speeds a walk up: a shell loop reading the clock every
+  200 ms cut one to a third (I9).
 - **`uiautomator dump` hangs while a video plays**, and a window with `FLAG_SECURE` cannot be captured (`screencap`
   exits 1). A throwaway local build with `SecureWindows` emptied is how the screens were looked at. Never commit one.
 
@@ -423,23 +428,40 @@ pins, which the user named and adb installed. Nothing of it is in this repositor
 made on encri's own first screen with passphrases generated for them and kept outside this repository, as the user
 asked ("These are tests. You can generate and manage the passphrases."). Creating a vault asks for the phone's own
 fingerprint or pattern, which only the user can give, so a new phone's vault takes the user once. The G6's waits on
-that, and is not measured here.
+that, and is not measured here. *Amended 2026-11-03: the user gave it the same day, and the G6 is measured below.*
 
-**The S9 (API 29) against the A20 (API 30, I8)**, with the same two libraries, seeded and removed the same way:
+**The S9 (API 29) against the A20 (API 30, I8)**, with the same two libraries, seeded and removed the same way, and
+the G6 (API 28) added the same day:
 
-| | A20 | S9 |
-|---|---|---|
-| Walk of about 2,080 photos in about 50 folders, again | 648–672 ms | 285–337 ms |
-| Walk of about 5,080, with 3,000 in one folder, again | 1,056–1,164 ms | 509–515 ms |
-| The folder of 3,000, listed | 362–442 ms | 173–196 ms |
-| A folder of about 50, listed | 11 ms | 5 ms |
-| A 180x180 preview, one at a time (median) | 62–68 ms | 46–50 ms |
-| Previews, four at a time | 54–56 a second | 62–64 a second |
-| A 4000x3000 photo read | 15–16 MiB/s | 23 MiB/s |
-| Twenty flings up Reels: janky, 99th percentile | 7–10%, 30–48 ms | 0.6–2%, 14–24 ms |
+| | A20 | S9 | G6 |
+|---|---|---|---|
+| Walk of about 2,080 photos in about 50 folders, again | 648–672 ms | 285–337 ms | 947–1,356 ms |
+| Walk of about 5,080, with 3,000 in one folder, again | 1,056–1,164 ms | 509–515 ms | 513–602 ms |
+| The folder of 3,000, listed | 362–442 ms | 173–196 ms | 169–253 ms |
+| A folder of about 50, listed | 11 ms | 5 ms | 14–24 ms, or 5 with the clock up |
+| A 180x180 preview, one at a time (median) | 62–68 ms | 46–50 ms | 41–55 ms |
+| Previews, four at a time | 54–56 a second | 62–64 a second | 65–71 a second |
+| A 4000x3000 photo read | 15–16 MiB/s | 23 MiB/s | 14–20 MiB/s |
+| Twenty flings up Reels: janky, 99th percentile | 7–10%, 30–48 ms | 0.6–2%, 14–24 ms | 59–88%, 57–65 ms |
 
 On the S9 the app held 188 MB during the flings at 5,082 photos, 66 MB of it graphics at its 1080x2220. The walk's
 shape is the A20's at about half the cost, so I8's decision stands.
+
+**On the G6 a walk costs what the CPU's clock allows.** The library of 2,080 walked slower than on the A20, and the
+one of 5,080 in half the time. A walk of small folders is a string of short requests to encri with a wait between
+each, and the G6's `interactive` governor leaves the clock low through it; the folder of 3,000 keeps a core busy for
+200 ms, and the folders after it list at the clock that raised. With nothing changed but a shell loop on the phone
+reading the clock every 200 ms, the same walk of 2,080 took 325 to 471 ms and a folder of fifty 5 ms, the S9's
+figures, and alone again 0.95 to 1.36 seconds. A walk with a finger on the screen may be quicker, since the governor
+boosts on touch; not measured. Listing a few folders at a time would overlap the waits (`ROADMAP.md`); I8's decision
+stands. The 5,080 were measured with the home screen behind, whose live wallpaper may have raised the clock too, and
+the 2,080 both ways, alike.
+
+**Reels drops most frames on the G6**: 59 to 88% janky over twenty flings, the median frame 19 to 24 ms, at its
+panel's own 1440x2880. At a temporary 1080x2160, near the S9's size, 48% were. In the frames the platform kept, the UI
+thread's 90th percentile was 24.5 ms and drawing waited 13.4 ms for a buffer: a 2017 phone's CPU and GPU at its own
+resolution, both, rather than something the app does on this phone alone. The app held 254 to 276 MB, 127 to 132 MB
+of it graphics.
 
 **A grant of one folder reaches that folder and nothing else.** Asked on encri's consent screen for *one folder only*
 and given the first library, the walk found its 2,082 photos in 43 albums across its 50 folders, and nothing of the
@@ -458,7 +480,8 @@ end, or the app be told. Polling for it was rejected in I7.
 **`scripts/device/scroll` drew no frames on the S9 at first.** It draws at an override of 1080x2220 on a 1440x2960
 panel, and input is given in the override, so every fling began below the screen. The script takes the override now.
 
-**Not measured, and not to be assumed:** the G6, until its vault exists; API 27 and 33+; video; 20,000 photos.
+**Not measured, and not to be assumed:** the G6, until its vault exists (*amended: measured above*); API 27 and 33+;
+video; 20,000 photos.
 
 ### I10 — Share and open with: encri's handoff, said first every time, and never back to encri
 *2026-11-03 · accepted (step 3 of the integration plan); **flagged for veto on two points** (below). **Amends I3** on
@@ -498,6 +521,9 @@ with nothing to take it. Showing the dialog without `SecureWindows.secure` fails
 0.1.0:** the dialog, its window with `FLAG_SECURE`; the share sheet, with one item and, in its full list of fourteen
 apps, no encri; and *Open with*, which Android passed straight to Samsung's gallery, the one app there that views an
 image, and which showed the test photo it read through the handoff. Nothing was sent to an app that uploads.
+**And on the G6 (API 28)**, the same day: the dialog's window `SECURE`; a share sheet of ten apps, without encri's
+`ShareToEncri`, the eleventh the package manager lists for a shared image; and *Open with*, which Android passed
+straight to LG's gallery, the one viewer there, which showed the photo.
 
 **Flagged for veto:**
 
@@ -544,7 +570,9 @@ a failure said without naming the photo. **On the S9, against encri 0.1.0:** wit
 folders*; after *Allow the whole vault* the viewer asked *Delete this photo?* at once, and *Delete* moved it to the next
 photo. A fresh process's walk found the camera folder at five photos, down from six. A second *Delete* went straight to
 the question. Whether encri ended the old session or widened its grant in place was not seen, since encri logs
-neither; the app waits for either, and `PROTOCOL.md` says neither.
+neither; the app waits for either, and `PROTOCOL.md` says neither. **And on the G6 (API 28)**, the same day, the
+same: *Allow in encri*, encri's screen listing both rights, *Delete this photo?* at once after *Allow the whole vault*,
+the photo gone from a fresh walk (2,081 of 2,082), and a second *Delete* straight to the question.
 
 **Not built:** several at once (`ROADMAP.md`). **Not measured:** deleting a video on a phone; the unit tests cover the
 library, not the viewer's playback position.
