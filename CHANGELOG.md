@@ -2,6 +2,11 @@
 
 What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is next.
 
+## 2026-11-02
+
+**Nothing from encri's closed repository** (I5). The phones and the code-server container are now described here rather
+than by reference to encri's notes.
+
 ## 2026-11-01
 
 **Forked from LineageOS Glimpse** at `89b4735` as `syshlted/encri-images`, with `lineage-24.0` renamed to `master`.

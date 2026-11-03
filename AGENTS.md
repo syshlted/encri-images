@@ -28,6 +28,8 @@ The fork on GitHub still holds only Glimpse's history, and nothing is released. 
   *encri-files F2*. Four logs each numbered from 1 would make "D3" mean four things.
 - **About the app, this file wins.** About the contract, encri-api's does; about encri's internals, encri's does.
 - **Upstream is Glimpse**, as the `upstream` remote. `config/upstream-fork-point` is the commit forked from.
+- **Nothing here comes from encri's own repository**, which is closed (I5). encri-api and encri-files are the open
+  sources to work from.
 
 ---
 
@@ -64,7 +66,13 @@ rm gradle/verification-metadata.xml
 
 ## Local development environment
 
-The same machine as encri, encri-api and encri-files, and encri's notes on its JDKs, phones and emulators apply.
+The same machine as encri-api and encri-files.
+
+- **The phones:** LG G6 (API 28), Galaxy S9 (API 29), Galaxy A20 (API 30) and Galaxy S24 Ultra (API 37, read from the
+  phone 2026-11-02). `adb` is in `~/Android/Sdk/platform-tools`, not on `PATH`.
+- **A shell here can be inside the code-server container**, which has a `/dev` and a `gpg-agent` of its own. A phone
+  enumerated after the container's `/dev` was made is listed in `/sys/bus/usb/devices` but has no device node, so `adb`
+  does not see it, and a key unlocked outside the container is still locked inside it (seen 2026-11-02).
 
 - **Set `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`**, and never run two Gradle invocations at once, here or in a
   sibling: the included encri-api build is one more set of outputs for them to fight over.
@@ -242,5 +250,21 @@ of about 150 lines. *Rejected:* changing `Media` to carry a document id rather t
 1. **Reels sorts by last change, not by when a photo was taken**, so a photo copied in today reads as today's.
 2. **A full image is decoded in this app's process**, not an isolated one. It holds no keys, but it does hold whatever
    else the user has opened.
+
+### I5 — Nothing from encri's closed repository
+*2026-11-02 · accepted at the user's direction ("encri-files and encri-images will be open-source. encri will not be.")*
+
+**This repository is public and encri's is not, so nothing here comes from encri's**: no source, record, document,
+build output, APK or test fixture, and its records are not read to settle a question here.
+
+**What this app relies on must be said by encri-api or seen from outside**: in the contract, `PROTOCOL.md`, encri-api's
+records or encri-files', or observed of an installed encri, as any app could. When none of them answers, the gap is
+raised in encri-api or with the user. A citation such as *encri D112* stays as a name for a reason given elsewhere, and
+is not something to go and read.
+
+**Testing is against an encri installed on a phone.** The S24 Ultra's encri 0.1.0 is signed by the certificate
+`EncriTrust.RELEASE_CERTIFICATES` pins (read from the phone 2026-11-02), so a debug build of this app trusts it with no
+key in common. I4 signed the release build with the debug key to reach an encri signed by that key, and an encri from a
+release does not need that. A phone without encri gets it from the user.
 
 ---
