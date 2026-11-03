@@ -8,6 +8,12 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 `SeedLibrary` and `RemoveLibrary` write a test library from a package of their own, `:testvault`, and remove it by the
 id they wrote down. `scripts/device/instrument` runs one class on one phone, and CI now compiles their APKs.
 
+**Measured on the A20 at 5,000 photos** (I8): a walk of a second or so, previews at 55 a second, and 7–10% janky
+frames over fast flings. The walk stays. ZoomImage turned out not to subsample a vault photo.
+
+**Fixed: document ids in the log** (I8). Glide logged every failed load with its URI, and ZoomImage made one for every
+photo opened.
+
 **Fixed: a lock or an unlock that encri's events did not carry** (I7). The link now hears them in what encri answers,
 and asks a session it believes locked whether it still is, so the gate no longer sticks on *locked* after an unlock it
 missed.

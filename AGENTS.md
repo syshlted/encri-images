@@ -19,7 +19,8 @@ and in encri-api's for the wire. It is not restated here. What this file owns is
 
 **The first version reads and shows, and nothing else (2026-11-01).** It connects to encri, asks to read, unlocks
 through encri's screen, shows Reels, Albums and Library from the vault, opens photos, and plays videos with seeking.
-It changes nothing in the vault and hands nothing to another app. Checked by hand on the A20 (API 30); see I4.
+It changes nothing in the vault and hands nothing to another app. Checked by hand on the A20 (API 30); see I4. Since
+2026-11-03 it starts on API 28 and 29 as well (I6), and the A20 is measured at 5,000 photos (I8).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
 ## Relationship to the others
@@ -339,4 +340,66 @@ small read), and that answer is heard like any other. The interface still only r
 
 **Checked by unit tests only** (ten new, 71 in all). Not on a phone, where a real lock would need the vault's passphrase
 to undo, and these runs have not been given it.
+
+### I8 — A library of 5,000 on the A20: the walk stays, and zoom does not subsample
+*2026-11-03 · accepted (step 2 of the integration plan, "measure"); **flagged for veto on one point** (below).
+Answers `ROADMAP.md`'s *Measure a real library* for the A20, and *Pinch zoom and large images* as far as reading
+ZoomImage's code.*
+
+**Measured on the A20 (API 30), debug build, against its encri 0.1.0**, with libraries `SeedLibrary` made: generated
+photos with a camera's grain, so a 1600x1200 is 530 KiB and a 4000x3000 3.2 MiB, dated back over three years.
+`WalkMeasurement` and `scripts/device/scroll` measured them, then `RemoveLibrary` took them away.
+
+| The vault | Walk, first and again | Folders | Heap held |
+|---|---|---|---|
+| Its own: 5 photos and videos | 230 ms | 4 | 62 KiB |
+| 2,087, in 45 albums of up to 51 | 1,117 ms, then 648 and 672 | 54 | 660 KiB |
+| 5,087: those, and 3,000 in one folder | 1,521 ms, then 1,056 and 1,164 | 56 | 1.6 MiB |
+
+**The walk costs about 11 ms a folder and 0.12 ms an entry**: a folder of fifty lists in 11 ms, and the one of 3,000 in
+362 to 442 ms over 15 pages. On those figures 20,000 photos in 200 folders would walk in four to five seconds, which is
+an estimate, not a measurement. The library holds about 320 bytes a photo.
+
+| Asked of encri | Measured |
+|---|---|
+| A 180x180 preview of a 1600x1200 photo, one at a time | median 62–68 ms, 90th percentile 68–74 ms |
+| The same, four at a time as Glide asks | 54–56 a second |
+| A 4000x3000 photo, opened, read and decoded for the screen | 16–24 ms, 188–209 ms (15–16 MiB/s), 177–183 ms |
+| An 8000x6000 photo, the same | about 20 ms, 0.94–1.02 s (12–13 MiB/s), 456–464 ms |
+
+| Twenty flings up Reels | Frames | Janky | 50th / 90th / 99th percentile | Memory (PSS, Java heap) |
+|---|---|---|---|---|
+| 2,087 photos | 2,046 | 9.6% | 7 / 16 / 30 ms | 124 MB, 21 MB |
+| 5,087 photos | 1,450 | 7.1% | 6 / 13 / 48 ms | 131 MB, 25 MB |
+
+With the 8000x6000 photo open in the viewer the app held 115 to 133 MB over two openings, and its data directory held
+one file, AndroidX ProfileInstaller's note of when it last wrote a profile, and nothing of the vault.
+
+**So the walk stays, and encri-api is not asked for a query across folders** (I4's rejection stands). At 5,000 photos a
+first walk is a second and a half before Reels shows anything, and a return to the gallery costs encri another second
+that publishes nothing new. Publishing a walk a folder at a time was not chosen either: Reels is newest first across
+every folder, so a partial walk would reorder itself as it finished.
+
+**ZoomImage never subsamples a vault photo**, read from its 1.4.0 classes. For a Glide model it knows only http(s),
+`content`, `file` and assets; for anything else it asks Glide for the picture as a file with `onlyRetrieveFromCache`,
+and `VaultGlide`'s disk cache is empty by design, so that fails. Zooming magnifies the bitmap Glide decoded for the
+screen, and an 8000x6000 photo zoomed shows no more than its screen-sized decode. Nothing is written: the request only
+reads the cache. Subsampling would need a `SubsamplingImageGenerator` of this app's own that reads through `openRead`;
+that is `ROADMAP.md`'s, and not built.
+
+**What it found besides: document ids in the log.** Glide logs a failed load at `WARN` with its model, here a
+document's `encri-vault://` URI, and ZoomImage's request fails for every photo opened, so each one put its id in
+logcat. `VaultGlide` sets Glide's level to `ERROR`, and a unit test fails a load and reads the log. After the fix,
+opening the 8000x6000 photo and ten flings up Reels logged no vault URI and no seeded file's name.
+
+**Not measured, and not to be assumed:** anything but the A20, because the G6 and the S9 have no encri and the S24
+was not attached; a library of 20,000; video; a grant of one folder, which needs the app's grant changed on encri's
+own screen. The gate test ran on all three phones (I6).
+
+*Rejected:* a query across folders in encri-api, for now. *Rejected:* a partial walk published as it goes.
+
+**Flagged for veto:**
+
+1. **A first walk of a large library shows nothing until it ends**, a second and a half at 5,000 on the A20, and by
+   estimate several seconds at 20,000.
 

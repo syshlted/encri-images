@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: SystemHalted
+# SPDX-License-Identifier: Apache-2.0
+#
+# Flings through the Reels grid of the installed app and prints what the frames and the memory cost (AGENTS.md I8).
+#
+#   scripts/device/scroll <serial> [flings] [settle seconds]
+#
+# The app's windows are FLAG_SECURE, so nothing here can see the screen; the platform's own frame statistics
+# (dumpsys gfxinfo) and memory (dumpsys meminfo) can. The app is started fresh, given [settle] seconds (default 5)
+# to walk the vault and draw, and flung upwards [flings] times (default 20), 700 ms apart, so encri's previews are
+# asked for as fast as a thumb would ask for them. The screen must be on and unlocked.
+#
+# ADB overrides the adb command.
+set -euo pipefail
+
+serial=${1:?usage: scroll <serial> [flings] [settle seconds]}
+flings=${2:-20}
+settle=${3:-5}
+adb=(${ADB:-$HOME/Android/Sdk/platform-tools/adb} -s "$serial")
+package=com.systemhalted.encri.images
+
+"${adb[@]}" shell input keyevent KEYCODE_WAKEUP
+"${adb[@]}" shell wm dismiss-keyguard
+read -r width height < <("${adb[@]}" shell wm size | sed -n 's/^Physical size: \([0-9]*\)x\([0-9]*\).*/\1 \2/p' | tr -d '\r')
+
+"${adb[@]}" shell am force-stop "$package"
+"${adb[@]}" shell am start -W -n "$package/.MainActivity" | tr -d '\r' | sed -n 's/^TotalTime: /started in (ms): /p'
+sleep "$settle"
+"${adb[@]}" shell dumpsys gfxinfo "$package" reset > /dev/null
+
+x=$((width / 2)); from=$((height * 4 / 5)); to=$((height / 5))
+for _ in $(seq "$flings"); do
+  "${adb[@]}" shell input swipe "$x" "$from" "$x" "$to" 120
+  sleep 0.7
+done
+sleep 1
+
+"${adb[@]}" shell dumpsys gfxinfo "$package" | tr -d '\r' | grep -E \
+  '^(Total frames rendered|Janky frames|50th|90th|95th|99th|Number Missed Vsync|Number High input latency|Number Slow UI thread|Number Slow bitmap uploads|Number Slow issue draw commands|Number Frame deadline missed)' \
+  | sort -u
+"${adb[@]}" shell dumpsys meminfo "$package" | tr -d '\r' | grep -E '^ *(Java Heap|Native Heap|Graphics|TOTAL PSS|TOTAL):' | sed 's/^ *//'
