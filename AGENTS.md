@@ -79,6 +79,9 @@ The same machine as encri-api and encri-files.
 - **Set `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`**, and never run two Gradle invocations at once, here or in a
   sibling: the included encri-api build is one more set of outputs for them to fight over.
 - **encri-api must be checked out beside this one**, at `../encri-api`, or pointed at with `-Pencri.api.dir=<path>`.
+- **Play Protect on the S9 asks to send the test vault's APK to Google** at every `adb install` of it, and the install
+  waits on the question, so `scripts/device/instrument` sits silent until *Don't send* is pressed on the phone (seen
+  2026-11-03; *Don't send* was pressed both times).
 - **`uiautomator dump` hangs while a video plays**, and a window with `FLAG_SECURE` cannot be captured (`screencap`
   exits 1). A throwaway local build with `SecureWindows` emptied is how the screens were looked at. Never commit one.
 
