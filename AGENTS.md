@@ -267,7 +267,8 @@ is not something to go and read.
 **Testing is against an encri installed on a phone.** The S24 Ultra's encri 0.1.0 is signed by the certificate
 `EncriTrust.RELEASE_CERTIFICATES` pins (read from the phone 2026-11-02), so a debug build of this app trusts it with no
 key in common. I4 signed the release build with the debug key to reach an encri signed by that key, and an encri from a
-release does not need that. A phone without encri gets it from the user.
+release does not need that. A phone without encri gets it from the user. *Amended by I9: the S9 and the G6 have
+encri's release build, installed at the user's direction.*
 
 ---
 
@@ -402,4 +403,50 @@ own screen. The gate test ran on all three phones (I6).
 
 1. **A first walk of a large library shows nothing until it ends**, a second and a half at 5,000 on the A20, and by
    estimate several seconds at 20,000.
+
+### I9 — The S9 at 5,000, a grant of one folder, and a grant whose folder is gone
+*2026-11-03 · accepted at the user's direction ("Let's test the other 2 phones as well"). **Amends I5** on where a test
+phone's encri comes from, and **raises a question for encri-api** (below).*
+
+**encri on the S9 and the G6 is its release build, 0.1.0**, signed by the certificate `EncriTrust.RELEASE_CERTIFICATES`
+pins, which the user named and adb installed. Nothing of it is in this repository. **Their vaults are test vaults**,
+made on encri's own first screen with passphrases generated for them and kept outside this repository, as the user
+asked ("These are tests. You can generate and manage the passphrases."). Creating a vault asks for the phone's own
+fingerprint or pattern, which only the user can give, so a new phone's vault takes the user once. The G6's waits on
+that, and is not measured here.
+
+**The S9 (API 29) against the A20 (API 30, I8)**, with the same two libraries, seeded and removed the same way:
+
+| | A20 | S9 |
+|---|---|---|
+| Walk of about 2,080 photos in about 50 folders, again | 648–672 ms | 285–337 ms |
+| Walk of about 5,080, with 3,000 in one folder, again | 1,056–1,164 ms | 509–515 ms |
+| The folder of 3,000, listed | 362–442 ms | 173–196 ms |
+| A folder of about 50, listed | 11 ms | 5 ms |
+| A 180x180 preview, one at a time (median) | 62–68 ms | 46–50 ms |
+| Previews, four at a time | 54–56 a second | 62–64 a second |
+| A 4000x3000 photo read | 15–16 MiB/s | 23 MiB/s |
+| Twenty flings up Reels: janky, 99th percentile | 7–10%, 30–48 ms | 0.6–2%, 14–24 ms |
+
+On the S9 the app held 188 MB during the flings at 5,082 photos, 66 MB of it graphics at its 1080x2220. The walk's
+shape is the A20's at about half the cost, so I8's decision stands.
+
+**A grant of one folder reaches that folder and nothing else.** Asked on encri's consent screen for *one folder only*
+and given the first library, the walk found its 2,082 photos in 43 albums across its 50 folders, and nothing of the
+3,000 beside it. **Turning the app out takes the gallery away**: with the gallery in the background, encri's *Turn out
+Encri Images*, and back in the same process, the gate asked for permission.
+
+**Found: a grant whose folder is deleted.** encri lets the app in no longer: a cold start answers *not authorized*.
+But a walk took the missing root for a folder deleted under it and showed an empty gallery, which says the folder is
+empty. **The root not found is now the session's end**, so the link asks encri again and the gate says why there is
+nothing; seen on the S9 after the fix. **And a gallery in front hears nothing at all**, because the change is to the
+root's parent, which the grant does not reach, so it goes on showing the deleted folder's albums until something walks
+again. `PROTOCOL.md` says a session ends when the app ends it, its process dies, the user turns it out or turns access
+off, and not when its folder goes. **That is a question for encri-api, not decided here**: whether the session should
+end, or the app be told. Polling for it was rejected in I7.
+
+**`scripts/device/scroll` drew no frames on the S9 at first.** It draws at an override of 1080x2220 on a 1440x2960
+panel, and input is given in the override, so every fling began below the screen. The script takes the override now.
+
+**Not measured, and not to be assumed:** the G6, until its vault exists; API 27 and 33+; video; 20,000 photos.
 

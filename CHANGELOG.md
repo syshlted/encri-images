@@ -8,6 +8,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 `SeedLibrary` and `RemoveLibrary` write a test library from a package of their own, `:testvault`, and remove it by the
 id they wrote down. `scripts/device/instrument` runs one class on one phone, and CI now compiles their APKs.
 
+**Measured on the S9 at 5,000 photos** (I9), at about half the A20's cost, and **a grant of one folder** checked on a
+phone. **Fixed: a grant whose folder was deleted showed an empty gallery** where encri no longer lets the app in; the
+app asks encri again now, and the gate says why. A gallery left in front still shows the folder until it walks again.
+
 **Measured on the A20 at 5,000 photos** (I8): a walk of a second or so, previews at 55 a second, and 7–10% janky
 frames over fast flings. The walk stays. ZoomImage turned out not to subsample a vault photo.
 
