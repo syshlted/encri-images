@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-03
 
+**What encri does when a grant changes** (I12), seen on the G6 by two new probes, `GrantChanges` and `GrantGone`.
+Allowing a consent replaces the grant with exactly what was asked and ends the session; refusing changes nothing. A
+grant whose folder another app deletes is gone, but its session is not told.
+
 **Measured on the G6** (I9), once its vault was made. A walk there is bound by the CPU's clock: 0.95 to 1.36 seconds
 at 2,080 photos, and a third of that with the clock held up. Reels drops most frames at its 1440x2880. Share, open
 with and delete were checked on it too, on API 28 (I10, I11).

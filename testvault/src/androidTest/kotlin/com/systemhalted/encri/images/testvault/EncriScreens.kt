@@ -5,6 +5,7 @@
 
 package com.systemhalted.encri.images.testvault
 
+import android.accessibilityservice.AccessibilityService
 import android.app.Instrumentation
 import android.os.Bundle
 import android.os.SystemClock
@@ -45,6 +46,12 @@ internal class EncriScreens(
             }
         check(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, typed)) { "the passphrase field took nothing" }
         press(UNLOCK_WITH_PASSPHRASE)
+    }
+
+    /** Backs out of the screen in front, as the system's back button does, only when that screen is encri's. */
+    fun back() {
+        checkNotNull(encris()) { "encri's screen is not in front" }
+        check(automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)) { "back was not taken" }
     }
 
     /** Waits until one of [labels] is on screen, and answers which. */
@@ -96,6 +103,7 @@ internal class EncriScreens(
         const val UNLOCK_THE_VAULT = "Unlock the vault"
         const val TURN_ACCESS_ON = "Turn on access for other apps"
         const val ALLOW_THE_WHOLE_VAULT = "Allow the whole vault"
+        const val DONT_ALLOW = "Don't allow"
 
         private const val WAIT_MILLIS = 20_000L
         private const val POLL_MILLIS = 250L

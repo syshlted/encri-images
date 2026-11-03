@@ -475,7 +475,8 @@ nothing; seen on the S9 after the fix. **And a gallery in front hears nothing at
 root's parent, which the grant does not reach, so it goes on showing the deleted folder's albums until something walks
 again. `PROTOCOL.md` says a session ends when the app ends it, its process dies, the user turns it out or turns access
 off, and not when its folder goes. **That is a question for encri-api, not decided here**: whether the session should
-end, or the app be told. Polling for it was rejected in I7.
+end, or the app be told. Polling for it was rejected in I7. *Amended by I12: what encri does was seen, and the
+question stands.*
 
 **`scripts/device/scroll` drew no frames on the S9 at first.** It draws at an override of 1080x2220 on a 1440x2960
 panel, and input is given in the override, so every fling began below the screen. The script takes the override now.
@@ -570,7 +571,8 @@ a failure said without naming the photo. **On the S9, against encri 0.1.0:** wit
 folders*; after *Allow the whole vault* the viewer asked *Delete this photo?* at once, and *Delete* moved it to the next
 photo. A fresh process's walk found the camera folder at five photos, down from six. A second *Delete* went straight to
 the question. Whether encri ended the old session or widened its grant in place was not seen, since encri logs
-neither; the app waits for either, and `PROTOCOL.md` says neither. **And on the G6 (API 28)**, the same day, the
+neither; the app waits for either, and `PROTOCOL.md` says neither. *Amended by I12: encri ends it.* **And on the G6
+(API 28)**, the same day, the
 same: *Allow in encri*, encri's screen listing both rights, *Delete this photo?* at once after *Allow the whole vault*,
 the photo gone from a fresh walk (2,081 of 2,082), and a second *Delete* straight to the question.
 
@@ -581,3 +583,43 @@ library, not the viewer's playback position.
 
 1. **A delete cannot be undone here**: there is no bin (encri-files F5's flag, again).
 2. **The gate asks for `READ` alone**, so a user turned out and let in again loses `DELETE` until they next delete.
+
+### I12 — What encri does to a session when its grant changes, seen from outside
+*2026-11-03 · accepted at the user's direction ("can we answer the encri-api questions?"). **Answers I11's open
+question, and I9's as far as what encri does**; what encri-api promises is the user's to decide (below).*
+
+**Two probes ask encri and log what it does**, rather than asserting what it should: `:testvault`'s `GrantChanges`,
+which asks encri's consent screen again from a session that is open, five ways, and the app's `GrantGone`, which holds
+a session over a grant of one folder, asking nothing, while `:testvault`'s `RemoveLibrary` deletes that folder. Run on
+the G6 against encri 0.1.0. Neither names a document in what it logs.
+
+**Any consent the user allows replaces the grant and ends the app's session.** The screen answers with exactly the
+rights asked for, and the next session holds exactly those: asking for fewer narrows the grant, and nothing is merged
+with what it had. The old session hears `Ended` within three seconds and answers `ENDED` to everything, its grant
+included. Asking again for the rights already held does the same. **A consent refused or backed out of changes
+nothing**: the screen answers `RESULT_CANCELED` with no rights, and the old session goes on with its grant.
+
+| Asked, from what the row before left | The screen answered | The old session | The next session |
+|---|---|---|---|
+| R+W+C, from R+W+C+D, allowed | OK, R+W+C | heard `Ended`, then answered `ENDED` | R+W+C |
+| R+W+C+D, allowed | OK, R+W+C+D | the same | R+W+C+D |
+| R+W+C+D again, allowed | OK, R+W+C+D | the same | R+W+C+D |
+| R+W+C+D+M, *Don't allow* | cancelled, no rights | heard nothing; works, its grant R+W+C+D | R+W+C+D |
+| R+W+C+D+M, backed out of | cancelled, no rights | the same | R+W+C+D |
+
+**A grant whose folder another app deletes is gone, and its session is not told.** Over the sixty seconds in which
+the folder went, the session heard nothing, neither `Ended` nor a change, and still counted itself open. Then its root
+answered `NOT_FOUND` to a stat and to a list, `refreshGrant` answered `NOT_AUTHORIZED`, and a new session was not let
+in. encri drops the grant and leaves its session running with nothing to reach.
+
+**What it means here.** I11's wait for the session that replaces the old one is right, and every *Allow in encri* ends
+the session, whatever it is playing (`ROADMAP.md`'s S3). **An app gets exactly what it asks for, so it asks for every
+right it means to keep**: *Delete* asks for `READ` and `DELETE`, and a right added later is asked for with both. A
+user who refuses deleting keeps the gallery.
+
+**For encri-api, and the user's to decide:** whether `PROTOCOL.md` promises the first answer, which encri-files F5
+and I11 already rely on; and whether encri should end a session whose grant's folder is deleted, as it ends one whose
+app is turned out, rather than leave `NOT_FOUND` and `refreshGrant` for the app to work it out from.
+
+**Not seen:** a grant of one folder replaced by one of the whole vault, or the other way; the S9 or the A20, though
+they run the same encri.

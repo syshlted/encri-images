@@ -40,13 +40,16 @@ internal object TestVault {
     val context: Context get() = instrumentation.targetContext
     val arguments get() = InstrumentationRegistry.getArguments()
     private val passphrase: String? get() = arguments.getString("encriPassphrase")
-    private val screens = EncriScreens(instrumentation)
+    val screens = EncriScreens(instrumentation)
 
     /** The top folders this package has seeded and not yet removed, one id a line, in its own files. */
     val seeded: File get() = File(context.filesDir, "seeded-folders.txt")
 
     /** A connection and a session with [RIGHTS], which [use] closes. */
-    fun <T> use(use: (EncriSession) -> T): T {
+    fun <T> use(use: (EncriSession) -> T): T = connected { use(openSession(it)) }
+
+    /** A connection to encri, which [use] closes. */
+    fun <T> connected(use: (EncriConnection) -> T): T {
         assumeTrue("encri is not installed here", Encri.availability(context) != Availability.NotInstalled)
         val connection =
             when (val connected = blocking { Encri.connect(context) }) {
@@ -54,7 +57,7 @@ internal object TestVault {
                 else -> throw AssertionError("not connected to encri: $connected")
             }
         return try {
-            use(openSession(connection))
+            use(connection)
         } finally {
             connection.close()
         }
@@ -75,7 +78,8 @@ internal object TestVault {
         block: suspend CoroutineScope.() -> T,
     ): T = runBlocking { withTimeout(millis, block) }
 
-    private fun openSession(connection: EncriConnection): EncriSession {
+    /** A session over [connection] with [RIGHTS], asking encri's screens for them if it has not. */
+    fun openSession(connection: EncriConnection): EncriSession {
         repeat(ATTEMPTS) {
             when (val outcome = blocking { connection.openSession() }) {
                 is SessionOutcome.Opened -> {
