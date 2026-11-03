@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-FileCopyrightText: SystemHalted
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <!--
+        Glimpse's own cutout mode, "always", which exists from API 30. Below it the platform refuses the value
+        and the activity does not start, so values/ says "shortEdges" (I1's minSdk 27).
+    -->
+
+    <!-- Base application theme -->
+    <style name="Theme.Images" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <!-- Media viewer -->
+    <style name="Theme.Images.MediaViewer" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+    </style>
+</resources>
