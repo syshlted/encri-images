@@ -11,6 +11,7 @@ import com.systemhalted.encri.client.ConnectResult
 import com.systemhalted.encri.client.Encri
 import com.systemhalted.encri.client.EncriConnection
 import com.systemhalted.encri.client.EncriDocument
+import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.EncriSession
 import com.systemhalted.encri.client.SessionOutcome
@@ -74,6 +75,8 @@ private class ClientSession(
     ): EncriResult<ByteArray> = session.thumbnail(documentId, width, height)
 
     override suspend fun openRead(documentId: String): EncriResult<ParcelFileDescriptor> = session.openRead(documentId)
+
+    override suspend fun grant(): EncriResult<EncriGrant> = session.refreshGrant()
 
     override fun close() = session.close()
 }

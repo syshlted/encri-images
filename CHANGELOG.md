@@ -8,6 +8,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 `SeedLibrary` and `RemoveLibrary` write a test library from a package of their own, `:testvault`, and remove it by the
 id they wrote down. `scripts/device/instrument` runs one class on one phone, and CI now compiles their APKs.
 
+**Fixed: a lock or an unlock that encri's events did not carry** (I7). The link now hears them in what encri answers,
+and asks a session it believes locked whether it still is, so the gate no longer sticks on *locked* after an unlock it
+missed.
+
 **Fixed: the app crashed at launch below API 30.** Glimpse's theme asked for a cutout mode API 30 added. Found by the
 gate's device test on the G6 (API 28) and the S9 (API 29), where it now passes, as it does on the A20 (API 30).
 

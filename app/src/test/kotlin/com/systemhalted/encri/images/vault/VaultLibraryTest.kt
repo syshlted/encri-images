@@ -81,6 +81,15 @@ class VaultLibraryTest {
         }
 
     @Test
+    fun `a walk that finds the vault locked locks the link, and forgets everything`() =
+        runTest {
+            val rig = rig(FakeVaultSession(tree = tree).apply { listFailures["sub"] = Failure.LOCKED })
+            rig.link.open()
+            assertEquals(LinkState.Open(rig.session, locked = true), rig.link.state.value)
+            assertTrue(rig.library.state.value is RequestStatus.Loading)
+        }
+
+    @Test
     fun `a session that ends forgets everything`() =
         runTest {
             val session = FakeVaultSession(tree = tree)
@@ -145,9 +154,23 @@ class VaultLibraryTest {
     @Test
     fun `a failed walk reads as an error`() =
         runTest {
-            val rig = rig(FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.DISCONNECTED })
+            val rig = rig(FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.FAILED })
             rig.link.open()
             assertEquals(MediaError.IO, (rig.library.state.value as RequestStatus.Error).error)
+        }
+
+    @Test
+    fun `a walk that finds the session gone ends it, and the gate says why there is none`() =
+        runTest {
+            val session = FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.DISCONNECTED }
+            val scope = CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher(testScheduler))
+            val openings = ArrayDeque(listOf(Opening.Open(session), Opening.Unavailable))
+            val link = VaultLink({ openings.removeFirst() }, scope)
+            val library = VaultLibrary(link, scope)
+            link.open()
+            assertTrue(session.closed)
+            assertEquals(LinkState.Refused(Opening.Unavailable), link.state.value)
+            assertTrue(library.state.value is RequestStatus.Loading)
         }
 
     @Test
@@ -209,7 +232,7 @@ class VaultLibraryTest {
     @Test
     fun `an album asked for after a failure carries the failure`() =
         runTest {
-            val rig = rig(FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.DISCONNECTED })
+            val rig = rig(FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.FAILED })
             rig.link.open()
             val answer = VaultDataSource(rig.library).album(VaultUris.folder("sub")).first()
             assertEquals(MediaError.IO, (answer as RequestStatus.Error).error)

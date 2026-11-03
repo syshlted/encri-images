@@ -6,9 +6,12 @@
 package com.systemhalted.encri.images.vault
 
 import android.app.Application
+import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
+import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.client.VaultEvent
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -117,5 +120,103 @@ class VaultLinkTest {
             val link = linkTo(Opening.Open(opened))
             link.open()
             assertEquals(EncriResult.Ok("root"), link.ask { EncriResult.Ok(it.root.id) })
+        }
+
+    @Test
+    fun `a request answered as locked locks the link, though encri never said so`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            link.ask { EncriResult.Failed(Failure.LOCKED, "locked") }
+            assertEquals(LinkState.Open(opened, locked = true), link.state.value)
+        }
+
+    @Test
+    fun `a request answered while the link believes it locked unlocks it`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            opened.events.emit(VaultEvent.Locked)
+            link.ask { EncriResult.Ok(1) }
+            assertEquals(LinkState.Open(opened, locked = false), link.state.value)
+        }
+
+    @Test
+    fun `asking again while locked asks encri whether it still is`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            opened.events.emit(VaultEvent.Locked)
+            opened.grant = EncriResult.Failed(Failure.LOCKED, "locked")
+            link.open()
+            assertEquals(1, opened.grantsAsked)
+            assertEquals(LinkState.Open(opened, locked = true), link.state.value)
+            opened.grant = EncriResult.Ok(EncriGrant(setOf(Right.READ), opened.root))
+            link.open()
+            assertEquals(LinkState.Open(opened, locked = false), link.state.value)
+        }
+
+    @Test
+    fun `an open link is not asked whether it is locked`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            link.open()
+            assertEquals(0, opened.grantsAsked)
+        }
+
+    @Test
+    fun `an answer from before a lock does not undo it`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            val answer = CompletableDeferred<EncriResult<Int>>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { link.ask { answer.await() } }
+            opened.events.emit(VaultEvent.Locked)
+            answer.complete(EncriResult.Ok(1))
+            assertEquals(LinkState.Open(opened, locked = true), link.state.value)
+        }
+
+    @Test
+    fun `an answer from before an unlock does not lock it again`() =
+        runTest {
+            val opened = FakeVaultSession()
+            val link = linkTo(Opening.Open(opened))
+            link.open()
+            opened.events.emit(VaultEvent.Locked)
+            val answer = CompletableDeferred<EncriResult<Int>>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { link.ask { answer.await() } }
+            opened.events.emit(VaultEvent.Unlocked)
+            answer.complete(EncriResult.Failed(Failure.LOCKED, "locked"))
+            assertEquals(LinkState.Open(opened, locked = false), link.state.value)
+        }
+
+    @Test
+    fun `a request answered as ended ends the session and asks for another`() =
+        runTest {
+            val first = FakeVaultSession()
+            val second = FakeVaultSession()
+            val link = linkTo(Opening.Open(first), Opening.Open(second))
+            link.open()
+            link.ask { EncriResult.Failed(Failure.DISCONNECTED, "gone") }
+            assertTrue(first.closed)
+            assertEquals(LinkState.Open(second, locked = false), link.state.value)
+        }
+
+    @Test
+    fun `an answer about a session that has gone changes nothing`() =
+        runTest {
+            val first = FakeVaultSession()
+            val second = FakeVaultSession()
+            val link = linkTo(Opening.Open(first), Opening.Open(second))
+            link.open()
+            first.events.emit(VaultEvent.Ended)
+            link.ask(first) { EncriResult.Failed(Failure.LOCKED, "locked") }
+            assertEquals(LinkState.Open(second, locked = false), link.state.value)
         }
 }

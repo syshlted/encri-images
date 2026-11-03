@@ -21,6 +21,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -139,7 +141,11 @@ class VaultLibrary(
     private suspend fun walkOnEveryChange(session: VaultSession) {
         merge(flowOf(Unit), asked, link.changes.debounce(CHANGES_QUIET_MILLIS).map { })
             .collectLatest {
-                when (val walked = walkLibrary(session)) {
+                // Through the link, so a walk that finds the vault locked or the session over is the gate's to say,
+                // and publishes nothing once the link has moved on from the session it walked.
+                val walked = link.ask(session, ::walkLibrary)
+                currentCoroutineContext().ensureActive()
+                when (walked) {
                     is EncriResult.Ok -> publish(walked.value)
                     is EncriResult.Failed -> mutableState.value = RequestStatus.Error(mediaErrorOf(walked.failure))
                 }

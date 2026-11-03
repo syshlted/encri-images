@@ -7,7 +7,9 @@ package com.systemhalted.encri.images.vault
 
 import android.os.ParcelFileDescriptor
 import com.systemhalted.encri.client.EncriDocument
+import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
+import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.VaultEvent
 import kotlinx.coroutines.flow.Flow
 
@@ -39,4 +41,10 @@ interface VaultSession : AutoCloseable {
 
     /** A read-only descriptor over [documentId] that seeks, which the caller owns and closes. */
     suspend fun openRead(documentId: String): EncriResult<ParcelFileDescriptor>
+
+    /**
+     * The grant as encri holds it now. One small read, which a locked vault answers [Failure.LOCKED] like any
+     * other, so it is how the link asks whether a vault it believes locked still is.
+     */
+    suspend fun grant(): EncriResult<EncriGrant>
 }

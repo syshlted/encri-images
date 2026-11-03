@@ -7,8 +7,10 @@ package com.systemhalted.encri.images.vault
 
 import android.os.ParcelFileDescriptor
 import com.systemhalted.encri.client.EncriDocument
+import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
+import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.client.VaultEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.io.File
@@ -25,6 +27,8 @@ class FakeVaultSession(
     val opened = mutableListOf<String>()
     val content = mutableMapOf<String, File>()
     var thumbnail: EncriResult<ByteArray> = EncriResult.Ok(byteArrayOf(1, 2, 3))
+    var grant: EncriResult<EncriGrant> = EncriResult.Ok(EncriGrant(setOf(Right.READ), root))
+    var grantsAsked = 0
     var closed = false
 
     override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
@@ -46,6 +50,11 @@ class FakeVaultSession(
         opened += documentId
         val file = content[documentId] ?: return EncriResult.Failed(Failure.NOT_FOUND, "no such document")
         return EncriResult.Ok(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY))
+    }
+
+    override suspend fun grant(): EncriResult<EncriGrant> {
+        grantsAsked++
+        return grant
     }
 
     override fun close() {
