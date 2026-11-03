@@ -92,6 +92,13 @@ class WalkLibraryTest {
         }
 
     @Test
+    fun `the grant's own folder gone is the session's end, not an empty vault`() =
+        runTest {
+            val session = FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.NOT_FOUND }
+            assertEquals(Failure.ENDED, (walkLibrary(session) as EncriResult.Failed).failure)
+        }
+
+    @Test
     fun `any other failure ends the walk with that failure`() =
         runTest {
             val session = FakeVaultSession(tree = tree).apply { listFailures["trip"] = Failure.LOCKED }

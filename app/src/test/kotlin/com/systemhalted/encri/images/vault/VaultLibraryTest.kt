@@ -90,6 +90,20 @@ class VaultLibraryTest {
         }
 
     @Test
+    fun `a walk that finds the grant's folder gone asks encri again, and the gate says why`() =
+        runTest {
+            val session = FakeVaultSession(tree = tree).apply { listFailures["root"] = Failure.NOT_FOUND }
+            val scope = CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher(testScheduler))
+            val openings = ArrayDeque(listOf(Opening.Open(session), Opening.NotAuthorized))
+            val link = VaultLink({ openings.removeFirst() }, scope)
+            val library = VaultLibrary(link, scope)
+            link.open()
+            assertTrue(session.closed)
+            assertEquals(LinkState.Refused(Opening.NotAuthorized), link.state.value)
+            assertTrue(library.state.value is RequestStatus.Loading)
+        }
+
+    @Test
     fun `a session that ends forgets everything`() =
         runTest {
             val session = FakeVaultSession(tree = tree)

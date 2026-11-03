@@ -51,6 +51,10 @@ data class Library(
  * encri has no query across folders, so this is the only way to know what the vault holds, and it costs one
  * request per page of every folder. A folder that went away while it was being walked is one a delete got to
  * first, which is not a failure.
+ *
+ * **The root gone is the session's end** (I9), not a folder deleted mid-walk: a grant of one folder whose folder
+ * was deleted reaches nothing, and encri lets the app in no longer, so the walk answers [Failure.ENDED] and the
+ * link asks encri again, whose answer is the gate's to show. An empty gallery would have said the folder was empty.
  */
 suspend fun walkLibrary(session: VaultSession): EncriResult<Library> {
     val medias = mutableListOf<Media>()
@@ -58,7 +62,7 @@ suspend fun walkLibrary(session: VaultSession): EncriResult<Library> {
     while (folders.isNotEmpty()) {
         val folder = folders.removeFirst()
         val listed = session.list(folder.id)
-        if (listed is EncriResult.Failed && listed.failure != Failure.NOT_FOUND) return listed
+        endOf(listed, folder, session.root)?.let { return it }
         val albumUri = VaultUris.folder(folder.id)
         // The root has no name worth showing: it is the vault itself, or a folder the user already chose.
         val albumName = folder.name.takeUnless { folder.id == session.root.id }
@@ -68,6 +72,20 @@ suspend fun walkLibrary(session: VaultSession): EncriResult<Library> {
     }
     val newest = medias.sortedWith(compareByDescending<Media> { it.dateModified }.thenBy { it.uri })
     return EncriResult.Ok(Library(newest, albumsOf(newest)))
+}
+
+/** Why [listed] ends the walk, or null when the walk goes on: past a folder deleted under it, or into this one. */
+private fun endOf(
+    listed: EncriResult<*>,
+    folder: EncriDocument,
+    root: EncriDocument,
+): EncriResult.Failed? {
+    val failed = listed as? EncriResult.Failed ?: return null
+    return when {
+        failed.failure != Failure.NOT_FOUND -> failed
+        folder.id == root.id -> EncriResult.Failed(Failure.ENDED, "the folder this grant is rooted at is gone")
+        else -> null
+    }
 }
 
 private fun mediaOf(
