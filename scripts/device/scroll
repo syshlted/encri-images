@@ -22,7 +22,9 @@ package=com.systemhalted.encri.images
 
 "${adb[@]}" shell input keyevent KEYCODE_WAKEUP
 "${adb[@]}" shell wm dismiss-keyguard
-read -r width height < <("${adb[@]}" shell wm size | sed -n 's/^Physical size: \([0-9]*\)x\([0-9]*\).*/\1 \2/p' | tr -d '\r')
+# The size input is given in: an override when the phone has one, as the S9 does, and the panel's own when not.
+read -r width height < <("${adb[@]}" shell wm size | tr -d '\r' \
+  | sed -n 's/^\(Physical\|Override\) size: \([0-9]*\)x\([0-9]*\).*/\2 \3/p' | tail -n 1)
 
 "${adb[@]}" shell am force-stop "$package"
 "${adb[@]}" shell am start -W -n "$package/.MainActivity" | tr -d '\r' | sed -n 's/^TotalTime: /started in (ms): /p'
