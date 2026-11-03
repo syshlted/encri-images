@@ -619,7 +619,10 @@ user who refuses deleting keeps the gallery.
 
 **For encri-api, and the user's to decide:** whether `PROTOCOL.md` promises the first answer, which encri-files F5
 and I11 already rely on; and whether encri should end a session whose grant's folder is deleted, as it ends one whose
-app is turned out, rather than leave `NOT_FOUND` and `refreshGrant` for the app to work it out from.
+app is turned out, rather than leave `NOT_FOUND` and `refreshGrant` for the app to work it out from. *Amended the
+same day: the user chose both, and encri-api L23 promises them. encri 0.1.0 does not yet end that session, so this
+app keeps taking a missing root for the end (I9).*
 
 **Not seen:** a grant of one folder replaced by one of the whole vault, or the other way; the S9 or the A20, though
-they run the same encri.
+they run the same encri. *Amended the same day: the A20's encri is an earlier build of 0.1.0 than the G6's and the
+S9's, which are one file, and `GrantChanges` answered there exactly as on the G6.*
