@@ -34,6 +34,8 @@ class FakeVaultSession(
 
     /** What a handoff answers; null hands one made-up URI per document. */
     var handOff: EncriResult<List<Uri>>? = null
+    val deleted = mutableListOf<String>()
+    var delete: EncriResult<Unit> = EncriResult.Ok(Unit)
     var closed = false
 
     override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
@@ -60,6 +62,11 @@ class FakeVaultSession(
     override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> {
         handedOff += documentIds
         return handOff ?: EncriResult.Ok(documentIds.map { Uri.parse("content://handoff.test/$it") })
+    }
+
+    override suspend fun delete(documentId: String): EncriResult<Unit> {
+        deleted += documentId
+        return delete
     }
 
     override suspend fun grant(): EncriResult<EncriGrant> {

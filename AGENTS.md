@@ -19,8 +19,8 @@ and in encri-api's for the wire. It is not restated here. What this file owns is
 
 **The first version reads and shows, and nothing else (2026-11-01).** It connects to encri, asks to read, unlocks
 through encri's screen, shows Reels, Albums and Library from the vault, opens photos, and plays videos with seeking.
-It changes nothing in the vault, and hands a photo or video to another app only through encri's handoff, once
-the user has agreed (I10). Checked by hand on the A20 (API 30); see I4. Since
+It hands a photo or video to another app only through encri's handoff, once the user has agreed (I10), and deletes
+one the user chose, asking encri for that right the first time (I11); it changes nothing else in the vault. Checked by hand on the A20 (API 30); see I4. Since
 2026-11-03 it starts on API 28 and 29 as well (I6), and the A20 is measured at 5,000 photos (I8).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
@@ -183,6 +183,7 @@ closes itself**, because an open descriptor goes on serving across a lock (encri
 play on. Glimpse's `ACTION_REVIEW_SECURE`, which showed media over the keyguard, is gone.
 
 **Asks for `READ` alone**, because this version does nothing else, and encri's screen says so to the user.
+*Amended by I11: and for `DELETE` as well, the first time the user deletes.*
 
 **`allowBackup` is false**, and **every window has `FLAG_SECURE`**, set in one place by `SecureWindows`.
 *Amended 2026-11-03: a dialog is a window of its own, which an activity's flag does not reach, and the info sheet's
@@ -501,3 +502,51 @@ image, and which showed the test photo it read through the handoff. Nothing was 
 2. **The share sheet is the platform's**, and what it offers is not this app's to choose. It records the app chosen
    and the type in the phone's usage history (encri D118), and the S9's offers *Share as link* and *Quick Share*,
    which upload.
+
+### I11 — Delete: a photo or video, the right asked for when first used, and nothing to undo it
+*2026-11-03 · accepted (step 4 of the integration plan); **flagged for veto on two points** (below). **Amends I3** on
+the rights asked for.*
+
+**The viewer's bottom bar has *Delete***, where Glimpse had *Move to trash*. It deletes the photo or video on screen
+and nothing else: albums do not offer it, because encri deletes a folder with everything in it.
+
+**The right is asked for when it is first used.** The gate still asks encri for `READ` alone. *Delete* asks encri for
+the grant as it is now (`refreshGrant`, not what it was when the session opened, since the user can change it in
+encri) and, without `DELETE`, says so and offers *Allow in encri*: encri's consent screen for `READ` and `DELETE`,
+started for a result as encri requires. Once that answers with `DELETE`, the app waits up to five seconds for a session
+whose grant says so, because encri ends the session whose grant it replaces (encri-files F5) and the link asks for the
+next at once; then it asks again whether to delete. A `NOT_AUTHORIZED` from the delete itself, a grant narrowed in
+between, offers the consent screen again.
+
+**A delete is said first, every time**: that it is deleted from the vault, not put in a bin, and cannot be undone, and
+that a backup encri made before may still hold a copy (encri-files F5's words, from encri D95). The dialog names the
+kind, *photo* or *video*, and not the file, since the photo is behind it.
+
+**Gone is gone at once.** `VaultLibrary.deleted` takes it out of every screen without waiting for a walk, and keeps it
+out of a walk already on its way, which may have listed its folder before the delete; encri never gives the id to
+another document, so the set is cleared only with the session. A `NOT_FOUND` counts as gone. A deleted video's saved
+playback position is removed, before the pager moves on and would save it again.
+
+*Rejected:* asking for `DELETE` at the gate, which would ask every user for a right most may never use. *Rejected:* a
+bin of this app's own, a folder in the vault that deleted photos move to: it needs `MOVE` and `CREATE`, is a folder
+every other app with a grant sees, and is a design of its own (encri has no trash; `ROADMAP.md`).
+
+**Verified.** Under Robolectric, seventeen tests: the grant asked each time; a delete leaving the library and the album
+it empties; a walk that listed it first not bringing it back, which fails with the filter removed; `NOT_FOUND` as gone;
+`NOT_AUTHORIZED` and a failure deleting nothing here; a locked answer as the lock; the wait passing over the session
+being ended to the one that replaces it, and giving up after five seconds; and the dialogs: secure, *Cancel* deleting
+nothing, the consent screen asked for `READ` and `DELETE`, a consent given up on or allowing less going no further, and
+a failure said without naming the photo. **On the S9, against encri 0.1.0:** with the read grant, *Delete* offered
+*Allow in encri*; encri's screen listed *See your documents and folders, and open them* and *Delete documents and
+folders*; after *Allow the whole vault* the viewer asked *Delete this photo?* at once, and *Delete* moved it to the next
+photo. A fresh process's walk found the camera folder at five photos, down from six. A second *Delete* went straight to
+the question. Whether encri ended the old session or widened its grant in place was not seen, since encri logs
+neither; the app waits for either, and `PROTOCOL.md` says neither.
+
+**Not built:** several at once (`ROADMAP.md`). **Not measured:** deleting a video on a phone; the unit tests cover the
+library, not the viewer's playback position.
+
+**Flagged for veto:**
+
+1. **A delete cannot be undone here**: there is no bin (encri-files F5's flag, again).
+2. **The gate asks for `READ` alone**, so a user turned out and let in again loses `DELETE` until they next delete.

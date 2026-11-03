@@ -67,6 +67,13 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/file_action_delete"
+            android:drawableTop="@drawable/ic_delete"
+            android:text="@string/file_action_delete" />
+
         <!-- Cannot mess with fixed padding from here because of insets -->
         <Space
             android:layout_width="16dp"

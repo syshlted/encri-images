@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.Flow
  * The part of an encri session this app uses (AGENTS.md I3).
  *
  * Narrower than the client's session on purpose, so this interface is the list of what the gallery asks
- * encri for: it reads, and hands a document to another app only through encri's handoff, once the user has
- * agreed (I10).
+ * encri for: it reads, hands a document to another app only through encri's handoff once the user has agreed
+ * (I10), and deletes a photo or video the user chose, once encri has let it (I11).
  */
 interface VaultSession : AutoCloseable {
     /** The folder the user let this app into, above which it cannot go. */
@@ -49,6 +49,9 @@ interface VaultSession : AutoCloseable {
      * They name neither the document's id nor its name, and stop working when the vault locks or the session ends.
      */
     suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>>
+
+    /** Deletes [documentId]. A folder would go with everything in it, which this app never asks. */
+    suspend fun delete(documentId: String): EncriResult<Unit>
 
     /**
      * The grant as encri holds it now. One small read, which a locked vault answers [Failure.LOCKED] like any

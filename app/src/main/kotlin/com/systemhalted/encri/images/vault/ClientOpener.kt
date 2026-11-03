@@ -79,6 +79,8 @@ private class ClientSession(
 
     override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> = session.handOff(documentIds)
 
+    override suspend fun delete(documentId: String): EncriResult<Unit> = session.delete(documentId)
+
     override suspend fun grant(): EncriResult<EncriGrant> = session.refreshGrant()
 
     override fun close() = session.close()

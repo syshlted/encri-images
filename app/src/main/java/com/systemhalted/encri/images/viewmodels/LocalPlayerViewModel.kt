@@ -299,6 +299,13 @@ class LocalPlayerViewModel(
         }
     }
 
+    /**
+     * A deleted video's place is not kept (I11), though encri never gives its id to another.
+     */
+    fun forgetVideoPosition(uri: Uri) {
+        sharedPreferences.removeVideoPlaybackPosition(uri)
+    }
+
     fun saveCurrentVideoPosition(currentVideoUri: Uri?) {
         val currentVideoUri = currentVideoUri ?: return
 

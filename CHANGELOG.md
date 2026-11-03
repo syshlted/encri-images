@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-03
 
+**Delete** (I11), from the viewer, for a photo or video and not an album. The first delete asks encri for the right,
+and every delete says first that it cannot be undone. Checked on the S9, where a photo was deleted after encri's
+consent screen allowed it.
+
 **Share and open with** (I10), from the viewer, through encri's handoff and the platform's chooser, with encri left
 out. A dialog says what it costs first, every time. Checked on the S9, where Samsung's gallery opened a photo it
 read through the handoff.

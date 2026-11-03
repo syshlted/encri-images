@@ -17,9 +17,10 @@ to do, each with a design of its own rather than Glimpse's.
 2. **Subsampling for large images.** ZoomImage does not subsample a vault photo, so zooming magnifies the screen's
    decode (I8). A `SubsamplingImageGenerator` of this app's own, reading through `openRead`, with its tiles in
    Glide's memory cache, which a lock clears.
-3. **Delete**, which asks for the `DELETE` right, and what stands in for a trash when encri has none.
-4. **Several at once.** Share is one photo at a time, from the viewer (I10). Glimpse's selection in the grid, which
-   was deleted with its trash, would share several through one handoff.
+3. **Several at once.** Share and delete are one photo at a time, from the viewer (I10, I11). Glimpse's selection in
+   the grid, which went with its trash, would share several through one handoff and delete them after one question.
+4. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
+   in the vault would need `MOVE` and `CREATE`, and every app with a grant would see it.
 5. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
    so this needs somewhere to keep the answer that is not outside the vault.
 6. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
@@ -42,6 +43,9 @@ to do, each with a design of its own rather than Glimpse's.
 
 - **S3 — A video of no length spins.** ExoPlayer's repeat mode over a clip whose duration is 0 creates and destroys a
   decoder several times a second, seen on the A20 (I4). Inherited.
+- **S3 — A video playing when encri replaces the grant may stop.** Allowing `DELETE` from the viewer replaces the
+  grant, encri ends the old session (encri-files F5), and a descriptor fails when its session ends (`PROTOCOL.md`), so
+  a video paused behind the consent screen would fail on resuming. Follows from the contract; not seen (I11).
 - **S2 — A gallery in front goes on showing a grant's folder after it is deleted**, until something walks again (I9).
   encri sends no notice the grant can hear, and the session does not end. A question for encri-api first.
 - **S4 — ZoomImage asks Glide for every opened photo as a file**, from a cache that is always empty (I8). Nothing is

@@ -43,6 +43,13 @@ data class Library(
 ) {
     /** The photos and videos directly in [albumUri], newest first. */
     fun mediasIn(albumUri: Uri): List<Media> = medias.filter { it.albumUri == albumUri }
+
+    /** This library less [uris], and less any album they leave empty. */
+    fun without(uris: Set<Uri>): Library {
+        if (medias.none { it.uri in uris }) return this
+        val left = medias.filterNot { it.uri in uris }
+        return Library(left, albumsOf(left))
+    }
 }
 
 /**
@@ -139,6 +146,9 @@ class VaultLibrary(
 
     private val asked = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
+    /** What this app deleted in this session, which a walk that listed it first does not bring back (I11). */
+    private val deleted = mutableSetOf<Uri>()
+
     init {
         scope.launch {
             link.state
@@ -146,6 +156,8 @@ class VaultLibrary(
                 .distinctUntilChanged()
                 .collectLatest { session ->
                     mutableState.value = RequestStatus.Loading()
+                    // A walk of another session starts after any delete it could have missed.
+                    deleted.clear()
                     if (session != null) walkOnEveryChange(session)
                 }
         }
@@ -170,8 +182,19 @@ class VaultLibrary(
             }
     }
 
+    /**
+     * [uri] was deleted, so it leaves every screen at once rather than at the next walk, and stays out of a walk
+     * already on its way, which may have listed its folder before the delete.
+     */
+    fun deleted(uri: Uri) {
+        deleted += uri
+        val current = mutableState.value as? RequestStatus.Success ?: return
+        mutableState.value = RequestStatus.Success(current.data.without(deleted))
+    }
+
     /** Only what is different, so a screen coming back to the same vault does not redraw it. */
-    private fun publish(library: Library) {
+    private fun publish(walked: Library) {
+        val library = walked.without(deleted)
         val current = mutableState.value
         if (current is RequestStatus.Success && current.data == library) return
         mutableState.value = RequestStatus.Success(library)

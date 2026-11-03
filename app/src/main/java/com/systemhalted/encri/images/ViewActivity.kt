@@ -7,6 +7,8 @@
 package com.systemhalted.encri.images
 
 import android.app.KeyguardManager.KeyguardDismissCallback
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +16,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -44,6 +47,8 @@ import com.systemhalted.encri.images.ui.dialogs.MediaInfoBottomSheetDialog
 import com.systemhalted.encri.images.ui.recyclerview.MediaViewerAdapter
 import com.systemhalted.encri.images.ext.getParcelable
 import com.systemhalted.encri.images.ext.getSerializable
+import com.systemhalted.encri.images.vault.DeleteFlow
+import com.systemhalted.encri.images.vault.Deletes
 import com.systemhalted.encri.images.vault.Handoff
 import com.systemhalted.encri.images.vault.Handoffs
 import com.systemhalted.encri.images.vault.LinkState
@@ -62,6 +67,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     // Views
     private val appBarLayout by lazy { findViewById<AppBarLayout>(R.id.appBarLayout) }
     private val bottomSheetLinearLayout by lazy { findViewById<LinearLayout>(R.id.bottomSheetLinearLayout) }
+    private val deleteButton by lazy { findViewById<MaterialButton>(R.id.deleteButton) }
     private val infoButton by lazy { toolbar.menu.findItem(R.id.info) }
     private val motionPhotoToggleButton by lazy { findViewById<MaterialButton>(R.id.motionPhotoToggleButton) }
     private val openWithButton by lazy { toolbar.menu.findItem(R.id.openWith) }
@@ -75,6 +81,24 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     private val handoffs by lazy {
         Handoffs(this, (application as ImagesApplication).link, lifecycleScope)
     }
+
+    // Asking encri for the right the first time, and saying it cannot be undone (I11)
+    private val deleteFlow by lazy {
+        val images = application as ImagesApplication
+        DeleteFlow(
+            this,
+            Deletes(images.link, images.library),
+            lifecycleScope,
+            ::askEncri,
+            ::forgetDeleted,
+        )
+    }
+
+    // encri learns who asked from getCallingPackage, which only a start for a result sets (encri D120).
+    private val askEncriForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            deleteFlow.answered(it.resultCode, it.data)
+        }
 
     // Adapter
     private val mediaViewerAdapter by lazy {
@@ -162,6 +186,10 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
 
         shareButton.setOnClickListener {
             viewModel.displayedMedia.value?.let { handoffs.offer(it, Handoff.SHARE) }
+        }
+
+        deleteButton.setOnClickListener {
+            viewModel.displayedMedia.value?.let { deleteFlow.offer(it) }
         }
 
         viewPager.offscreenPageLimit = 2
@@ -293,6 +321,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
                     // What leaves through encri's handoff
                     openWithButton.isVisible = displayedMedia != null
                     shareButton.isVisible = displayedMedia != null
+                    deleteButton.isVisible = displayedMedia != null
 
                     // Reset motion photo toggle button
                     viewModel.toggleMotionPhotoEnabled(false)
@@ -351,6 +380,26 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
 
     private fun saveCurrentVideoPosition() {
         viewModel.saveCurrentVideoPosition(lastVideoUriPlayed)
+    }
+
+    private fun askEncri(intent: Intent) {
+        try {
+            askEncriForResult.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            // encri was uninstalled while this screen showed; the link says so once it asks again.
+            (application as ImagesApplication).link.open()
+        }
+    }
+
+    /**
+     * Called before the list without [media] reaches the pager, so moving on from a deleted video does not
+     * save its place again.
+     */
+    private fun forgetDeleted(media: Media) {
+        if (media.uri == lastVideoUriPlayed) {
+            lastVideoUriPlayed = null
+        }
+        viewModel.forgetVideoPosition(media.uri)
     }
 
     /**

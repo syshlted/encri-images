@@ -30,6 +30,16 @@
     <string name="handoff_failed">encri would not hand this to another app.</string>
     <string name="handoff_no_app">No app on this phone can take it.</string>
 
+    <!-- I11: deleting a photo or video from the vault, which encri is asked to allow the first time -->
+    <string name="file_action_delete">Delete</string>
+    <string name="delete_photo_title">Delete this photo?</string>
+    <string name="delete_video_title">Delete this video?</string>
+    <string name="delete_explain">It is deleted from the vault, not put in a bin: this cannot be undone. A backup encri made before now may still hold a copy.</string>
+    <string name="delete_allow_title">Allow deleting, in encri?</string>
+    <string name="delete_allow_explain">encri has let Encri Images look at what is in the vault, not delete from it. encri asks you next whether to let it delete as well.</string>
+    <string name="delete_not_allowed">encri has not let Encri Images delete.</string>
+    <string name="delete_failed">It was not deleted.</string>
+
     <!-- Toast messages -->
     <string name="app_permissions_toast">Permissions not granted by the user.</string>
 
