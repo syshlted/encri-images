@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**The release build walked through again, and API 27 started** (I18). The minified build zooms, chooses, shares,
+deletes and plays as the debug build does, on the G6 and the A20; on an API 27 emulator the app starts and shows its
+gate, the first run below API 28.
+
 **Fixed: a screen recording could carry a vault video's sound** (I3, amended). `FLAG_SECURE` keeps out the picture,
 and from API 29 any app recording the screen may capture another's audio unless it says not; this app now says not.
 Seen in the package's flags on Waydroid, where the gate test passes at API 33.

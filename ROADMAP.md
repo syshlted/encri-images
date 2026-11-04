@@ -12,7 +12,7 @@ The first version shows the vault and does nothing else (I3, I4). What follows p
 to do, each with a design of its own rather than Glimpse's.
 
 1. **Measure a real library elsewhere.** The A20, the S9, the G6 and the S24 are measured at 5,000 photos, and the
-   walk stays (I8, I9). Still to measure: API 27, which needs encri on an emulator; and a library of 20,000,
+   walk stays (I8, I9). Still to measure: a vault on API 27, where the app now starts (I18) but has no encri; and a library of 20,000,
    where the A20's estimate was four to five seconds before Reels shows anything, one folder at a time; I14 lists four
    at once, which took the G6's walk of 2,000 photos from a second or more to under a third of one.
 2. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
