@@ -29,6 +29,7 @@
     <application
         android:name=".ImagesApplication"
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:appCategory="image"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"

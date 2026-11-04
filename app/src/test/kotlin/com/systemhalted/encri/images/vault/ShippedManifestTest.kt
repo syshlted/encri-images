@@ -9,11 +9,17 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.test.core.app.ApplicationProvider
+import com.systemhalted.encri.images.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.w3c.dom.Element
+import org.xmlpull.v1.XmlPullParser
+import java.io.File
+import java.util.Properties
+import javax.xml.parsers.DocumentBuilderFactory
 
 /** What the merged manifest gives away, including whatever a library merged in (I3). */
 @RunWith(RobolectricTestRunner::class)
@@ -70,5 +76,72 @@ class ShippedManifestTest {
     @Test
     fun `nothing leaves through a backup`() {
         assertEquals(0, info.applicationInfo!!.flags and ApplicationInfo.FLAG_ALLOW_BACKUP)
+    }
+
+    @Test
+    fun `nothing leaves through a transfer to a new phone either`() {
+        // From API 31 allowBackup="false" stops a cloud backup and not a device transfer; only the rules do.
+        assertEquals("@xml/data_extraction_rules", mergedApplicationAttribute("dataExtractionRules"))
+        val excluded = excludedIn(R.xml.data_extraction_rules)
+        assertEquals(setOf("cloud-backup", "device-transfer"), excluded.keys)
+        excluded.forEach { (kind, domains) -> assertEquals(kind, EVERY_DOMAIN, domains) }
+    }
+
+    /**
+     * [name] on the merged manifest's `<application>`, read from the file AGP merged, since Robolectric does not
+     * parse every attribute.
+     */
+    private fun mergedApplicationAttribute(name: String): String? {
+        val config = Properties()
+        javaClass.classLoader!!.getResourceAsStream("com/android/tools/test_config.properties").use(config::load)
+        val manifest = File(config.getProperty("android_merged_manifest"))
+        val application =
+            DocumentBuilderFactory
+                .newInstance()
+                .apply { isNamespaceAware = true }
+                .newDocumentBuilder()
+                .parse(manifest)
+                .getElementsByTagName("application")
+                .item(0) as Element
+        return application.getAttributeNS(ANDROID, name).ifEmpty { null }
+    }
+
+    /** Each kind of transfer in [rules], with the domains it excludes whole. */
+    private fun excludedIn(rules: Int): Map<String, Set<String>> {
+        val excluded = mutableMapOf<String, MutableSet<String>>()
+        val parser = ApplicationProvider.getApplicationContext<Application>().resources.getXml(rules)
+        var kind: String? = null
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.eventType != XmlPullParser.START_TAG) continue
+            when (parser.name) {
+                "cloud-backup", "device-transfer" -> {
+                    kind = parser.name.also { excluded[it] = mutableSetOf() }
+                }
+
+                "exclude" -> {
+                    if (parser.getAttributeValue(null, "path") == ".") {
+                        excluded.getValue(kind!!) += parser.getAttributeValue(null, "domain")
+                    }
+                }
+            }
+        }
+        return excluded
+    }
+
+    private companion object {
+        const val ANDROID = "http://schemas.android.com/apk/res/android"
+
+        val EVERY_DOMAIN =
+            setOf(
+                "root",
+                "file",
+                "database",
+                "sharedpref",
+                "external",
+                "device_root",
+                "device_file",
+                "device_database",
+                "device_sharedpref",
+            )
     }
 }

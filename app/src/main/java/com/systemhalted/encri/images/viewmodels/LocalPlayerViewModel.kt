@@ -56,6 +56,7 @@ import com.systemhalted.encri.images.vault.VaultUris
 import com.systemhalted.encri.images.vault.initialPositionIn
 import java.io.FileInputStream
 
+@androidx.annotation.OptIn(UnstableApi::class)
 class LocalPlayerViewModel(
     application: Application,
     savedStateHandle: SavedStateHandle,

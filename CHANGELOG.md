@@ -4,6 +4,14 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Fixed: a transfer to a new phone could carry what this app keeps** (I3, amended). From API 31 `allowBackup` false
+stops a cloud backup and not a device transfer, which would have taken the preferences and the saved playback
+positions, keyed by a hash of the document's id. Data extraction rules now exclude everything from both.
+
+**Fixed: the inherited lint errors, and Android lint is a CI step.** The 54 `ImpliedQuantity` were all in strings for
+what this app no longer has (trash, favourites, the picker and the wallpaper), which went with 11 drawables and the
+rest of what nothing used. The Media3 calls lint flagged are opted in where they are made.
+
 **Fixed: the inherited compile warnings**, and a new one now fails the build. `bundleOf` gave way to a typed
 `Bundle`, `@BuilderInference` went, and the two extensions the compiler took for shadowed stay, since the members
 they reach are package-private.

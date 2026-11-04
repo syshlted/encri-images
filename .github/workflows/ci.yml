@@ -49,6 +49,11 @@ jobs:
       - name: Static analysis (detekt)
         run: scripts/hooks/gradle-task detekt
 
+      # Android lint over the whole app, inherited screens included, which ktlint and detekt leave to upstream's
+      # shape (I1). Errors only: its warnings are Glimpse's, and a list nobody acts on.
+      - name: Android lint
+        run: scripts/hooks/gradle-task :app:lintDebug
+
       # NOT testDebugUnitTest: Gradle runs a name-matched task in whichever projects have it without
       # complaining that the others lack it (encri D11).
       - name: JVM unit tests (all modules)

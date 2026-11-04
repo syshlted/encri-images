@@ -61,7 +61,7 @@ every task a workflow runs (encri D7):
 ```sh
 rm gradle/verification-metadata.xml
 ./gradlew --write-verification-metadata sha256 --refresh-dependencies --rerun-tasks \
-  ktlintCheck detekt allUnitTests koverVerify koverXmlReport assemble assembleAndroidTest bundleRelease
+  ktlintCheck detekt :app:lintDebug allUnitTests koverVerify koverXmlReport assemble assembleAndroidTest bundleRelease
 ```
 
 **Changing what a user receives** means updating the lockfile, which STRICT mode demands:
@@ -201,6 +201,11 @@ play on. Glimpse's `ACTION_REVIEW_SECURE`, which showed media over the keyguard,
 *Amended by I11: and for `DELETE` as well, the first time the user deletes.*
 
 **`allowBackup` is false**, and **every window has `FLAG_SECURE`**, set in one place by `SecureWindows`.
+*Amended 2026-11-04: from API 31 `allowBackup` false stops a cloud backup and not a transfer to a new phone, which
+would have carried the preferences, saved playback positions among them, each keyed by a hash of its document's id.
+Lint said so.
+`data_extraction_rules.xml` excludes every domain from both, and `ShippedManifestTest` reads it and the merged
+manifest.*
 *Amended 2026-11-03: a dialog is a window of its own, which an activity's flag does not reach, and the info sheet's
 had none (its flags on the S9 were `0x81810102`, the activity's behind it `0x81812100`). Android leaves a secure
 window out of a screen recording and shows the rest, so the sheet's name, size, date and coordinates would have been

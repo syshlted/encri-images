@@ -38,8 +38,6 @@ to do, each with a design of its own rather than Glimpse's.
 - **Device tests in a run of their own.** They exist (I6), and run by hand, one class on one phone at a time. A
   release wants every class on every phone, with the results kept.
 - **Protect `master`** with a ruleset, at the user's word (I1).
-- **Remove unused resources** left by what was deleted: strings, drawables and translations. The release build
-  shrinks them out, so this is **S4**.
 
 ## Bugs
 
@@ -54,5 +52,3 @@ to do, each with a design of its own rather than Glimpse's.
   `NOT_AUTHORIZED` (I12). A question for encri-api first.
 - **S4 — ZoomImage asks Glide for every opened photo as a file**, from a cache that is always empty (I8). Nothing is
   read or written, and since I8 nothing is logged; item 2 replaces it.
-- **S4 — Inherited lint errors**: 54 `ImpliedQuantity` in Glimpse's translations, and `UnsafeOptInUsageError` on Media3
-  calls in `LocalPlayerViewModel` and `MediaViewerAdapter`. Lint is not one of the gates yet.
