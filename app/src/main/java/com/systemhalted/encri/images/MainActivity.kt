@@ -23,6 +23,8 @@ import com.systemhalted.encri.client.Encri
 import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.images.vault.Gate
 import com.systemhalted.encri.images.vault.GateAction
+import com.systemhalted.encri.images.vault.PrivacySettings
+import com.systemhalted.encri.images.vault.VaultGlide
 import com.systemhalted.encri.images.vault.gateOf
 import kotlinx.coroutines.launch
 
@@ -34,6 +36,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private val gateMessage by lazy { findViewById<TextView>(R.id.gateMessage) }
     private val gateView by lazy { findViewById<View>(R.id.gateView) }
     private val navHost by lazy { findViewById<View>(R.id.navHostFragment) }
+
+    // What the grids were drawn with (I13): a cell whose preview was not asked for does not ask again by itself.
+    private var previewsShown = true
 
     // encri learns who asked from getCallingPackage, which only a start for a result sets (encri D120).
     private val askEncri =
@@ -47,6 +52,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         // Enable edge-to-edge
         enableEdgeToEdge()
 
+        previewsShown = PrivacySettings.of(this).previewsShown
+        // The screens drawn before previews went off have let theirs go into Glide's memory by now (I13).
+        if (!previewsShown) {
+            VaultGlide.forget(this)
+        }
+
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 images.link.state.collect { render(gateOf(it)) }
@@ -56,6 +67,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onStart() {
         super.onStart()
+
+        // Previews turned on or off in settings: every grid is drawn again, asking for them or not.
+        if (PrivacySettings.of(this).previewsShown != previewsShown) {
+            recreate()
+            return
+        }
 
         // encri's notice that a folder changed is best effort, so a screen coming back asks.
         images.link.open()

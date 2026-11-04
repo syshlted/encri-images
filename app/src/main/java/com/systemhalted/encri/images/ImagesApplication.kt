@@ -11,6 +11,7 @@ import com.google.android.material.color.DynamicColors
 import com.systemhalted.encri.images.repository.MediaRepository
 import com.systemhalted.encri.images.vault.ClientOpener
 import com.systemhalted.encri.images.vault.LinkState
+import com.systemhalted.encri.images.vault.PrivacySettings
 import com.systemhalted.encri.images.vault.SecureWindows
 import com.systemhalted.encri.images.vault.VaultDataSource
 import com.systemhalted.encri.images.vault.VaultGlide
@@ -34,7 +35,7 @@ class ImagesApplication : Application() {
         DynamicColors.applyToActivitiesIfAvailable(this)
 
         registerActivityLifecycleCallbacks(SecureWindows)
-        VaultGlide.install(this, link)
+        VaultGlide.install(this, link) { PrivacySettings.of(this).previewsShown }
 
         // A locked vault leaves no picture in memory that this app can help.
         scope.launch {

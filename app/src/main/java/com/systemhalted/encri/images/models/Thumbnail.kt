@@ -64,12 +64,14 @@ data class Thumbnail(
         val MAX_THUMBNAIL_SIZE = 128.px
 
         /**
-         * A grid cell: encri's own preview, so a thumbnail never decodes an original here.
+         * A grid cell: encri's own preview, so a thumbnail never decodes an original here, and
+         * none at all while the user has previews off (I13).
          */
         fun previewOptions() = RequestOptions()
             .override(MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_SIZE)
             .centerCrop()
             .set(VaultGlide.PREVIEW, true)
+            .skipMemoryCache(!VaultGlide.previewsShown())
 
         override fun createFromParcel(parcel: Parcel) = Thumbnail(
             uri = parcel.readParcelable(Uri::class),

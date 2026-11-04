@@ -79,8 +79,15 @@
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference titles -->
+    <string name="privacy_header">Privacy</string>
     <string name="general_header">General</string>
     <string name="video_header">Video</string>
+
+    <!-- I13: what leaves this app's screens, the user's to choose -->
+    <string name="allow_screenshots_title">Allow screenshots</string>
+    <string name="allow_screenshots_summary">Off, Android keeps Encri Images out of screenshots, screen recordings and the recent apps. A screenshot is saved outside the vault, not encrypted, where photo backups and other apps reach it. This changes Encri Images alone: encri\'s own screens always keep them out.</string>
+    <string name="show_previews_title">Show previews</string>
+    <string name="show_previews_summary">encri makes the small pictures in the grid from what is in the vault. Off, Encri Images asks for none, and a photo shows only when you open it.</string>
 
     <!-- General preferences -->
     <string name="edge_tap_navigation_enable_title">Edge tap navigation</string>

@@ -26,7 +26,6 @@ to do, each with a design of its own rather than Glimpse's.
 5. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
    so this needs somewhere to keep the answer that is not outside the vault.
 6. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
-7. **Settings of its own**: previews on or off (encri D112 gives each app its own), and screenshots (encri-files F3).
 
 ## Before a first release
 

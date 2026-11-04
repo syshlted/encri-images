@@ -40,11 +40,26 @@ object VaultGlide {
     /** Ask encri for its preview, rather than reading the document and decoding it here. */
     val PREVIEW: Option<Boolean> = Option.memory("com.systemhalted.encri.images.vault.PREVIEW", false)
 
-    /** Must run before anything else touches Glide, whose configuration is fixed on first use. */
+    /** The user's setting (I13), as [install] was given it. */
+    @Volatile
+    private var previewsShown: () -> Boolean = { true }
+
+    /**
+     * Whether a preview is wanted now. While it is not, a grid's request skips Glide's memory too, which holds the
+     * previews of screens drawn before the setting changed, and would hand them over without asking this loader.
+     */
+    fun previewsShown(): Boolean = previewsShown.invoke()
+
+    /**
+     * Must run before anything else touches Glide, whose configuration is fixed on first use. [previewsShown] is the
+     * user's setting (I13), asked each time a preview is wanted.
+     */
     fun install(
         context: Context,
         link: VaultLink,
+        previewsShown: () -> Boolean = { true },
     ) {
+        this.previewsShown = previewsShown
         Glide.init(
             context,
             GlideBuilder()
@@ -56,16 +71,20 @@ object VaultGlide {
         Glide
             .get(context)
             .registry
-            .prepend(Uri::class.java, InputStream::class.java, VaultModelLoader.Factory(link))
+            .prepend(Uri::class.java, InputStream::class.java, VaultModelLoader.Factory(link, previewsShown))
     }
 
-    /** Forgets every picture held in memory. Called on the main thread when the vault locks. */
+    /** Forgets every picture held in memory. Called on the main thread when the vault locks, or previews go off. */
     fun forget(context: Context) = Glide.get(context).clearMemory()
 }
 
-/** Reads a document named by [VaultUris]; any other [Uri] is not this loader's. */
+/**
+ * Reads a document named by [VaultUris]; any other [Uri] is not this loader's. While the user has previews off
+ * (I13), a preview is not asked for at all, and the load fails before encri hears of it.
+ */
 class VaultModelLoader(
     private val link: VaultLink,
+    private val previewsShown: () -> Boolean = { true },
 ) : ModelLoader<Uri, InputStream> {
     override fun handles(model: Uri): Boolean = VaultUris.documentIdOf(model) != null
 
@@ -74,17 +93,20 @@ class VaultModelLoader(
         width: Int,
         height: Int,
         options: Options,
-    ): ModelLoader.LoadData<InputStream>? =
-        VaultUris.documentIdOf(model)?.let { documentId ->
-            val preview = options.get(VaultGlide.PREVIEW) == true
-            ModelLoader.LoadData(ObjectKey(model), VaultFetcher(link, documentId, preview, width, height))
-        }
+    ): ModelLoader.LoadData<InputStream>? {
+        val preview = options.get(VaultGlide.PREVIEW) == true
+        return VaultUris
+            .documentIdOf(model)
+            ?.takeUnless { preview && !previewsShown() }
+            ?.let { ModelLoader.LoadData(ObjectKey(model), VaultFetcher(link, it, preview, width, height)) }
+    }
 
     class Factory(
         private val link: VaultLink,
+        private val previewsShown: () -> Boolean = { true },
     ) : ModelLoaderFactory<Uri, InputStream> {
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, InputStream> =
-            VaultModelLoader(link)
+            VaultModelLoader(link, previewsShown)
 
         override fun teardown() = Unit
     }

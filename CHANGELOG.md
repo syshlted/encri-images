@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Settings of its own** (I13): *Allow screenshots*, off by default as in encri-files, and *Show previews*, on by
+default. Checked on the A20, where the first try showed every preview still from Glide's memory after they were turned
+off.
+
 **Stable dependencies** (I1, amended). Glimpse's five alphas are the stable releases of their lines, and nothing the
 app ships is a pre-release.
 

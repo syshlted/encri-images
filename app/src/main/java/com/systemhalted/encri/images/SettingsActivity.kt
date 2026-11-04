@@ -6,6 +6,7 @@
 
 package com.systemhalted.encri.images
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -21,15 +22,25 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.systemhalted.encri.images.ext.setOffset
+import com.systemhalted.encri.images.vault.PrivacySettings
+import com.systemhalted.encri.images.vault.SecureWindows
 import kotlin.reflect.safeCast
 
 class SettingsActivity : AppCompatActivity(R.layout.activity_settings) {
     private val appBarLayout by lazy { findViewById<AppBarLayout>(R.id.appBarLayout) }
     private val coordinatorLayout by lazy { findViewById<CoordinatorLayout>(R.id.coordinatorLayout) }
     private val toolbar by lazy { findViewById<MaterialToolbar>(R.id.toolbar) }
+
+    // Screenshots allowed or not take effect on this screen at once, not only on the next (I13).
+    private val screenshotsChanged = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == PrivacySettings.SCREENSHOTS) {
+            SecureWindows.follow(this)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +60,20 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_settings) {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .registerOnSharedPreferenceChangeListener(screenshotsChanged)
+    }
+
+    override fun onPause() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(screenshotsChanged)
+
+        super.onPause()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {

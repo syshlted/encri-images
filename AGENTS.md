@@ -205,7 +205,8 @@ play on. Glimpse's `ACTION_REVIEW_SECURE`, which showed media over the keyguard,
 **Asks for `READ` alone**, because this version does nothing else, and encri's screen says so to the user.
 *Amended by I11: and for `DELETE` as well, the first time the user deletes.*
 
-**`allowBackup` is false**, and **every window has `FLAG_SECURE`**, set in one place by `SecureWindows`.
+**`allowBackup` is false**, and **every window has `FLAG_SECURE`**, set in one place by `SecureWindows`. *Amended by
+I13: unless the user allows screenshots.*
 *Amended 2026-11-04: from API 31 `allowBackup` false stops a cloud backup and not a transfer to a new phone, which
 would have carried the preferences, saved playback positions among them, each keyed by a hash of its document's id.
 Lint said so.
@@ -224,6 +225,7 @@ there is nothing to forget.
 **Flagged for veto:**
 
 1. **Screenshots are always blocked**, with no setting. encri-files has one, off by default (encri-files F3).
+   *Amended by I13: a setting, off by default.*
 2. **The first version has no share, favourites, trash or delete**, all of which a gallery is expected to have.
 3. **A location is shown as numbers**, which is the only way to keep it from a service without a design for asking.
 
@@ -671,3 +673,40 @@ app keeps taking a missing root for the end (I9).*
 they run the same encri. *Amended the same day: the A20's encri is an earlier build of 0.1.0 than the G6's and the
 S9's, which are one file, and `GrantChanges` answered there exactly as on the G6. Amended 2026-11-04: so did
 `GrantGone`, and both probes on the S24 (API 37), with the G6's encri.*
+
+### I13 — Settings of its own: screenshots allowed or not, and previews shown or not
+*2026-11-04 · accepted (`ROADMAP.md`'s *Settings of its own*); **flagged for veto on one point** (below). **Amends I3**
+on screenshots.*
+
+**Two switches at the top of the settings screen, under *Privacy***, kept in the app's own preferences, which nothing
+backs up or transfers (I3), and read by `PrivacySettings`.
+
+**Allow screenshots, off by default**, as encri-files' (F3), with its reasons and its words: off, every window this
+app draws carries `FLAG_SECURE`; on, none does, and the switch says what a screenshot costs and that encri's own
+screens are not changed by it. `SecureWindows` applies it when a window is made and again whenever a screen comes to
+the front, so a change reaches the gallery behind the settings without a restart, and the settings screen follows at
+once. Every dialog follows it through `SecureWindows.secure`, as before.
+
+**Show previews, on by default** (encri D112 gives each app its own, as encri-files' F4 does). Off, no grid cell, album
+cover or video's still asks encri for a preview: `VaultModelLoader` builds no load for one, so the request fails before
+encri hears of it, and the cell shows its empty background. A photo opened is still read and shown, which is not a
+preview. **Glide's memory is the catch**: the gallery's old screens hand their previews to Glide's memory cache as they
+go, and a new request for the same cell takes it from there without asking the loader, which is how the first try
+showed every preview still (seen on the A20). So while previews are off a preview request skips Glide's memory, and
+the gallery, drawn again when it comes back with the setting changed, empties that memory once the old screens have
+let go of it.
+
+*Rejected:* a setting per screen, for F3's reason. *Rejected:* applying the previews setting only at the next start,
+which leaves the switch looking broken.
+
+**Verified.** Under Robolectric: kept out by default, allowed once chosen, applied on a screen's return, which fails its
+test without the re-apply, and at once on the screen it was changed on; the settings screen's keys and defaults are
+`PrivacySettings`'; with previews off no preview is asked for, a full image still is, and one Glide already holds is
+not shown, which fails without the memory skip. **On the A20 (API 30):** `screencap` refused, then allowed on the
+settings screen at once and on the gallery behind it, then refused again on both; a photo cell's brightness spread
+44.9 with previews on, 0.0 with them off, and 44.9 again.
+
+**Flagged for veto:**
+
+1. **Screenshots are blocked by default** (encri-files F3's flag, again).
+

@@ -18,6 +18,7 @@ import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.data.DataFetcher
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
+import com.systemhalted.encri.images.models.Thumbnail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.After
@@ -87,6 +88,65 @@ class VaultGlideTest {
         assertArrayEquals(byteArrayOf(1, 2, 3), caught.data!!.readBytes())
         assertEquals(listOf(Triple("photo", 64, 48)), session.thumbnailsAsked)
         assertEquals(emptyList<String>(), session.opened)
+    }
+
+    @Test
+    fun `with previews off, a preview is not asked for at all, and a full image still is`() {
+        val loader = VaultModelLoader(link) { false }
+        val preview = Options().set(VaultGlide.PREVIEW, true)
+        assertNull(loader.buildLoadData(VaultUris.document("photo"), 64, 48, preview))
+        assertNotNull(loader.buildLoadData(VaultUris.document("photo"), 64, 48, Options()))
+        assertEquals(emptyList<Any>(), session.thumbnailsAsked)
+    }
+
+    @Test(timeout = 30_000)
+    fun `with previews off, a grid's load through Glide fails before encri hears of it`() {
+        VaultGlide.install(context, link) { false }
+        val loading =
+            Glide
+                .with(context)
+                .asBitmap()
+                .load(VaultUris.document("photo"))
+                .set(VaultGlide.PREVIEW, true)
+                .override(4, 4)
+                .submit()
+        while (!loading.isDone) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(5)
+        }
+        assertTrue("the load did not fail", runCatching { loading.get() }.isFailure)
+        assertEquals(emptyList<Any>(), session.thumbnailsAsked)
+    }
+
+    @Test(timeout = 30_000)
+    fun `with previews turned off, one Glide already holds is not shown either`() {
+        var shown = true
+        VaultGlide.install(context, link) { shown }
+        session.thumbnail = EncriResult.Ok(png())
+        val cell = {
+            Glide
+                .with(context)
+                .asBitmap()
+                .load(VaultUris.document("photo"))
+                .apply(previewOptions())
+                .submit()
+        }
+        val first = cell()
+        while (!first.isDone) idle()
+        assertNotNull("drawn with previews on, and held in memory", first.get())
+
+        shown = false
+        val again = cell()
+        while (!again.isDone) idle()
+        assertTrue("shown from memory after previews went off", runCatching { again.get() }.isFailure)
+        assertEquals(1, session.thumbnailsAsked.size)
+    }
+
+    private fun previewOptions() = Thumbnail.previewOptions().override(4, 4)
+
+    private fun idle() {
+        shadowOf(Looper.getMainLooper()).idle()
+        Thread.sleep(5)
     }
 
     @Test
