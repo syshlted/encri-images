@@ -10,6 +10,8 @@
 #   app:        GateOnPhoneTest, WalkMeasurement, GrantGone    in the app's process, with its grant
 #   testvault:  SeedLibrary, RemoveLibrary, GrantChanges       a package of its own, which may write
 #
+# scripts/device/suite runs all but GrantGone on several phones, one after another (I17).
+#
 # Builds the APKs (NO_BUILD=1 skips that), installs them with -r, which keeps the grant encri keyed on the
 # install, and runs the class with am instrument rather than connectedDebugAndroidTest, which uninstalls the
 # test APK when it finishes and so drops that grant (encri-api L13). A locked vault, or a test package encri has

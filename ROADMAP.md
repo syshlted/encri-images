@@ -27,8 +27,6 @@ to do, each with a design of its own rather than Glimpse's.
 - **Third-party notices**, as encri-files shows them with a gate that checks the list (encri-files F10).
 - **A signing key**, whether encri's registry lists this app, and whether it joins encri D136's joint release (I2).
 - **Reproducible builds**, as encri-files has them (encri-files F9).
-- **Device tests in a run of their own.** They exist (I6), and run by hand, one class on one phone at a time. A
-  release wants every class on every phone, with the results kept.
 - **Protect `master`** with a ruleset, at the user's word (I1).
 
 ## Bugs

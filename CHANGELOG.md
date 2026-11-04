@@ -4,6 +4,9 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**The device tests in one run** (I17): `scripts/device/suite <serial>...` runs the gate, a small seed, the walk
+measurement, the seed's removal and the grant probe on each phone, and keeps what each logged under `build/`.
+
 **Several at once** (I16). A long press in a grid starts choosing; the action bar shares what is chosen through one
 handoff and deletes it after one question. Checked on the G6, where three of six seeded photos were shared as far as the
 chooser and then deleted.

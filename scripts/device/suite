@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: SystemHalted
+# SPDX-License-Identifier: Apache-2.0
+#
+# Runs the device tests on every phone named, one after another, and keeps what each logged (AGENTS.md I17).
+#
+#   scripts/device/suite <serial>...
+#
+# On each phone, in this order: GateOnPhoneTest; SeedLibrary, a small library of its own; WalkMeasurement over it;
+# RemoveLibrary, which takes it away again; and GrantChanges. GrantGone is left out, because it needs the app let into
+# one folder and a removal run beside it, by hand (I12). The APKs are built once, and each class is run through
+# scripts/device/instrument, so what it says there holds here.
+#
+# A phone's passphrase comes from the file PASSPHRASES names, one `<serial>=<passphrase>` a line, kept outside the
+# repository; a phone with none runs without, and a test that then needs one skips and says so. What each class logged
+# goes to build/device-runs/<time>/<serial>/<Class>.log, and the summary to summary.txt beside them. Counts, times and
+# outcomes only, as every device test logs.
+#
+# Exit status: 0 when every class passed or skipped on every phone, 1 when any failed, 2 a refusal.
+set -euo pipefail
+
+refuse() { echo "suite: $*" >&2; exit 2; }
+[ $# -gt 0 ] || refuse "usage: suite <serial>..."
+
+root=$(cd "$(dirname "$0")/../.." && pwd)
+run="$root/build/device-runs/$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$run"
+summary="$run/summary.txt"
+
+# A small library, so a run takes minutes: what the walk costs per folder is what is measured (I14).
+seed=(-e albums 10 -e perAlbum 20 -e width 160 -e height 120)
+classes=(
+  "app GateOnPhoneTest"
+  "testvault SeedLibrary ${seed[*]}"
+  "app WalkMeasurement -e walks 3 -e previews 24 -e reads 0"
+  "testvault RemoveLibrary"
+  "testvault GrantChanges"
+)
+
+(cd "$root" && ./gradlew --quiet :app:assembleDebug :app:assembleDebugAndroidTest :testvault:assembleDebugAndroidTest)
+
+failed=0
+for serial in "$@"; do
+  mkdir -p "$run/$serial"
+  passphrase=""
+  if [ -n "${PASSPHRASES:-}" ] && [ -r "$PASSPHRASES" ]; then
+    passphrase=$(sed -n "s/^$serial=\([^ ]*\).*/\1/p" "$PASSPHRASES")
+  fi
+  for entry in "${classes[@]}"; do
+    read -r module class extra <<< "$entry"
+    # shellcheck disable=SC2086 # The extra arguments are words, split on purpose.
+    if ENCRI_PASSPHRASE="$passphrase" NO_BUILD=1 "$root/scripts/device/instrument" "$serial" "$module" "$class" $extra \
+      > "$run/$serial/$class.log" 2>&1; then
+      outcome=$(tail -n 2 "$run/$serial/$class.log" | grep -m1 "^$class: " || echo "$class: passed")
+    else
+      outcome="$class: FAILED"
+      failed=1
+    fi
+    printf '%s  %s\n' "$serial" "$outcome" | tee -a "$summary"
+  done
+done
+
+echo "suite: logs in $run"
+exit "$failed"
