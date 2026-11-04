@@ -26,6 +26,9 @@ to do, each with a design of its own rather than Glimpse's.
 - **The icon** is still Glimpse's (I2).
 - **Third-party notices**, as encri-files shows them with a gate that checks the list (encri-files F10).
 - **A signing key**, whether encri's registry lists this app, and whether it joins encri D136's joint release (I2).
+- **The Play Console listing must carry the app's id**, `com.systemhalted.encri.images` (I2), which stays, at the user's
+  word (2026-11-04). The id registered there that day was `com.systemhalted.encri_images`, which a bundle of this app
+  cannot be uploaded to.
 - **Reproducible builds**, as encri-files has them (encri-files F9).
 - **Protect `master`** with a ruleset, at the user's word (I1).
 
