@@ -21,6 +21,7 @@ import com.systemhalted.encri.images.device.OnPhone.spread
 import com.systemhalted.encri.images.device.OnPhone.timed
 import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.MediaType
+import com.systemhalted.encri.images.vault.FOLDERS_AT_ONCE
 import com.systemhalted.encri.images.vault.Library
 import com.systemhalted.encri.images.vault.LinkState
 import com.systemhalted.encri.images.vault.VaultSession
@@ -41,8 +42,9 @@ import org.junit.runner.RunWith
  * takes and what it holds, and how fast encri's previews and a whole picture arrive.
  *
  * Through the app's own link and grant, so what is measured is what the app does. It skips when there is no
- * session to measure. Arguments, each optional: `walks` (3), `previews` (48), `previewSize` (180, a grid cell on
- * a phone 720 pixels wide), `concurrency` (4, Glide's own for a phone of four cores or more) and `reads` (3).
+ * session to measure. Arguments, each optional: `walks` (3), `atOnce` (folders listed at once, the walk's own),
+ * `previews` (48), `previewSize` (180, a grid cell on a phone 720 pixels wide), `concurrency` (4, Glide's own for a
+ * phone of four cores or more) and `reads` (3).
  */
 @RunWith(AndroidJUnit4::class)
 class WalkMeasurement {
@@ -60,11 +62,13 @@ class WalkMeasurement {
     /** The walk, [OnPhone.int] `walks` times; the library the last one found stays held while its heap is read. */
     private fun walk(session: VaultSession): Library {
         var library: Library? = null
+        val atOnce = OnPhone.int("atOnce", FOLDERS_AT_ONCE)
+        log("walk: $atOnce folders at once")
         repeat(OnPhone.int("walks", WALKS)) { run ->
             library = null
             val before = heldHeap()
             val counting = CountingSession(session)
-            val (walked, millis) = timed { runBlocking { walkLibrary(counting) } }
+            val (walked, millis) = timed { runBlocking { walkLibrary(counting, atOnce) } }
             library = ok(walked)
             val held = heldHeap() - before
             val found = requireNotNull(library)

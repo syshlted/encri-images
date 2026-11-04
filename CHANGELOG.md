@@ -4,6 +4,9 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**The walk lists four folders at once** (I14): on the G6, 2,000 photos in 50 folders walked in 274 to 440 ms,
+where one folder at a time took 0.9 to 1.4 seconds.
+
 **Settings of its own** (I13): *Allow screenshots*, off by default as in encri-files, and *Show previews*, on by
 default. Checked on the A20, where the first try showed every preview still from Glide's memory after they were turned
 off.

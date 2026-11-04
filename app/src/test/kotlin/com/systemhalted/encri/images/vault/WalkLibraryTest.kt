@@ -6,10 +6,12 @@
 package com.systemhalted.encri.images.vault
 
 import android.app.Application
+import com.systemhalted.encri.client.EncriDocument
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.images.datasources.MediaError
 import com.systemhalted.encri.images.models.MediaType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -113,4 +115,44 @@ class WalkLibraryTest {
         }
         assertEquals(MediaError.IO, mediaErrorOf(Failure.DISCONNECTED))
     }
+
+    /** [inner], whose every listing takes a while, counting how many are under way at once. */
+    private class Slow(
+        private val inner: FakeVaultSession,
+    ) : VaultSession by inner {
+        private var listing = 0
+        var most = 0
+
+        override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
+            most = maxOf(most, ++listing)
+            delay(10)
+            return inner.list(folderId).also { listing-- }
+        }
+    }
+
+    private val wide =
+        mapOf("root" to List(10) { folder("album$it", "Album $it") }) +
+            List(10) { "album$it" to listOf(document("photo$it", modified = it.toLong(), parentId = "album$it")) }
+
+    @Test
+    fun `several folders are listed at once, and never more than asked`() =
+        runTest {
+            val slow = Slow(FakeVaultSession(tree = wide))
+            walkLibrary(slow, atOnce = 4)
+            assertEquals(4, slow.most)
+
+            val one = Slow(FakeVaultSession(tree = wide))
+            walkLibrary(one, atOnce = 1)
+            assertEquals(1, one.most)
+        }
+
+    @Test
+    fun `what a walk finds does not depend on how many folders it lists at once`() =
+        runTest {
+            assertEquals(walkLibrary(FakeVaultSession(tree = tree), 1), walkLibrary(FakeVaultSession(tree = tree), 8))
+            val one = walkLibrary(Slow(FakeVaultSession(tree = wide)), atOnce = 1)
+            val four = walkLibrary(Slow(FakeVaultSession(tree = wide)), atOnce = 4)
+            assertEquals(10, (four as EncriResult.Ok).value.albums.size)
+            assertEquals(one, four)
+        }
 }

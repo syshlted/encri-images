@@ -20,7 +20,10 @@ import com.systemhalted.encri.images.utils.MimeUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,6 +37,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.util.Date
 
 /** Every photo and video the grant reaches, newest first, and the folders that hold them. */
@@ -53,33 +58,48 @@ data class Library(
 }
 
 /**
- * Lists the vault under [session]'s root, a folder at a time (AGENTS.md I4).
+ * Lists the vault under [session]'s root, a folder at a time (AGENTS.md I4), [atOnce] folders at once.
  *
  * encri has no query across folders, so this is the only way to know what the vault holds, and it costs one
  * request per page of every folder. A folder that went away while it was being walked is one a delete got to
  * first, which is not a failure.
  *
+ * **Several folders are listed at once** (I14), a level of the tree at a time: a walk of small folders is a string of
+ * short requests with a wait between each, which on a phone whose clock stays low through it costs more than the
+ * listing (I9). What it finds does not depend on the order the answers come in, since the library is sorted.
+ *
  * **The root gone is the session's end** (I9), not a folder deleted mid-walk: a grant of one folder whose folder
  * was deleted reaches nothing, and encri lets the app in no longer, so the walk answers [Failure.ENDED] and the
  * link asks encri again, whose answer is the gate's to show. An empty gallery would have said the folder was empty.
  */
-suspend fun walkLibrary(session: VaultSession): EncriResult<Library> {
-    val medias = mutableListOf<Media>()
-    val folders = ArrayDeque(listOf(session.root))
-    while (folders.isNotEmpty()) {
-        val folder = folders.removeFirst()
-        val listed = session.list(folder.id)
-        endOf(listed, folder, session.root)?.let { return it }
-        val albumUri = VaultUris.folder(folder.id)
-        // The root has no name worth showing: it is the vault itself, or a folder the user already chose.
-        val albumName = folder.name.takeUnless { folder.id == session.root.id }
-        listed.valueOrNull().orEmpty().forEach { child ->
-            if (child.isFolder) folders.addLast(child) else mediaOf(child, albumUri, albumName)?.let(medias::add)
+suspend fun walkLibrary(
+    session: VaultSession,
+    atOnce: Int = FOLDERS_AT_ONCE,
+): EncriResult<Library> =
+    coroutineScope {
+        val medias = mutableListOf<Media>()
+        val permits = Semaphore(atOnce)
+        var level = listOf(session.root)
+        while (level.isNotEmpty()) {
+            val listed = level.map { folder -> async { permits.withPermit { session.list(folder.id) } } }.awaitAll()
+            val next = mutableListOf<EncriDocument>()
+            level.zip(listed).forEach { (folder, children) ->
+                endOf(children, folder, session.root)?.let { return@coroutineScope it }
+                val albumUri = VaultUris.folder(folder.id)
+                // The root has no name worth showing: it is the vault itself, or a folder the user already chose.
+                val albumName = folder.name.takeUnless { folder.id == session.root.id }
+                children.valueOrNull().orEmpty().forEach { child ->
+                    if (child.isFolder) next += child else mediaOf(child, albumUri, albumName)?.let(medias::add)
+                }
+            }
+            level = next
         }
+        val newest = medias.sortedWith(compareByDescending<Media> { it.dateModified }.thenBy { it.uri })
+        EncriResult.Ok(Library(newest, albumsOf(newest)))
     }
-    val newest = medias.sortedWith(compareByDescending<Media> { it.dateModified }.thenBy { it.uri })
-    return EncriResult.Ok(Library(newest, albumsOf(newest)))
-}
+
+/** As many folders as Glide asks previews of at once, which encri already serves that many of (I8). */
+const val FOLDERS_AT_ONCE = 4
 
 /** Why [listed] ends the walk, or null when the walk goes on: past a folder deleted under it, or into this one. */
 private fun endOf(
