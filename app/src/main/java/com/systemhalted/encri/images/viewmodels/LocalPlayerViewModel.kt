@@ -51,6 +51,7 @@ import com.systemhalted.encri.images.models.RequestStatus
 import com.systemhalted.encri.images.models.RequestStatus.Companion.map
 import com.systemhalted.encri.images.utils.MotionPhotoExtractor
 import com.systemhalted.encri.images.utils.media3.ByteBufferDataSource
+import com.systemhalted.encri.images.vault.LoopWhatLasts
 import com.systemhalted.encri.images.vault.VaultMediaSource
 import com.systemhalted.encri.images.vault.VaultUris
 import com.systemhalted.encri.images.vault.initialPositionIn
@@ -81,7 +82,8 @@ class LocalPlayerViewModel(
         .setHandleAudioBecomingNoisy(true)
         .build()
         .apply {
-            repeatMode = ExoPlayer.REPEAT_MODE_ONE
+            // Looped as Glimpse loops a video, but only once it is known to last (ROADMAP.md).
+            addListener(LoopWhatLasts(this))
         }
 
     val isPlaying = exoPlayer.isPlayingFlow()

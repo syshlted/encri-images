@@ -41,8 +41,6 @@ to do, each with a design of its own rather than Glimpse's.
 
 ## Bugs
 
-- **S3 — A video of no length spins.** ExoPlayer's repeat mode over a clip whose duration is 0 creates and destroys a
-  decoder several times a second, seen on the A20 (I4). Inherited.
 - **S3 — A video playing when encri replaces the grant may stop.** Allowing `DELETE` from the viewer replaces the
   grant, encri ends the old session (encri-files F5), and a descriptor fails when its session ends (`PROTOCOL.md`), so
   a video paused behind the consent screen would fail on resuming. encri does end the session (I12); the video

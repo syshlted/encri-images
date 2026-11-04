@@ -267,7 +267,9 @@ MediaStore's slower load had hidden. The start is now read from the request itse
 **Not measured, and not to be assumed:** how long a walk takes on a large vault; anything below or above API 30; pinch
 zoom and whether ZoomImage's subsampling reaches a `Uri` it does not know; a motion photo; a large video over the proxy
 descriptor; memory on a large album. A clip whose duration is 0 spins ExoPlayer's repeat mode, creating and destroying a
-decoder several times a second (seen on the A20, inherited behaviour, `ROADMAP.md`).
+decoder several times a second (seen on the A20, inherited behaviour, `ROADMAP.md`). *Amended 2026-11-04: fixed.
+`LoopWhatLasts` starts every clip unlooped and loops one once it is ready and lasts. On the A20 that clip had started
+a decoder 132 times in six seconds, and with the fix started none and stopped; an 8-second clip still looped.*
 
 *Rejected:* adding a query across folders to the contract before this app had shown it needs one. The walk gives the
 measurement that would justify it. *Rejected:* a `ContentProvider` here serving vault content by `content://` URI so

@@ -4,6 +4,9 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Fixed: a video of no length spun the player** (I4, amended). Glimpse looped every clip, and one that lasts nothing
+made and dropped a decoder about twenty times a second on the A20. A clip now loops only once it is ready and lasts.
+
 **Fixed: a transfer to a new phone could carry what this app keeps** (I3, amended). From API 31 `allowBackup` false
 stops a cloud backup and not a device transfer, which would have taken the preferences and the saved playback
 positions, keyed by a hash of the document's id. Data extraction rules now exclude everything from both.
