@@ -638,6 +638,14 @@ nothing**: the screen answers `RESULT_CANCELED` with no rights, and the old sess
 | R+W+C+D+M, *Don't allow* | cancelled, no rights | heard nothing; works, its grant R+W+C+D | R+W+C+D |
 | R+W+C+D+M, backed out of | cancelled, no rights | the same | R+W+C+D |
 
+**A descriptor the old session opened fails once a consent is allowed** (seen 2026-11-04 on the S9 and the G6, by
+`GrantChanges` reading a document of its own across each step). It gave the 16 KiB it had buffered and then an
+`IOException`, after every consent allowed; after one refused or backed out of, it read to the end. So a video behind
+*Allow in encri* does lose its descriptor (`ROADMAP.md`'s S3). **`VaultMediaSource` opens the document again** where
+the read stopped, through the link's session, or the next one when that answers that it is over, waiting up to the
+five seconds I11 waits; an open between sessions waits the same way. Checked by unit tests; not with a video on a
+phone, which would need one longer than the player's buffer.
+
 **A grant whose folder another app deletes is gone, and its session is not told.** Over the sixty seconds in which
 the folder went, the session heard nothing, neither `Ended` nor a change, and still counted itself open. Then its root
 answered `NOT_FOUND` to a stat and to a list, `refreshGrant` answered `NOT_AUTHORIZED`, and a new session was not let

@@ -27,6 +27,12 @@ class FakeVaultSession(
     val thumbnailsAsked = mutableListOf<Triple<String, Int, Int>>()
     val opened = mutableListOf<String>()
     val content = mutableMapOf<String, File>()
+
+    /** Every descriptor [openRead] gave, which a test may close to stand for encri ending what it served. */
+    val descriptors = mutableListOf<ParcelFileDescriptor>()
+
+    /** Ended, as encri ends a session whose grant it replaced: [openRead] answers [Failure.ENDED]. */
+    var over = false
     var thumbnail: EncriResult<ByteArray> = EncriResult.Ok(byteArrayOf(1, 2, 3))
     var grant: EncriResult<EncriGrant> = EncriResult.Ok(EncriGrant(setOf(Right.READ), root))
     var grantsAsked = 0
@@ -55,8 +61,22 @@ class FakeVaultSession(
 
     override suspend fun openRead(documentId: String): EncriResult<ParcelFileDescriptor> {
         opened += documentId
-        val file = content[documentId] ?: return EncriResult.Failed(Failure.NOT_FOUND, "no such document")
-        return EncriResult.Ok(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY))
+        val file = content[documentId]
+        return when {
+            over -> {
+                EncriResult.Failed(Failure.ENDED, "the session is over")
+            }
+
+            file == null -> {
+                EncriResult.Failed(Failure.NOT_FOUND, "no such document")
+            }
+
+            else -> {
+                EncriResult.Ok(
+                    ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).also(descriptors::add),
+                )
+            }
+        }
     }
 
     override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> {

@@ -41,10 +41,6 @@ to do, each with a design of its own rather than Glimpse's.
 
 ## Bugs
 
-- **S3 — A video playing when encri replaces the grant may stop.** Allowing `DELETE` from the viewer replaces the
-  grant, encri ends the old session (encri-files F5), and a descriptor fails when its session ends (`PROTOCOL.md`), so
-  a video paused behind the consent screen would fail on resuming. encri does end the session (I12); the video
-  stopping has not been seen (I11).
 - **S2 — A gallery in front goes on showing a grant's folder after it is deleted**, until something walks again (I9).
   encri sends no notice the grant can hear, and the session does not end, though its `refreshGrant` answers
   `NOT_AUTHORIZED` (I12). A question for encri-api first.
