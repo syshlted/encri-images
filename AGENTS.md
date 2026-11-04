@@ -22,7 +22,7 @@ through encri's screen, shows Reels, Albums and Library from the vault, opens ph
 It hands a photo or video to another app only through encri's handoff, once the user has agreed (I10), and deletes
 one the user chose, asking encri for that right the first time (I11); it changes nothing else in the vault. Checked
 by hand on the A20 (API 30); see I4. Since 2026-11-03 it starts on API 28 and 29 as well (I6), and it was seen on
-API 37 on 2026-11-04; the A20, the S9, the G6 and the S24 are measured at 5,000 photos (I8, I9).
+API 37 on 2026-11-04, and its gate on API 33 under Waydroid; the A20, the S9, the G6 and the S24 are measured at 5,000 photos (I8, I9).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
 ## Relationship to the others
@@ -73,6 +73,11 @@ The same machine as encri-api and encri-files.
 
 - **The phones:** LG G6 (API 28), Galaxy S9 (API 29), Galaxy A20 (API 30) and Galaxy S24 Ultra (API 37, read from the
   phone 2026-11-02). `adb` is in `~/Android/Sdk/platform-tools`, not on `PATH`.
+- **Waydroid on bigtab01 is API 33** (Android 13, read from it 2026-11-04, though bigtab01's own notes speak of Android
+  16), with no encri. Reach it by `ssh 10.42.0.137`, where `sshd` is started by hand after a reboot; its container is
+  `192.168.240.112:5555` on bigtab01's own bridge, so from here through a tunnel,
+  `ssh -N -L 127.0.0.1:5562:192.168.240.112:5555 10.42.0.137`, then `adb connect 127.0.0.1:5562`. A new adb key is
+  allowed on the tablet's screen; this machine's was, 2026-11-04.
 - **A shell here can be inside the code-server container**, which has a `/dev` and a `gpg-agent` of its own. A phone
   enumerated after the container's `/dev` was made is listed in `/sys/bus/usb/devices` but has no device node, so `adb`
   does not see it, and a key unlocked outside the container is still locked inside it (seen 2026-11-02).
@@ -211,7 +216,11 @@ I13: unless the user allows screenshots.*
 would have carried the preferences, saved playback positions among them, each keyed by a hash of its document's id.
 Lint said so.
 `data_extraction_rules.xml` excludes every domain from both, and `ShippedManifestTest` reads it and the merged
-manifest.*
+manifest.* *Amended 2026-11-04 again: a video's sound was still another app's to record. From API 29 an app's audio may
+be captured by any app recording the screen, unless it says not, and `FLAG_SECURE` keeps out the picture alone; seen in
+the package's flags on Waydroid, API 33. `allowAudioPlaybackCapture` is false, the flag is gone there and on the S9, and
+`ShippedManifestTest` reads it. It does not follow I13's screenshot setting: a screenshot has no sound, and a
+recording's would be the vault's.*
 *Amended 2026-11-03: a dialog is a window of its own, which an activity's flag does not reach, and the info sheet's
 had none (its flags on the S9 were `0x81810102`, the activity's behind it `0x81812100`). Android leaves a secure
 window out of a screen recording and shows the rest, so the sheet's name, size, date and coordinates would have been

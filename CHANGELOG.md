@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Fixed: a screen recording could carry a vault video's sound** (I3, amended). `FLAG_SECURE` keeps out the picture,
+and from API 29 any app recording the screen may capture another's audio unless it says not; this app now says not.
+Seen in the package's flags on Waydroid, where the gate test passes at API 33.
+
 **The device tests in one run** (I17): `scripts/device/suite <serial>...` runs the gate, a small seed, the walk
 measurement, the seed's removal and the grant probe on each phone, and keeps what each logged under `build/`.
 

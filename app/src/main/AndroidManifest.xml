@@ -28,6 +28,7 @@
          here any of them would hand vault plaintext to whichever app asked (I3). -->
     <application
         android:name=".ImagesApplication"
+        android:allowAudioPlaybackCapture="false"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:appCategory="image"

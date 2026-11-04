@@ -106,6 +106,12 @@ class ShippedManifestTest {
         return application.getAttributeNS(ANDROID, name).ifEmpty { null }
     }
 
+    @Test
+    fun `a screen recording carries no sound of a vault video`() {
+        // FLAG_SECURE keeps the picture out of a recording and not the sound, which from API 29 any app may capture.
+        assertEquals("false", mergedApplicationAttribute("allowAudioPlaybackCapture"))
+    }
+
     /** Each kind of transfer in [rules], with the domains it excludes whole. */
     private fun excludedIn(rules: Int): Map<String, Set<String>> {
         val excluded = mutableMapOf<String, MutableSet<String>>()
