@@ -15,13 +15,11 @@ to do, each with a design of its own rather than Glimpse's.
    walk stays (I8, I9). Still to measure: API 27, which needs encri on an emulator; and a library of 20,000,
    where the A20's estimate was four to five seconds before Reels shows anything, one folder at a time; I14 lists four
    at once, which took the G6's walk of 2,000 photos from a second or more to under a third of one.
-2. **Several at once.** Share and delete are one photo at a time, from the viewer (I10, I11). Glimpse's selection in
-   the grid, which went with its trash, would share several through one handoff and delete them after one question.
-3. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
+2. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
    in the vault would need `MOVE` and `CREATE`, and every app with a grant would see it.
-4. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
+3. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
    so this needs somewhere to keep the answer that is not outside the vault.
-5. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
+4. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
 
 ## Before a first release
 

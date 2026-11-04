@@ -27,6 +27,7 @@
     <string name="handoff_share_explain">The app you choose next gets what is in it, not encrypted, and can keep a copy: Encri Images cannot take it back, and deleting it from the vault later does not delete that copy. The app reads it from the vault, so if it waits to read until after the vault locks or Encri Images is closed, it will find nothing.</string>
     <string name="handoff_open_title">Open in another app?</string>
     <string name="handoff_open_explain">The app you choose next gets what is in it, not encrypted, and can keep a copy: Encri Images cannot take it back. Anything that app saves, an edited copy too, it saves outside the vault, not encrypted. It reads from the vault, so once the vault locks or Encri Images is closed, it finds nothing more.</string>
+    <string name="handoff_share_several_explain">The app you choose next gets what is in them, not encrypted, and can keep copies: Encri Images cannot take them back, and deleting them from the vault later does not delete those copies. The app reads them from the vault, so if it waits to read until after the vault locks or Encri Images is closed, it will find nothing.</string>
     <string name="handoff_failed">encri would not hand this to another app.</string>
     <string name="handoff_no_app">No app on this phone can take it.</string>
 
@@ -35,6 +36,15 @@
     <string name="delete_photo_title">Delete this photo?</string>
     <string name="delete_video_title">Delete this video?</string>
     <string name="delete_explain">It is deleted from the vault, not put in a bin: this cannot be undone. A backup encri made before now may still hold a copy.</string>
+    <plurals name="delete_several_title">
+        <item quantity="one">Delete %d photo or video?</item>
+        <item quantity="other">Delete these %d photos and videos?</item>
+    </plurals>
+    <string name="delete_several_explain">They are deleted from the vault, not put in a bin: this cannot be undone. A backup encri made before now may still hold copies.</string>
+    <plurals name="delete_some_failed">
+        <item quantity="one">%d was not deleted.</item>
+        <item quantity="other">%d were not deleted.</item>
+    </plurals>
     <string name="delete_allow_title">Allow deleting, in encri?</string>
     <string name="delete_allow_explain">encri has let Encri Images look at what is in the vault, not delete from it. encri asks you next whether to let it delete as well.</string>
     <string name="delete_not_allowed">encri has not let Encri Images delete.</string>
@@ -64,6 +74,12 @@
     <!-- File actions -->
     <string name="file_action_information">Information</string>
     <string name="file_action_share">Share</string>
+
+    <!-- I16: several chosen in a grid -->
+    <plurals name="thumbnail_selection_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
 
     <!-- No media -->
     <string name="no_media">No media</string>

@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Several at once** (I16). A long press in a grid starts choosing; the action bar shares what is chosen through one
+handoff and deletes it after one question. Checked on the G6, where three of six seeded photos were shared as far as the
+chooser and then deleted.
+
 **Zoom reads the photo itself** (I15). A large photo zoomed now shows its own pixels in tiles read from the vault,
 where it showed its screen-sized decode magnified; on the G6 an 8000x6000 photo's grain came back. ZoomImage no longer
 asks Glide for the photo as a file.

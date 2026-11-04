@@ -6,15 +6,19 @@
 
 package com.systemhalted.encri.images.fragments
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -34,6 +38,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.systemhalted.encri.images.ImagesApplication
 import com.systemhalted.encri.images.R
 import com.systemhalted.encri.images.ViewActivity
 import com.systemhalted.encri.images.datasources.MediaError
@@ -42,10 +47,15 @@ import com.systemhalted.encri.images.ext.getSerializable
 import com.systemhalted.encri.images.ext.getViewProperty
 import com.systemhalted.encri.images.models.Album
 import com.systemhalted.encri.images.models.AlbumType
+import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.MediaType
 import com.systemhalted.encri.images.models.RequestStatus
 import com.systemhalted.encri.images.ui.recyclerview.ThumbnailAdapter
 import com.systemhalted.encri.images.ui.recyclerview.ThumbnailLayoutManager
+import com.systemhalted.encri.images.vault.DeleteFlow
+import com.systemhalted.encri.images.vault.Deletes
+import com.systemhalted.encri.images.vault.Handoff
+import com.systemhalted.encri.images.vault.Handoffs
 import com.systemhalted.encri.images.viewmodels.AlbumViewModel
 
 /**
@@ -63,6 +73,53 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
 
     // RecyclerView
     private val thumbnailAdapter by lazy { ThumbnailAdapter() }
+
+    // Several at once (I16): shared and deleted through the viewer's own flows, said first.
+    private val images get() = requireActivity().application as ImagesApplication
+    private val handoffs by lazy { Handoffs(requireActivity(), images.link, lifecycleScope) }
+    private val deleteFlow by lazy {
+        DeleteFlow(requireActivity(), Deletes(images.link, images.library), lifecycleScope, ::askEncri) {}
+    }
+
+    // encri learns who asked from getCallingPackage, which only a start for a result sets (encri D120).
+    private val askEncriForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            deleteFlow.answered(it.resultCode, it.data)
+        }
+
+    /** What the grid shows now, which a selection is taken from. */
+    private var shown: List<Media> = listOf()
+
+    private var actionMode: ActionMode? = null
+
+    /** Set while the view goes, whose action mode ends without letting the selection go: a rotation keeps it. */
+    private var leaving = false
+
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            requireActivity().menuInflater.inflate(R.menu.fragment_album_selection, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu) = false
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            val chosen = viewModel.selection.of(shown)
+            when (item.itemId) {
+                R.id.share -> handoffs.offer(chosen, Handoff.SHARE)
+                R.id.delete -> deleteFlow.offer(chosen)
+                else -> return false
+            }
+            return true
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            actionMode = null
+            if (!leaving) {
+                viewModel.selection.clear()
+            }
+        }
+    }
 
     // Arguments
     private val albumType: AlbumType?
@@ -112,7 +169,16 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
         )
         recyclerView.adapter = thumbnailAdapter
 
+        thumbnailAdapter.setOnItemLongPressed { media ->
+            viewModel.selection.toggle(media.uri)
+        }
+
         thumbnailAdapter.setOnItemSelected { media ->
+            if (viewModel.selection.active) {
+                viewModel.selection.toggle(media.uri)
+                return@setOnItemSelected
+            }
+
             startActivity(
                 Intent(requireContext(), ViewActivity::class.java).apply {
                     putExtras(
@@ -136,10 +202,15 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
     }
 
     override fun onDestroyView() {
+        leaving = true
+        actionMode?.finish()
+        leaving = false
+
         recyclerView.layoutManager = null
         recyclerView.adapter = null
 
         thumbnailAdapter.setOnItemSelected(null)
+        thumbnailAdapter.setOnItemLongPressed(null)
 
         super.onDestroyView()
     }
@@ -164,11 +235,29 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
             )
 
             launch {
+                viewModel.selection.uris.collectLatest { uris ->
+                    thumbnailAdapter.setSelected(uris)
+                    if (uris.isEmpty()) {
+                        actionMode?.finish()
+                    } else {
+                        val mode = actionMode ?: toolbar.startActionMode(actionModeCallback).also {
+                            actionMode = it
+                        }
+                        mode?.title = resources.getQuantityString(
+                            R.plurals.thumbnail_selection_count, uris.size, uris.size
+                        )
+                    }
+                }
+            }
+
+            launch {
                 viewModel.album.collectLatest {
                     when (it) {
                         is RequestStatus.Loading -> {
                             // Whatever was here, the vault may have locked since.
                             thumbnailAdapter.submitList(listOf())
+                            shown = listOf()
+                            viewModel.selection.clear()
                         }
 
                         is RequestStatus.Success -> {
@@ -191,6 +280,12 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
 
                             thumbnailAdapter.submitList(medias)
 
+                            // A photo deleted, here or elsewhere, leaves the selection with the grid.
+                            shown = medias.mapNotNull { item ->
+                                (item as? AlbumViewModel.AlbumContent.MediaItem)?.media
+                            }
+                            viewModel.selection.keepOnly(shown.map(Media::uri))
+
                             val isEmpty = medias.isEmpty()
                             recyclerView.isVisible = !isEmpty
                             noMediaLinearLayout.isVisible = isEmpty
@@ -202,6 +297,8 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
                             toolbar.title = ""
 
                             thumbnailAdapter.submitList(listOf())
+                            shown = listOf()
+                            viewModel.selection.clear()
 
                             recyclerView.isVisible = false
                             noMediaLinearLayout.isVisible = true
@@ -214,6 +311,15 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
                     }
                 }
             }
+        }
+    }
+
+    private fun askEncri(intent: Intent) {
+        try {
+            askEncriForResult.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            // encri was uninstalled while the grid showed; the link says so once it asks again.
+            images.link.open()
         }
     }
 

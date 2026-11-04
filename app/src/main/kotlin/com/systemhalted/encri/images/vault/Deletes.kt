@@ -89,8 +89,9 @@ class Deletes(
 }
 
 /**
- * The viewer's *Delete* (I11): asks encri for the right the first time, says that a delete cannot be undone, and
- * only then deletes. Every dialog is kept out of screenshots, and a toast names nothing (I3).
+ * The viewer's *Delete* (I11), and the grid's for several at once (I16): asks encri for the right the first time,
+ * says that a delete cannot be undone, and only then deletes. Every dialog is kept out of screenshots, and a toast
+ * names nothing (I3).
  */
 class DeleteFlow(
     private val activity: Activity,
@@ -102,14 +103,18 @@ class DeleteFlow(
     private val onDeleted: (Media) -> Unit,
 ) {
     /** What waits on encri's consent screen. */
-    private var waiting: Media? = null
+    private var waiting: List<Media>? = null
 
     /** The user pressed *Delete* on [media]. */
-    fun offer(media: Media) {
+    fun offer(media: Media) = offer(listOf(media))
+
+    /** The user pressed *Delete* on several at once, which are asked about once. */
+    fun offer(medias: List<Media>) {
+        if (medias.isEmpty()) return
         scope.launch {
             when (deletes.allowed()) {
-                true -> confirm(media)
-                false -> askToAllow(media)
+                true -> confirm(medias)
+                false -> askToAllow(medias)
                 null -> say(R.string.delete_failed)
             }
         }
@@ -120,39 +125,56 @@ class DeleteFlow(
         resultCode: Int,
         data: Intent?,
     ) {
-        val media = waiting ?: return
+        val medias = waiting ?: return
         waiting = null
         if (Right.DELETE !in Encri.authorizationResult(resultCode, data).orEmpty()) return
         scope.launch {
-            if (deletes.awaitAllowed()) confirm(media) else say(R.string.delete_not_allowed)
+            if (deletes.awaitAllowed()) confirm(medias) else say(R.string.delete_not_allowed)
         }
     }
 
-    private fun confirm(media: Media) {
-        val title = if (media.mediaType == MediaType.VIDEO) R.string.delete_video_title else R.string.delete_photo_title
-        show(
-            MaterialAlertDialogBuilder(activity)
-                .setTitle(title)
-                .setMessage(R.string.delete_explain)
-                .setPositiveButton(R.string.file_action_delete) { _, _ -> scope.launch { delete(media) } },
-        )
+    private fun confirm(medias: List<Media>) {
+        val builder = MaterialAlertDialogBuilder(activity)
+        val single = medias.singleOrNull()
+        when {
+            single == null -> {
+                builder
+                    .setTitle(
+                        activity.resources.getQuantityString(R.plurals.delete_several_title, medias.size, medias.size),
+                    ).setMessage(R.string.delete_several_explain)
+            }
+
+            single.mediaType == MediaType.VIDEO -> {
+                builder.setTitle(R.string.delete_video_title).setMessage(R.string.delete_explain)
+            }
+
+            else -> {
+                builder.setTitle(R.string.delete_photo_title).setMessage(R.string.delete_explain)
+            }
+        }
+        show(builder.setPositiveButton(R.string.file_action_delete) { _, _ -> scope.launch { delete(medias) } })
     }
 
-    private suspend fun delete(media: Media) {
-        when (deletes.delete(media)) {
-            Deleted.GONE -> onDeleted(media)
-            Deleted.NOT_ALLOWED -> askToAllow(media)
-            Deleted.FAILED -> say(R.string.delete_failed)
+    /** Deletes [medias] one after another; what is left, encri's grant lets be asked for again, or is said. */
+    private suspend fun delete(medias: List<Media>) {
+        val answers = medias.associateWith { deletes.delete(it) }
+        answers.filterValues { it == Deleted.GONE }.keys.forEach(onDeleted)
+        val left = answers.filterValues { it != Deleted.GONE }.keys.toList()
+        when {
+            left.isEmpty() -> Unit
+            Deleted.NOT_ALLOWED in answers.values -> askToAllow(left)
+            medias.size == 1 -> say(R.string.delete_failed)
+            else -> say(activity.resources.getQuantityString(R.plurals.delete_some_failed, left.size, left.size))
         }
     }
 
-    private fun askToAllow(media: Media) =
+    private fun askToAllow(medias: List<Media>) =
         show(
             MaterialAlertDialogBuilder(activity)
                 .setTitle(R.string.delete_allow_title)
                 .setMessage(R.string.delete_allow_explain)
                 .setPositiveButton(R.string.vault_gate_allow) { _, _ ->
-                    waiting = media
+                    waiting = medias
                     askEncri(Encri.authorizationIntent(setOf(Right.READ, Right.DELETE)))
                 },
         )
@@ -162,5 +184,8 @@ class DeleteFlow(
 
     private fun say(
         @StringRes text: Int,
-    ) = Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
+    ) = say(activity.getString(text))
+
+    /** A toast, which the system draws outside this app's windows, so it says counts and never names a document. */
+    private fun say(text: String) = Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
 }

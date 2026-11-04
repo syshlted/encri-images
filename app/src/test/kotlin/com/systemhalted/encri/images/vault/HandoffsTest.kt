@@ -12,6 +12,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Looper
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.systemhalted.encri.client.Encri
@@ -24,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -125,6 +127,54 @@ class HandoffsTest {
         assertEquals("", target.clipData!!.description.label)
         assertTrue(target.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
         assertNull("the share sheet names itself", chooser.getCharSequenceExtra(Intent.EXTRA_TITLE))
+    }
+
+    private val film =
+        photo.copy(uri = VaultUris.document("v1"), mediaType = MediaType.VIDEO, mimeType = "video/mp4")
+
+    private fun messageShown(): String = shown().findViewById<TextView>(android.R.id.message)!!.text.toString()
+
+    @Test
+    fun `several are shared through one handoff, each in the stream and the clip (I16)`() {
+        val second = photo.copy(uri = VaultUris.document("p2"))
+        handoffs.offer(listOf(photo, second), Handoff.SHARE)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(activity.getString(R.string.handoff_share_several_explain), messageShown())
+        press(AlertDialog.BUTTON_POSITIVE)
+
+        assertEquals(listOf(listOf("p1", "p2")), session.handedOff)
+        val target = started()!!.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)!!
+        val handed = listOf(Uri.parse("content://handoff.test/p1"), Uri.parse("content://handoff.test/p2"))
+        assertEquals(Intent.ACTION_SEND_MULTIPLE, target.action)
+        assertEquals("image/jpeg", target.type)
+        assertEquals(handed, target.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java))
+        assertEquals(handed, List(target.clipData!!.itemCount) { target.clipData!!.getItemAt(it).uri })
+        assertTrue(target.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+    }
+
+    @Test
+    fun `several share as the type they have in common, or as any`() {
+        assertEquals("image/jpeg", Handoffs.mimeTypeOf(listOf(photo, photo)))
+        assertEquals("image/*", Handoffs.mimeTypeOf(listOf(photo, photo.copy(mimeType = "image/png"))))
+        assertEquals("*/*", Handoffs.mimeTypeOf(listOf(photo, film)))
+    }
+
+    @Test
+    fun `a handoff that comes back short opens nothing`() {
+        session.handOff = EncriResult.Ok(listOf(Uri.parse("content://handoff.test/p1")))
+        handoffs.offer(listOf(photo, film), Handoff.SHARE)
+        shadowOf(Looper.getMainLooper()).idle()
+        press(AlertDialog.BUTTON_POSITIVE)
+
+        assertNull(started())
+        assertEquals(activity.getString(R.string.handoff_failed), ShadowToast.getTextOfLatestToast())
+    }
+
+    @Test
+    fun `only a share takes several, since a view is of one`() {
+        assertThrows(IllegalArgumentException::class.java) { handoffs.offer(listOf(photo, film), Handoff.OPEN_WITH) }
+        handoffs.offer(emptyList(), Handoff.SHARE)
+        assertNull(ShadowDialog.getLatestDialog())
     }
 
     @Test

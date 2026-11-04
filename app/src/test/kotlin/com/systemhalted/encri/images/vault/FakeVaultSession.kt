@@ -42,6 +42,9 @@ class FakeVaultSession(
     var handOff: EncriResult<List<Uri>>? = null
     val deleted = mutableListOf<String>()
     var delete: EncriResult<Unit> = EncriResult.Ok(Unit)
+
+    /** What a delete of one document in particular answers, ahead of [delete]. */
+    val deleteFailures = mutableMapOf<String, Failure>()
     var closed = false
 
     override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
@@ -86,7 +89,7 @@ class FakeVaultSession(
 
     override suspend fun delete(documentId: String): EncriResult<Unit> {
         deleted += documentId
-        return delete
+        return deleteFailures[documentId]?.let { EncriResult.Failed(it, "told to fail") } ?: delete
     }
 
     override suspend fun grant(): EncriResult<EncriGrant> {

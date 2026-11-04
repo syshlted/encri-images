@@ -25,13 +25,24 @@ import kotlinx.coroutines.launch
 enum class Handoff(
     @param:StringRes val title: Int,
     @param:StringRes val explain: Int,
+    @param:StringRes val explainSeveral: Int,
     @param:StringRes val confirm: Int,
 ) {
-    /** Through the share sheet, as `ACTION_SEND`. */
-    SHARE(R.string.handoff_share_title, R.string.handoff_share_explain, R.string.file_action_share),
+    /** Through the share sheet, as `ACTION_SEND`, or `ACTION_SEND_MULTIPLE` for several (I16). */
+    SHARE(
+        R.string.handoff_share_title,
+        R.string.handoff_share_explain,
+        R.string.handoff_share_several_explain,
+        R.string.file_action_share,
+    ),
 
-    /** To whichever app the user picks to look at it or edit it, as `ACTION_VIEW`. */
-    OPEN_WITH(R.string.handoff_open_title, R.string.handoff_open_explain, R.string.file_action_open_with),
+    /** To whichever app the user picks to look at it or edit it, as `ACTION_VIEW`, which takes one alone. */
+    OPEN_WITH(
+        R.string.handoff_open_title,
+        R.string.handoff_open_explain,
+        R.string.handoff_open_explain,
+        R.string.file_action_open_with,
+    ),
 }
 
 /**
@@ -52,29 +63,38 @@ class Handoffs(
     fun offer(
         media: Media,
         way: Handoff,
+    ) = offer(listOf(media), way)
+
+    /** The same for several at once (I16), through one handoff, after one question. Only a share takes more. */
+    fun offer(
+        medias: List<Media>,
+        way: Handoff,
     ) {
+        if (medias.isEmpty()) return
+        require(medias.size == 1 || way == Handoff.SHARE) { "only a share takes more than one" }
         val dialog =
             MaterialAlertDialogBuilder(activity)
                 .setTitle(way.title)
-                .setMessage(way.explain)
-                .setPositiveButton(way.confirm) { _, _ -> scope.launch { handOver(media, way) } }
+                .setMessage(if (medias.size > 1) way.explainSeveral else way.explain)
+                .setPositiveButton(way.confirm) { _, _ -> scope.launch { handOver(medias, way) } }
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
         SecureWindows.secure(dialog).show()
     }
 
-    /** Asks encri for a handoff of [media], and passes it to the app the user picks. */
+    /** Asks encri for one handoff of [medias], and passes them to the app the user picks. */
     internal suspend fun handOver(
-        media: Media,
+        medias: List<Media>,
         way: Handoff,
     ) {
-        val documentId = VaultUris.documentIdOf(media.uri) ?: return
-        val handed = link.ask { it.handOff(listOf(documentId)) }
-        val uri = (handed as? EncriResult.Ok)?.value?.singleOrNull()
-        if (uri == null) {
+        val documentIds = medias.mapNotNull { VaultUris.documentIdOf(it.uri) }
+        if (documentIds.size != medias.size) return
+        val handed = link.ask { it.handOff(documentIds) }
+        val uris = (handed as? EncriResult.Ok)?.value?.takeIf { it.size == documentIds.size }
+        if (uris.isNullOrEmpty()) {
             say(R.string.handoff_failed)
         } else {
-            choose(chooserFor(way, uri, media.mimeType))
+            choose(chooserFor(way, uris, mimeTypeOf(medias)))
         }
     }
 
@@ -91,13 +111,32 @@ class Handoffs(
         way: Handoff,
         uri: Uri,
         mimeType: String,
+    ): Intent = chooserFor(way, listOf(uri), mimeType)
+
+    /** The same over several [uris], which only a share takes, each in the stream and in the clip. */
+    internal fun chooserFor(
+        way: Handoff,
+        uris: List<Uri>,
+        mimeType: String,
     ): Intent {
         val target =
-            when (way) {
-                Handoff.SHARE -> Intent(Intent.ACTION_SEND).setType(mimeType).putExtra(Intent.EXTRA_STREAM, uri)
-                Handoff.OPEN_WITH -> Intent(Intent.ACTION_VIEW).setDataAndType(uri, mimeType)
+            when {
+                way == Handoff.SHARE && uris.size > 1 -> {
+                    Intent(Intent.ACTION_SEND_MULTIPLE)
+                        .setType(mimeType)
+                        .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+                }
+
+                way == Handoff.SHARE -> {
+                    Intent(Intent.ACTION_SEND).setType(mimeType).putExtra(Intent.EXTRA_STREAM, uris.single())
+                }
+
+                else -> {
+                    Intent(Intent.ACTION_VIEW).setDataAndType(uris.single(), mimeType)
+                }
             }.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        target.clipData = ClipData.newRawUri("", uri)
+        target.clipData =
+            ClipData.newRawUri("", uris.first()).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
         // The share sheet has a title of its own; a chooser for anything else does not.
         val title = activity.getString(R.string.file_action_open_with).takeIf { way == Handoff.OPEN_WITH }
         val chooser = Intent.createChooser(target, title)
@@ -122,6 +161,19 @@ class Handoffs(
             .queryIntentActivities(intent, 0)
             .map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
             .filter { it.packageName == Encri.PACKAGE }
+
+    internal companion object {
+        /** The type several share as: theirs if they have one, any image or any video if they are all one, or any. */
+        fun mimeTypeOf(medias: List<Media>): String {
+            val types = medias.map { it.mimeType }.toSet()
+            val kinds = types.map { it.substringBefore('/') }.toSet()
+            return when {
+                types.size == 1 -> types.single()
+                kinds.size == 1 -> "${kinds.single()}/*"
+                else -> "*/*"
+            }
+        }
+    }
 
     /** A toast, which the system draws outside this app's windows, so it never names a document. */
     private fun say(

@@ -6,6 +6,10 @@
 
 package com.systemhalted.encri.images.ui.recyclerview
 
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.net.Uri
+import android.os.Build
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +31,10 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
     UniqueItemDiffCallback()
 ) {
     private var onItemSelected: (media: Media) -> Unit = {}
+    private var onItemLongPressed: (media: Media) -> Unit = {}
+
+    // What is chosen, drawn over each cell (I16)
+    private var selected: Set<Uri> = emptySet()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         LayoutInflater.from(parent.context).let { layoutInflater ->
@@ -58,7 +66,30 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
         }
     }
 
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        // Only what is chosen changed: the picture is not loaded again.
+        if (SELECTION in payloads && holder is ThumbnailViewHolder) {
+            holder.bindSelection((getItem(position) as AlbumViewModel.AlbumContent.MediaItem).media)
+        } else {
+            onBindViewHolder(holder, position)
+        }
+    }
+
     override fun getItemViewType(position: Int) = getItem(position).viewType
+
+    fun setOnItemLongPressed(onItemLongPressed: ((media: Media) -> Unit)?) {
+        this.onItemLongPressed = onItemLongPressed ?: {}
+    }
+
+    fun setSelected(selected: Set<Uri>) {
+        if (selected == this.selected) return
+        this.selected = selected
+        notifyItemRangeChanged(0, itemCount, SELECTION)
+    }
 
     fun setOnItemSelected(onItemSelected: ((media: Media) -> Unit)?) {
         this.onItemSelected = onItemSelected ?: {}
@@ -66,6 +97,9 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
 
     inner class ThumbnailViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // Views
+        private val selectionCheckedImageView =
+            itemView.findViewById<ImageView>(R.id.selectionCheckedImageView)!!
+        private val selectionScrimView = itemView.findViewById<View>(R.id.selectionScrimView)!!
         private val videoOverlayImageView =
             itemView.findViewById<ImageView>(R.id.videoOverlayImageView)!!
         private val thumbnailImageView = itemView.findViewById<ImageView>(R.id.thumbnailImageView)!!
@@ -74,6 +108,10 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
             itemView.setOnClickListener {
                 onItemSelected(media)
             }
+            itemView.setOnLongClickListener {
+                onItemLongPressed(media)
+                true
+            }
 
             thumbnailImageView.load(
                 media.uri,
@@ -81,6 +119,32 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
             )
 
             videoOverlayImageView.isVisible = media.mediaType == MediaType.VIDEO
+
+            bindSelection(media)
+        }
+
+        /** Glimpse's look for a chosen cell: blurred from API 31, behind a scrim before it, and checked. */
+        fun bindSelection(media: Media) {
+            val isSelected = media.uri in selected
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                thumbnailImageView.setRenderEffect(
+                    when (isSelected) {
+                        true -> RenderEffect.createBlurEffect(BLUR_RADIUS, BLUR_RADIUS, Shader.TileMode.CLAMP)
+                        false -> null
+                    }
+                )
+            } else {
+                selectionScrimView.isVisible = isSelected
+            }
+
+            selectionCheckedImageView.isVisible = selected.isNotEmpty()
+            selectionCheckedImageView.setImageResource(
+                when (isSelected) {
+                    true -> R.drawable.ic_check_circle
+                    false -> R.drawable.ic_check_circle_outline
+                }
+            )
         }
     }
 
@@ -95,5 +159,10 @@ class ThumbnailAdapter : ListAdapter<AlbumViewModel.AlbumContent, RecyclerView.V
                 DateUtils.DAY_IN_MILLIS
             )
         }
+    }
+
+    companion object {
+        private const val SELECTION = "selection"
+        private const val BLUR_RADIUS = 16f
     }
 }

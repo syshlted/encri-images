@@ -350,6 +350,74 @@ class DeletesTest {
         assertEquals(emptyList<Media>(), gone)
     }
 
+    private fun message(): String = shown().findViewById<TextView>(android.R.id.message)!!.text.toString()
+
+    @Test
+    fun `several are said once, and Delete deletes them all (I16)`() {
+        val rig = uiRig()
+        rig.session.grant = grantOf(Right.READ, Right.DELETE)
+        val several = listOf(rig.media("other"), rig.media("photo"), rig.media("film"))
+
+        flowOf(rig).offer(several)
+        idle()
+        assertEquals(activity.resources.getQuantityString(R.plurals.delete_several_title, 3, 3), title())
+        assertEquals(activity.getString(R.string.delete_several_explain), message())
+        assertEquals(emptyList<String>(), rig.session.deleted)
+
+        press(AlertDialog.BUTTON_POSITIVE)
+        assertEquals(listOf("other", "photo", "film"), rig.session.deleted)
+        assertEquals(several, gone)
+        assertEquals(emptyList<String>(), rig.ids())
+    }
+
+    @Test
+    fun `of several, those that fail are counted and the rest are deleted`() {
+        val rig = uiRig()
+        rig.session.grant = grantOf(Right.READ, Right.DELETE)
+        rig.session.deleteFailures["film"] = Failure.FAILED
+
+        flowOf(rig).offer(listOf(rig.media("photo"), rig.media("film")))
+        idle()
+        press(AlertDialog.BUTTON_POSITIVE)
+
+        assertEquals("the one that failed stays, as does what was not chosen", listOf("other", "film"), rig.ids())
+        assertEquals(listOf(VaultUris.document("photo")), gone.map(Media::uri))
+        assertEquals(
+            activity.resources.getQuantityString(R.plurals.delete_some_failed, 1, 1),
+            ShadowToast.getTextOfLatestToast(),
+        )
+    }
+
+    @Test
+    fun `of several, a grant narrowed part way asks encri again for what is left`() {
+        val rig = uiRig()
+        rig.session.grant = grantOf(Right.READ, Right.DELETE)
+        rig.session.deleteFailures["film"] = Failure.NOT_AUTHORIZED
+        val flow = flowOf(rig)
+
+        flow.offer(listOf(rig.media("photo"), rig.media("film")))
+        idle()
+        press(AlertDialog.BUTTON_POSITIVE)
+        assertEquals(activity.getString(R.string.delete_allow_title), title())
+
+        press(AlertDialog.BUTTON_POSITIVE)
+        rig.session.deleteFailures.clear()
+        flow.answered(Activity.RESULT_OK, consent(Right.READ, Right.DELETE))
+        idle()
+        assertEquals("only what is left is asked about", activity.getString(R.string.delete_video_title), title())
+        press(AlertDialog.BUTTON_POSITIVE)
+        assertEquals(listOf("photo", "film", "film"), rig.session.deleted)
+        assertEquals(listOf("other"), rig.ids())
+    }
+
+    @Test
+    fun `nothing chosen is nothing to delete`() {
+        val rig = uiRig()
+        flowOf(rig).offer(emptyList())
+        idle()
+        assertEquals(0, rig.session.grantsAsked)
+    }
+
     /** encri's answer: the rights allowed, in the extra and the bits they were asked in. */
     private fun consent(vararg rights: Right): Intent =
         Intent().putExtras(Encri.authorizationIntent(rights.toSet()).extras!!)

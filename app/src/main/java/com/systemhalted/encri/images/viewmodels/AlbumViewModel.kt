@@ -29,6 +29,7 @@ import com.systemhalted.encri.images.models.MediaType
 import com.systemhalted.encri.images.models.RequestStatus
 import com.systemhalted.encri.images.models.RequestStatus.Companion.map
 import com.systemhalted.encri.images.models.UniqueItem
+import com.systemhalted.encri.images.vault.Selection
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
@@ -71,6 +72,9 @@ class AlbumViewModel(application: Application) : ImagesViewModel(application) {
         val mediaType: MediaType? = null,
         val mimeType: String? = null,
     )
+
+    /** What is chosen in this grid, for one share or one delete (I16). */
+    val selection = Selection()
 
     private val _albumRequest = MutableStateFlow<AlbumRequest?>(null)
     val albumRequest = _albumRequest.asStateFlow()
