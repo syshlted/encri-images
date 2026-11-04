@@ -31,7 +31,6 @@ to do, each with a design of its own rather than Glimpse's.
 ## Before a first release
 
 - **The icon** is still Glimpse's (I2).
-- **Stable dependencies**, for the alphas Glimpse was forked with (I1).
 - **Third-party notices**, as encri-files shows them with a gate that checks the list (encri-files F10).
 - **A signing key**, whether encri's registry lists this app, and whether it joins encri D136's joint release (I2).
 - **Reproducible builds**, as encri-files has them (encri-files F9).

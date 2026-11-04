@@ -4,6 +4,9 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Stable dependencies** (I1, amended). Glimpse's five alphas are the stable releases of their lines, and nothing the
+app ships is a pre-release.
+
 **Fixed: a video behind encri's consent screen lost what it was reading** (I12, amended). An allowed consent ends the
 session, and a descriptor it opened fails after the 16 KiB it had buffered, seen on the S9 and the G6. The player's
 source now opens the video again where it stopped, through the next session.

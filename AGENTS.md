@@ -139,6 +139,11 @@ module, which would measure Glimpse having no tests rather than this code having
    rule was the whole module, nothing excluded.
 2. **Glimpse's alpha dependencies are kept** (`core`, `activity`, `lifecycle`, `material`, `exifinterface`), at the
    versions it was forked with. A gallery of a vault should be on stable releases before it ships (`ROADMAP.md`).
+   *Amended 2026-11-04: each is now the stable release of the line it was on, at its latest patch (`activity` 1.12.4,
+   `core` 1.18.0, `exifinterface` 1.4.2, `lifecycle` 2.10.0, `material` 1.14.0), which takes `navigationevent` and
+   `savedstate` off their alphas too and adds one jar of annotations, `androidx.compose.runtime:runtime-annotation`.
+   Nothing in the lockfile is a pre-release now. The gallery, a photo and the settings were opened on the S9 and the
+   A20 with them.*
 3. **Nothing in GitHub protects `master` yet.** encri-files' ruleset requires signatures; here it is not set, because
    changing a repository's rules is the user's to say.
 
