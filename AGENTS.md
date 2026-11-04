@@ -542,7 +542,10 @@ image, and which showed the test photo it read through the handoff. Nothing was 
 straight to LG's gallery, the one viewer there, which showed the photo. **And on the A20 (API 30)**, 2026-11-04,
 where package visibility applies: the dialog's window `0x1822002`, with `FLAG_SECURE`; a share sheet without encri,
 whose older build there takes a shared image too (`ShareToEncri`); and *Open with*, passed straight to Samsung's
-gallery, which showed the photo.
+gallery, which showed the photo. **And on the S24 (API 37)**, the same day: the dialog's window `0x1822002`; a
+share sheet, now the platform's IntentResolver, without encri; and *Open with*, a chooser of the nineteen apps there
+that view an image, where Samsung's Gallery was picked rather than Google Photos, which uploads. It opened the
+handoff and logged no error; the photo was not looked at, since nothing is captured on that phone.
 
 **Flagged for veto:**
 
@@ -594,7 +597,8 @@ neither; the app waits for either, and `PROTOCOL.md` says neither. *Amended by I
 same: *Allow in encri*, encri's screen listing both rights, *Delete this photo?* at once after *Allow the whole vault*,
 the photo gone from a fresh walk (2,081 of 2,082), and a second *Delete* straight to the question. **And on the A20
 (API 30)**, 2026-11-04: *Allow in encri*, encri's screen, *Delete this photo?* at once after *Allow the whole vault*,
-and the album at two of three after a fresh start.
+and the album at two of three after a fresh start. **And on the S24 (API 37)**, the same day: encri's screen listing
+both rights, the question at once, and the album at 49 of 50 after a fresh start.
 
 **Not built:** several at once (`ROADMAP.md`). **Not measured:** deleting a video on a phone; the unit tests cover the
 library, not the viewer's playback position.
@@ -646,4 +650,4 @@ app keeps taking a missing root for the end (I9).*
 **Not seen:** a grant of one folder replaced by one of the whole vault, or the other way; the S9 or the A20, though
 they run the same encri. *Amended the same day: the A20's encri is an earlier build of 0.1.0 than the G6's and the
 S9's, which are one file, and `GrantChanges` answered there exactly as on the G6. Amended 2026-11-04: so did
-`GrantGone`.*
+`GrantGone`, and both probes on the S24 (API 37), with the G6's encri.*

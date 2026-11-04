@@ -6,8 +6,8 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 **Measured on the S24** (I9), at API 37, the first phone above API 30: a walk of 5,080 photos in an eighth of a
 second, previews three times as fast as on any other phone, and Reels at 120 Hz missing about one frame in a thousand.
-**Share, open with and delete checked on the A20** (I10, I11), at API 30, and **`GrantGone` there** (I12), whose
-older encri answered as the G6's did.
+**Share, open with and delete checked on the A20 and the S24** (I10, I11), at API 30 and 37, and **both probes on
+the S24 and `GrantGone` on the A20** (I12), which answered as on the G6.
 
 ## 2026-11-03
 
