@@ -21,8 +21,8 @@ and in encri-api's for the wire. It is not restated here. What this file owns is
 through encri's screen, shows Reels, Albums and Library from the vault, opens photos, and plays videos with seeking.
 It hands a photo or video to another app only through encri's handoff, once the user has agreed (I10), and deletes
 one the user chose, asking encri for that right the first time (I11); it changes nothing else in the vault. Checked
-by hand on the A20 (API 30); see I4. Since 2026-11-03 it starts on API 28 and 29 as well (I6), and the A20, the S9
-and the G6 are measured at 5,000 photos (I8, I9).
+by hand on the A20 (API 30); see I4. Since 2026-11-03 it starts on API 28 and 29 as well (I6), and it was seen on
+API 37 on 2026-11-04; the A20, the S9, the G6 and the S24 are measured at 5,000 photos (I8, I9).
 The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
 
 ## Relationship to the others
@@ -87,6 +87,13 @@ The same machine as encri-api and encri-files.
   fifth of a core whenever the home screen shows, and `WalkMeasurement` has no screen of its own. Its CPU governor is
   `interactive`, so anything else running raises the clock and speeds a walk up: a shell loop reading the clock every
   200 ms cut one to a third (I9).
+- **The S24 is a phone in daily use with a test vault on it** (the user's word, 2026-11-03). Read only encri's and this
+  app's text from its screen, and capture nothing: other apps' windows hold what is not a test's. Its vault's
+  passphrase is the user's and is not on file; the phone's fingerprint unlocks it. encri 0.1.0 can neither change nor
+  remove a passphrase: *Ways into this vault* only renames one.
+- **Norton Mobile Security on the S24 opened a *malware found* screen** during the first install of the test vault's
+  APK (2026-11-04). What it named was not read, because a run's own UI automation keeps `uiautomator dump` out; it had
+  closed by the time the run ended, and nothing was removed.
 - **`uiautomator dump` hangs while a video plays**, and a window with `FLAG_SECURE` cannot be captured (`screencap`
   exits 1). A throwaway local build with `SecureWindows` emptied is how the screens were looked at. Never commit one.
 
@@ -431,18 +438,18 @@ fingerprint or pattern, which only the user can give, so a new phone's vault tak
 that, and is not measured here. *Amended 2026-11-03: the user gave it the same day, and the G6 is measured below.*
 
 **The S9 (API 29) against the A20 (API 30, I8)**, with the same two libraries, seeded and removed the same way, and
-the G6 (API 28) added the same day:
+the G6 (API 28) added the same day, and the S24 (API 37) on 2026-11-04:
 
-| | A20 | S9 | G6 |
-|---|---|---|---|
-| Walk of about 2,080 photos in about 50 folders, again | 648–672 ms | 285–337 ms | 947–1,356 ms |
-| Walk of about 5,080, with 3,000 in one folder, again | 1,056–1,164 ms | 509–515 ms | 513–602 ms |
-| The folder of 3,000, listed | 362–442 ms | 173–196 ms | 169–253 ms |
-| A folder of about 50, listed | 11 ms | 5 ms | 14–24 ms, or 5 with the clock up |
-| A 180x180 preview, one at a time (median) | 62–68 ms | 46–50 ms | 41–55 ms |
-| Previews, four at a time | 54–56 a second | 62–64 a second | 65–71 a second |
-| A 4000x3000 photo read | 15–16 MiB/s | 23 MiB/s | 14–20 MiB/s |
-| Twenty flings up Reels: janky, 99th percentile | 7–10%, 30–48 ms | 0.6–2%, 14–24 ms | 59–88%, 57–65 ms |
+| | A20 | S9 | G6 | S24 |
+|---|---|---|---|---|
+| Walk of about 2,080 photos in about 50 folders, again | 648–672 ms | 285–337 ms | 947–1,356 ms | 277–353 ms |
+| Walk of about 5,080, with 3,000 in one folder, again | 1,056–1,164 ms | 509–515 ms | 513–602 ms | 125–127 ms |
+| The folder of 3,000, listed | 362–442 ms | 173–196 ms | 169–253 ms | 35–37 ms |
+| A folder of about 50, listed | 11 ms | 5 ms | 14–24 ms, or 5 with the clock up | 3–5 ms, or 1 |
+| A 180x180 preview, one at a time (median) | 62–68 ms | 46–50 ms | 41–55 ms | 11–35 ms |
+| Previews, four at a time | 54–56 a second | 62–64 a second | 65–71 a second | 206–212 a second |
+| A 4000x3000 photo read | 15–16 MiB/s | 23 MiB/s | 14–20 MiB/s | 30 MiB/s |
+| Twenty flings up Reels: janky, 99th percentile | 7–10%, 30–48 ms | 0.6–2%, 14–24 ms | 59–88%, 57–65 ms | 0.1%, 21–23 ms |
 
 On the S9 the app held 188 MB during the flings at 5,082 photos, 66 MB of it graphics at its 1080x2220. The walk's
 shape is the A20's at about half the cost, so I8's decision stands.
@@ -462,6 +469,14 @@ panel's own 1440x2880. At a temporary 1080x2160, near the S9's size, 48% were. I
 thread's 90th percentile was 24.5 ms and drawing waited 13.4 ms for a buffer: a 2017 phone's CPU and GPU at its own
 resolution, both, rather than something the app does on this phone alone. The app held 254 to 276 MB, 127 to 132 MB
 of it graphics.
+
+**The S24 (API 37) walks 5,080 photos in an eighth of a second, and draws Reels at 120 Hz missing about one frame in
+a thousand.** That janky count is Android's own since API 31, frames that missed the deadline the compositor gave
+them. The older phones count against a fixed budget, and by that count the S24's frames are 64 to 87% janky at 120 Hz,
+which compares with nothing. Its walk has the G6's shape at a smaller scale: the library of 2,080 walked slower than
+the one of 5,080, its folders of fifty listing in 3 to 5 ms against 1. Previews came three times as fast as on any
+other phone. The app held 292 to 342 MB during the flings, 140 to 166 MB of it graphics at 1440x3120. Walks were
+measured with Settings in front, as on the G6. Nothing here argues against I8's decision.
 
 **A grant of one folder reaches that folder and nothing else.** Asked on encri's consent screen for *one folder only*
 and given the first library, the walk found its 2,082 photos in 43 albums across its 50 folders, and nothing of the
@@ -524,7 +539,10 @@ apps, no encri; and *Open with*, which Android passed straight to Samsung's gall
 image, and which showed the test photo it read through the handoff. Nothing was sent to an app that uploads.
 **And on the G6 (API 28)**, the same day: the dialog's window `SECURE`; a share sheet of ten apps, without encri's
 `ShareToEncri`, the eleventh the package manager lists for a shared image; and *Open with*, which Android passed
-straight to LG's gallery, the one viewer there, which showed the photo.
+straight to LG's gallery, the one viewer there, which showed the photo. **And on the A20 (API 30)**, 2026-11-04,
+where package visibility applies: the dialog's window `0x1822002`, with `FLAG_SECURE`; a share sheet without encri,
+whose older build there takes a shared image too (`ShareToEncri`); and *Open with*, passed straight to Samsung's
+gallery, which showed the photo.
 
 **Flagged for veto:**
 
@@ -574,7 +592,9 @@ the question. Whether encri ended the old session or widened its grant in place 
 neither; the app waits for either, and `PROTOCOL.md` says neither. *Amended by I12: encri ends it.* **And on the G6
 (API 28)**, the same day, the
 same: *Allow in encri*, encri's screen listing both rights, *Delete this photo?* at once after *Allow the whole vault*,
-the photo gone from a fresh walk (2,081 of 2,082), and a second *Delete* straight to the question.
+the photo gone from a fresh walk (2,081 of 2,082), and a second *Delete* straight to the question. **And on the A20
+(API 30)**, 2026-11-04: *Allow in encri*, encri's screen, *Delete this photo?* at once after *Allow the whole vault*,
+and the album at two of three after a fresh start.
 
 **Not built:** several at once (`ROADMAP.md`). **Not measured:** deleting a video on a phone; the unit tests cover the
 library, not the viewer's playback position.
@@ -625,4 +645,5 @@ app keeps taking a missing root for the end (I9).*
 
 **Not seen:** a grant of one folder replaced by one of the whole vault, or the other way; the S9 or the A20, though
 they run the same encri. *Amended the same day: the A20's encri is an earlier build of 0.1.0 than the G6's and the
-S9's, which are one file, and `GrantChanges` answered there exactly as on the G6.*
+S9's, which are one file, and `GrantChanges` answered there exactly as on the G6. Amended 2026-11-04: so did
+`GrantGone`.*

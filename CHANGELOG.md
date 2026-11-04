@@ -2,6 +2,13 @@
 
 What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is next.
 
+## 2026-11-04
+
+**Measured on the S24** (I9), at API 37, the first phone above API 30: a walk of 5,080 photos in an eighth of a
+second, previews three times as fast as on any other phone, and Reels at 120 Hz missing about one frame in a thousand.
+**Share, open with and delete checked on the A20** (I10, I11), at API 30, and **`GrantGone` there** (I12), whose
+older encri answered as the G6's did.
+
 ## 2026-11-03
 
 **What encri does when a grant changes** (I12), seen on the G6 by two new probes, `GrantChanges` and `GrantGone`.
