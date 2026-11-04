@@ -22,6 +22,7 @@ import com.github.panpf.zoomimage.GlideZoomImageView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.systemhalted.encri.images.ImagesApplication
 import com.systemhalted.encri.images.R
 import com.systemhalted.encri.images.ext.fade
 import com.systemhalted.encri.images.ext.load
@@ -30,6 +31,7 @@ import com.systemhalted.encri.images.models.MediaType
 import com.systemhalted.encri.images.models.MotionPhoto
 import com.systemhalted.encri.images.models.Thumbnail
 import com.systemhalted.encri.images.ui.MediaGestureListener
+import com.systemhalted.encri.images.vault.VaultSubsampling
 import com.systemhalted.encri.images.viewmodels.LocalPlayerViewModel
 
 class MediaViewerAdapter(
@@ -136,6 +138,11 @@ class MediaViewerAdapter(
         private var observersJob: Job? = null
 
         init {
+            // A vault photo zooms from the vault itself, in tiles (I15).
+            imageView.setSubsamplingImageGenerators(
+                VaultSubsampling((itemView.context.applicationContext as ImagesApplication).link)
+            )
+
             imageView.setOnClickListener {
                 localPlayerViewModel.toggleFullscreenMode()
             }

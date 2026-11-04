@@ -15,16 +15,13 @@ to do, each with a design of its own rather than Glimpse's.
    walk stays (I8, I9). Still to measure: API 27, which needs encri on an emulator; and a library of 20,000,
    where the A20's estimate was four to five seconds before Reels shows anything, one folder at a time; I14 lists four
    at once, which took the G6's walk of 2,000 photos from a second or more to under a third of one.
-2. **Subsampling for large images.** ZoomImage does not subsample a vault photo, so zooming magnifies the screen's
-   decode (I8). A `SubsamplingImageGenerator` of this app's own, reading through `openRead`, with its tiles in
-   Glide's memory cache, which a lock clears.
-3. **Several at once.** Share and delete are one photo at a time, from the viewer (I10, I11). Glimpse's selection in
+2. **Several at once.** Share and delete are one photo at a time, from the viewer (I10, I11). Glimpse's selection in
    the grid, which went with its trash, would share several through one handoff and delete them after one question.
-4. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
+3. **A bin**, if there is to be one. A delete is permanent (I11), and encri has no trash; a folder of this app's own
    in the vault would need `MOVE` and `CREATE`, and every app with a grant would see it.
-5. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
+4. **A date a photo was taken.** Reels sorts by last change (I4). EXIF for every photo is too slow to read in a walk,
    so this needs somewhere to keep the answer that is not outside the vault.
-6. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
+5. **Favourites**, which need somewhere to live. Encri has no such field; a file in the vault is one way.
 
 ## Before a first release
 
@@ -42,5 +39,3 @@ to do, each with a design of its own rather than Glimpse's.
   encri sends no notice the grant can hear, and the session does not end, though its `refreshGrant` answers
   `NOT_AUTHORIZED` (I12). encri-api L23 now promises the end, which the link already hears; this waits on an encri
   that sends it, and the newest build, 0.1.0 of 2026-10-29, does not.
-- **S4 — ZoomImage asks Glide for every opened photo as a file**, from a cache that is always empty (I8). Nothing is
-  read or written, and since I8 nothing is logged; item 2 replaces it.

@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Zoom reads the photo itself** (I15). A large photo zoomed now shows its own pixels in tiles read from the vault,
+where it showed its screen-sized decode magnified; on the G6 an 8000x6000 photo's grain came back. ZoomImage no longer
+asks Glide for the photo as a file.
+
 **The walk lists four folders at once** (I14): on the G6, 2,000 photos in 50 folders walked in 274 to 440 ms,
 where one folder at a time took 0.9 to 1.4 seconds.
 
