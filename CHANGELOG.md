@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-04
 
+**Fixed: the inherited compile warnings**, and a new one now fails the build. `bundleOf` gave way to a typed
+`Bundle`, `@BuilderInference` went, and the two extensions the compiler took for shadowed stay, since the members
+they reach are package-private.
+
 **Measured on the S24** (I9), at API 37, the first phone above API 30: a walk of 5,080 photos in an eighth of a
 second, previews three times as fast as on any other phone, and Reels at 120 Hz missing about one frame in a thousand.
 **Share, open with and delete checked on the A20 and the S24** (I10, I11), at API 30 and 37, and **both probes on

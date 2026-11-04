@@ -15,7 +15,6 @@ import android.view.ActionMode
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -240,12 +239,12 @@ class AlbumFragment : Fragment(R.layout.fragment_album) {
             fileType: MediaType? = null,
             mimeType: String? = null,
             hideToolbar: Boolean = false,
-        ) = bundleOf(
-            ARG_ALBUM_TYPE to albumType,
-            ARG_ALBUM_URI to albumUri,
-            ARG_MEDIA_TYPE to fileType,
-            ARG_MIME_TYPE to mimeType,
-            ARG_HIDE_TOOLBAR to hideToolbar,
-        )
+        ) = Bundle().apply {
+            putSerializable(ARG_ALBUM_TYPE, albumType)
+            putParcelable(ARG_ALBUM_URI, albumUri)
+            putSerializable(ARG_MEDIA_TYPE, fileType)
+            putString(ARG_MIME_TYPE, mimeType)
+            putBoolean(ARG_HIDE_TOOLBAR, hideToolbar)
+        }
     }
 }

@@ -266,6 +266,8 @@ class DeletesTest {
         assertEquals(1, asked.size)
         assertTrue(wanted.filterEquals(asked.single()))
         assertEquals(wanted.extras!!.keySet(), asked.single().extras!!.keySet())
+        // Every extra, whatever its type, which only the untyped get can compare.
+        @Suppress("DEPRECATION")
         wanted.extras!!.keySet().forEach { assertEquals(wanted.extras!!.get(it), asked.single().extras!!.get(it)) }
         assertEquals(emptyList<String>(), rig.session.deleted)
     }

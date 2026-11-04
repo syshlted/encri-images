@@ -70,6 +70,11 @@ android {
 
 kotlin {
     jvmToolchain(21)
+
+    // The inherited warnings are fixed (ROADMAP.md), so a new one fails the build rather than joining a list.
+    compilerOptions {
+        allWarningsAsErrors.set(true)
+    }
 }
 
 dependencies {

@@ -19,7 +19,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -463,12 +462,12 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
             fileType: MediaType? = null,
             mimeType: String? = null,
             initialMediaUri: Uri? = null,
-        ) = bundleOf(
-            EXTRA_ALBUM_TYPE to albumType,
-            EXTRA_ALBUM_URI to albumUri,
-            EXTRA_MEDIA_TYPE to fileType,
-            EXTRA_MIME_TYPE to mimeType,
-            EXTRA_INITIAL_MEDIA_URI to initialMediaUri,
-        )
+        ) = Bundle().apply {
+            putSerializable(EXTRA_ALBUM_TYPE, albumType)
+            putParcelable(EXTRA_ALBUM_URI, albumUri)
+            putSerializable(EXTRA_MEDIA_TYPE, fileType)
+            putString(EXTRA_MIME_TYPE, mimeType)
+            putParcelable(EXTRA_INITIAL_MEDIA_URI, initialMediaUri)
+        }
     }
 }

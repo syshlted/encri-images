@@ -54,6 +54,5 @@ to do, each with a design of its own rather than Glimpse's.
   `NOT_AUTHORIZED` (I12). A question for encri-api first.
 - **S4 — ZoomImage asks Glide for every opened photo as a file**, from a cache that is always empty (I8). Nothing is
   read or written, and since I8 nothing is logged; item 2 replaces it.
-- **S4 — Inherited compile warnings**: `bundleOf`, `BuilderInference` and two shadowed extensions.
 - **S4 — Inherited lint errors**: 54 `ImpliedQuantity` in Glimpse's translations, and `UnsafeOptInUsageError` on Media3
   calls in `LocalPlayerViewModel` and `MediaViewerAdapter`. Lint is not one of the gates yet.
