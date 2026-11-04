@@ -43,6 +43,7 @@ to do, each with a design of its own rather than Glimpse's.
 
 - **S2 — A gallery in front goes on showing a grant's folder after it is deleted**, until something walks again (I9).
   encri sends no notice the grant can hear, and the session does not end, though its `refreshGrant` answers
-  `NOT_AUTHORIZED` (I12). A question for encri-api first.
+  `NOT_AUTHORIZED` (I12). encri-api L23 now promises the end, which the link already hears; this waits on an encri
+  that sends it, and the newest build, 0.1.0 of 2026-10-29, does not.
 - **S4 — ZoomImage asks Glide for every opened photo as a file**, from a cache that is always empty (I8). Nothing is
   read or written, and since I8 nothing is logged; item 2 replaces it.
