@@ -105,6 +105,12 @@
     <string name="show_previews_title">Show previews</string>
     <string name="show_previews_summary">encri makes the small pictures in the grid from what is in the vault. Off, Encri Images asks for none, and a photo shows only when you open it.</string>
 
+    <!-- I19: the third-party notices, opened from the settings -->
+    <string name="about_header">About</string>
+    <string name="notices_title">Third-party notices</string>
+    <string name="notices_summary">The open-source software Encri Images is built with, and the licences it is used under</string>
+    <string name="navigate_up">Back</string>
+
     <!-- General preferences -->
     <string name="edge_tap_navigation_enable_title">Edge tap navigation</string>
     <string name="edge_tap_navigation_enabled_description">Tap left or right edge of screen to navigate between media</string>

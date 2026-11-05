@@ -66,6 +66,12 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.SettingsLib" />
 
+        <!-- I19: the third-party notices, opened from the settings alone. -->
+        <activity
+            android:name=".notices.NoticesActivity"
+            android:exported="false"
+            android:label="@string/notices_title" />
+
     </application>
 
 </manifest>

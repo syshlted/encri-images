@@ -80,4 +80,17 @@
 
     </PreferenceCategory>
 
+    <!-- I19: the notices, as a row of their own; SettingsActivity gives it the screen it opens. -->
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/about_header">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="third_party_notices"
+            app:summary="@string/notices_summary"
+            app:title="@string/notices_title" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

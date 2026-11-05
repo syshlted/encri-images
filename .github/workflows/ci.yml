@@ -54,6 +54,10 @@ jobs:
       - name: Android lint
         run: scripts/hooks/gradle-task :app:lintDebug
 
+      # Every module an APK carries is named in the notices it shows, at its version, and nothing else (I19).
+      - name: Third-party notices
+        run: scripts/hooks/gradle-task :app:checkThirdPartyNotices
+
       # NOT testDebugUnitTest: Gradle runs a name-matched task in whichever projects have it without
       # complaining that the others lack it (encri D11).
       - name: JVM unit tests (all modules)

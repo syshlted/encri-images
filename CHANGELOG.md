@@ -2,6 +2,11 @@
 
 What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is next.
 
+## 2026-11-05
+
+**Third-party notices** (I19). The licences and notices of the 117 modules the app ships, written from each library's own
+files, shown from the settings, and held to the build, which fails when a module ships that the notices do not name.
+
 ## 2026-11-04
 
 **The release build walked through again, and API 27 started** (I18). The minified build zooms, chooses, shares,

@@ -7,6 +7,7 @@
 package com.systemhalted.encri.images
 
 import android.content.SharedPreferences
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -21,11 +22,13 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.systemhalted.encri.images.ext.setOffset
+import com.systemhalted.encri.images.notices.NoticesActivity
 import com.systemhalted.encri.images.vault.PrivacySettings
 import com.systemhalted.encri.images.vault.SecureWindows
 import kotlin.reflect.safeCast
@@ -156,5 +159,17 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_settings) {
         }
     }
 
-    class RootSettingsFragment : SettingsFragment(R.xml.root_preferences)
+    class RootSettingsFragment : SettingsFragment(R.xml.root_preferences) {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            super.onCreatePreferences(savedInstanceState, rootKey)
+
+            // The licences of what the app ships (I19), whatever state the vault is in.
+            findPreference<Preference>(NOTICES_KEY)?.intent =
+                Intent(requireContext(), NoticesActivity::class.java)
+        }
+    }
+
+    companion object {
+        const val NOTICES_KEY = "third_party_notices"
+    }
 }
