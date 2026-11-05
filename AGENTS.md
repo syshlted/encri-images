@@ -919,6 +919,16 @@ transparency (encri D144).
 **CI is Encri Files'**: `ci.yml` and `commit-policy.yml` already were (I1); the notices step (I19) and `reproducible.yml`
 were what it lacked.
 
+**The upload key is made by `scripts/release/upload-key.sh`**, on the key machine, into the directory that holds encri's
+two keystores. Encri Files' repository holds no such script, its key having been made elsewhere, and encri's records are
+not read here (I5), so this one is written to what `sign.sh` expects and rehearses with: RSA 4096 in PKCS#12, valid
+10,000 days, under the alias `sign.sh` looks for. keytool asks for the password at the terminal, so the script never
+holds it; an existing keystore is never written over; and it leaves the certificate as a `.pem` for Play and prints the
+`upload=` line for `config/release-certificates`. `--rehearse` does it all with a throwaway key and keeps nothing.
+*Measured:* the rehearsal passed and refused a second run over its key for that reason; a real run through a
+pseudo-terminal, into a scratch directory, asked three times, left the keystore mode 600, and printed the SHA-256 that
+`keytool -list` reads from the keystore, as `sign.sh` does; the scratch key was deleted.
+
 *Flagged for veto:* **a kit of this app's own rather than one kit for all three apps**, Encri Files' flag, again: the
 release scripts are now in three repositories, and a fix to one has to be made to the others.
 

@@ -33,7 +33,7 @@ lefthook install                          # once per clone: signed, Conventional
 As Encri Files releases (`AGENTS.md`, I20): a tag is built twice and must come out the same, here with
 `scripts/release/reproduce.sh <commit>` and on GitHub by `.github/workflows/reproducible.yml`; `scripts/release/kit.sh`
 packs that build into a signing kit, and the kit's `sign.sh` signs it on the machine that holds the keys and checks what
-comes back. Anyone can rebuild a tag with `reproduce.sh` and hold a published APK to it with
+comes back. `scripts/release/upload-key.sh` makes this app's upload key there, once. Anyone can rebuild a tag with `reproduce.sh` and hold a published APK to it with
 `scripts/release/compare-builds.py`. The certificates a release is signed with are in
 [`config/release-certificates`](config/release-certificates).
 
