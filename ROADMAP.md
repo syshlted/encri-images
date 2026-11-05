@@ -24,8 +24,12 @@ to do, each with a design of its own rather than Glimpse's.
 ## Before a first release
 
 - **The icon** is still Glimpse's (I2).
-- **A signing key**, whether encri's registry lists this app, and whether it joins encri D136's joint release (I2).
-- **Reproducible builds**, as encri-files has them (encri-files F9).
+- **This app's upload key**, made on the key machine as `encri-images-upload.p12`, alias `encri-images-upload`, and its
+  certificate's SHA-256 as `upload=` in `config/release-certificates`; until then `kit.sh` makes no kit (I20). Then a
+  kit is carried to the key machine, signed, verified here, and the bundle uploaded with the listing's automatic
+  protection off (encri D144).
+- **Whether encri's registry lists this app**, and whether it joins encri D136's joint release (I2): encri-api's, and
+  the user's to say.
 - **Protect `master`** with a ruleset, at the user's word (I1).
 
 ## Bugs

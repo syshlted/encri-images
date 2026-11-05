@@ -4,6 +4,10 @@ What happened, newest first. `AGENTS.md` is why, and `ROADMAP.md` is what is nex
 
 ## 2026-11-05
 
+**Releases are built and signed as Encri Files' are** (I20): twice from a tag, the same both times, here and by a
+workflow on GitHub, and signed from a kit on the key machine with encri's app signing and transparency keys and an upload
+key of this app's own, which is owed. `1d957f4` built the same twice.
+
 **Third-party notices** (I19). The licences and notices of the 117 modules the app ships, written from each library's own
 files, shown from the settings, and held to the build, which fails when a module ships that the notices do not name.
 

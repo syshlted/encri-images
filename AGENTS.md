@@ -178,7 +178,7 @@ every source file that changed carries a copyright line of its own beneath The L
 2. **The copyright holder is written "SystemHalted".** Nothing else in these repositories names one.
 
 **Left open:** the signing key, whether encri's registry lists this app, and whether it joins the joint release of
-encri D136. encri D142 said D115's shared key does not extend here by itself, and nothing needs one until a release.
+encri D136. encri D142 said D115's shared key does not extend here by itself, and nothing needs one until a release. *Amended by I20: the signing key is decided, as Encri Files'.*
 
 ### I3 — Nothing leaves: no permission, one way in, no disk, and nothing shown while locked
 *2026-11-01 · accepted; **flagged for veto on three points** (below)*
@@ -891,4 +891,40 @@ package from the release build. Okio's copyright line is its README's, its LICEN
 their marks, selectable; kept out of screenshots; up leaves it; and the settings row opens it. The gate passes on both
 variants and fails with a module's line removed and with a version moved, naming both. **On the S9 (API 29):** the
 settings row opened it, from its introduction to the end of the Apache License, in a `SECURE` window.
+
+### I20 — A release is built from a tag, twice, and signed from a kit of its own, as Encri Files' is
+*2026-11-05 · accepted at the user's direction ("Release signing should be done in the same manner as encri files", and
+CI "set up in the same way"). **Amends I2**, which left the signing key open. Encri Files' F9, carried over whole.*
+
+**The keys are Encri Files' arrangement**: the app is signed with encri's app signing key and its bundle carries code
+transparency signed with encri's transparency key (encri D115, D140), both of which encri-api's `FINGERPRINTS.md`
+publishes and `config/release-certificates` names; the upload key is this app's own, `encri-images-upload`, which is
+owed. Until its certificate is named there, `kit.sh` refuses to make a kit. encri D142 had said D115's shared key does
+not extend to this app by itself; the user's word extends it.
+
+**Built twice from one commit, and the same both times.** `scripts/release/reproduce.sh` and `compare-builds.py` are
+Encri Files', with this app's names: two clones at different paths, under different umask, timezone, locale and Gradle
+home, each with encri-api cloned beside it at the commit `config/encri-api.pin` names, with the pinned Gradle and every
+pinned dependency. It refuses a commit without the notices (I19), without the wrapper pinned to what gradle.org
+publishes, or from before the encri-api pin. `.github/workflows/reproducible.yml` runs it on every `v*` tag, weekly and
+by hand, and keeps the unsigned APK and bundle for 90 days; the maintainer's run must give the same SHA-256s.
+
+**Signed from a kit, on the key machine.** `kit.sh`, `sign.sh` and `bundletool.init.gradle.kts` are Encri Files', with
+this app's names: the kit packs the reproduced build with apksigner and bundletool, each pinned, and rehearses itself
+with throwaway keys before it is kept; `sign.sh` asks for each password at a terminal, signs, holds the signed files to
+the build, and keeps nothing signed by a key `config/release-certificates` does not name; `sign.sh --verify`, here,
+checks what comes back. On Play, the bundle needs the listing's automatic protection off, because it carries code
+transparency (encri D144).
+
+**CI is Encri Files'**: `ci.yml` and `commit-policy.yml` already were (I1); the notices step (I19) and `reproducible.yml`
+were what it lacked.
+
+*Flagged for veto:* **a kit of this app's own rather than one kit for all three apps**, Encri Files' flag, again: the
+release scripts are now in three repositories, and a fix to one has to be made to the others.
+
+**Measured, 2026-11-05.** `1d957f4` built the same twice here (APK `4c8c77fa…`, bundle `8213a9b4…`) against encri-api
+`c27f139`. `kit.sh` refused it, naming no upload certificate. With a placeholder upload line, never committed, it made a
+kit of 29 MB that rehearsed itself through every step with throwaway keys; the kit was then deleted and the line taken
+out. The minified build was walked through on the G6 and the A20 (I18). **Not yet:** a real signing, which needs the
+upload key, and `reproducible.yml` on GitHub, which needs the push.
 
