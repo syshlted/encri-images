@@ -161,7 +161,8 @@ module, which would measure Glimpse having no tests rather than this code having
 *2026-11-01 · accepted; **flagged for veto on two points** (below)*
 
 **`com.systemhalted.encri.images`**, following encri-files, and permanent from the first build a user installs,
-because encri keys a grant on it (encri D120). **The launcher name is "Encri Images"** in every language; Glimpse's
+because encri keys a grant on it (encri D120). It is the id registered on the Play Console (the user's word,
+2026-11-05). **The launcher name is "Encri Images"** in every language; Glimpse's
 translations of its own name were removed so none overrides it.
 
 **Apache-2.0**, which is not a choice: the inherited code is under it. A `NOTICE` says where this came from, and
