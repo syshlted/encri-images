@@ -4,6 +4,12 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### The app on GitHub, and its first CI runs (2026-11-11)
+
+**Completed.** The fork's `master` held only Glimpse's history. It was fast-forwarded to this app's work and pushed,
+39 signed commits up to `e5ff5d8`, and the workflows ran for the first time: `ci` and `commit-policy` passed.
+`reproducible.yml` waits for a `v*` tag or its Monday run.
+
 ### The gate and the privacy switches say what Encri Files says (2026-11-11)
 
 **Completed.** The screen in front of the gallery words each of its states as Encri Files does: not let in yet,

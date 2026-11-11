@@ -88,7 +88,8 @@ shows it. Encri Files' arrangement, carried over whole. This brief is level 1; f
 - Owed before a release: the upload key, made by `upload-key.sh` and its `upload=` line put in
   `config/release-certificates`; then a kit carried to the key machine, signed, verified here, and the bundle
   uploaded with the listing's protection off (I20, `ROADMAP.md`).
-- Not yet: a real signing, and `reproducible.yml` on GitHub, which needs the push. (I20)
+- Not yet: a real signing. `reproducible.yml` is on GitHub since the push of 2026-11-11 and has not run; it runs on a
+  `v*` tag, on Mondays, or by hand. (I20)
 - Whether encri's registry lists this app, and whether it joins encri D136's joint release: encri-api's and the
   user's to say (I2, `ROADMAP.md`). The launcher icon is still Glimpse's (I2).
 - Flagged for veto: a kit of this app's own rather than one for all three apps, so a fix to the release scripts is owed

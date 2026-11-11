@@ -92,7 +92,8 @@ files. Releases are `release-and-signing`'s. This brief is level 1; full records
 - Nothing in GitHub protects `master` yet: changing a repository's rules is the user's to say (I1, `ROADMAP.md`).
 - The inherited screens have no coverage and no ktlint or detekt; flagged (I1). Android lint's CI step came after the
   flag, and the flag does not mark it.
-- The workflows have not run on GitHub: the fork there holds only Glimpse's history (`docs/status.md`, I20).
+- The workflows first ran on GitHub on 2026-11-11, when `master` was pushed at `e5ff5d8`: `ci` and `commit-policy`
+  passed. (I20)
 - A stale pointer left as it is: `commit-policy.yml` points to "AGENTS.md, *Repo conventions*", now
   `docs/conventions.md`. `scripts/ci/diff-coverage.py` cites encri-files' F1, which I1 takes on.
 - `.claude/rules/` is committed in a public repository; flagged (I21).
