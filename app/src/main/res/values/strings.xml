@@ -7,15 +7,15 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" translatable="false">Encri Images</string>
 
-    <!-- The screen in front of the gallery while the vault cannot be shown -->
+    <!-- I3: the screen in front of the gallery while the vault cannot be shown, in Encri Files' words for each state -->
     <string name="album_vault">Vault</string>
     <string name="vault_gate_connecting">Connecting to encri…</string>
     <string name="vault_gate_locked">The vault is locked.</string>
-    <string name="vault_gate_not_authorized">Encri Images needs your permission, in encri, to show what is in the vault.</string>
-    <string name="vault_gate_access_off">Access for other apps is turned off in encri.</string>
-    <string name="vault_gate_not_installed">Encri Images shows what is in an encri vault, and encri is not installed.</string>
-    <string name="vault_gate_not_trusted">The encri installed here is signed by a key this app does not trust, so nothing was sent to it.</string>
-    <string name="vault_gate_too_old">The encri installed here is too old for this app. Update encri, and try again.</string>
+    <string name="vault_gate_not_authorized">Encri Images has not been let into your vault yet, or was let in before this version was installed. encri asks you, on its own screen, what this app may see.</string>
+    <string name="vault_gate_access_off">Other apps are not allowed into the vault: that is turned off in encri. encri can turn it on when it asks you about this app.</string>
+    <string name="vault_gate_not_installed">encri is not installed. Encri Images shows what is in an encri vault, so it needs encri on this phone.</string>
+    <string name="vault_gate_not_trusted">The encri on this phone is not signed by a key this app trusts, so this app will not talk to it.</string>
+    <string name="vault_gate_too_old">The encri on this phone is too old for this app. Update encri, and try again.</string>
     <string name="vault_gate_unavailable">encri could not be reached.</string>
     <string name="vault_gate_allow">Allow in encri</string>
     <string name="vault_gate_unlock">Unlock</string>
@@ -99,16 +99,16 @@
     <string name="general_header">General</string>
     <string name="video_header">Video</string>
 
-    <!-- I13: what leaves this app's screens, the user's to choose -->
+    <!-- I13: what leaves this app's screens, the user's to choose, in Encri Files' words (F3, F4) -->
     <string name="allow_screenshots_title">Allow screenshots</string>
-    <string name="allow_screenshots_summary">Off, Android keeps Encri Images out of screenshots, screen recordings and the recent apps. A screenshot is saved outside the vault, not encrypted, where photo backups and other apps reach it. This changes Encri Images alone: encri\'s own screens always keep them out.</string>
+    <string name="allow_screenshots_summary">When this is off, Android blocks screenshots and screen recordings of Encri Images, keeps it off any screen you cast to, and shows a blank card for it among your recent apps. When it is on, anything this app shows, such as the photos and videos in your vault, can be captured, and a screenshot is kept in your photos, outside the vault, where photo backups and other apps can reach it. This changes Encri Images alone: encri\'s own screens always block screenshots.</string>
     <string name="show_previews_title">Show previews</string>
-    <string name="show_previews_summary">encri makes the small pictures in the grid from what is in the vault. Off, Encri Images asks for none, and a photo shows only when you open it.</string>
+    <string name="show_previews_summary">When this is on, Encri Images shows a small picture of each photo and video in the grid. encri makes each picture and hands it to this app, which keeps it in memory only, never on the phone\'s storage, and drops them all when the vault locks. When it is off, this app asks encri for no pictures at all, and a photo shows only when you open it. This changes Encri Images alone: what other apps\' file pickers show is set in encri.</string>
 
     <!-- I19: the third-party notices, opened from the settings -->
     <string name="about_header">About</string>
     <string name="notices_title">Third-party notices</string>
-    <string name="notices_summary">The open-source software Encri Images is built with, and the licences it is used under</string>
+    <string name="notices_summary">The open-source software Encri Images is built with, and the licences it is used under.</string>
     <string name="navigate_up">Back</string>
 
     <!-- General preferences -->

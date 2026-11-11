@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail a pull request whose changed lines are not covered (AGENTS.md F1).
+"""Fail a pull request whose changed lines are not covered (encri-files F1, which I1 takes on).
 
 encri's script (encri D5, roadmap B4), carried across unchanged in what it measures. The
 per-module gates stop a module's average sliding; this stops a change *arriving* uncovered while
@@ -31,7 +31,7 @@ from pathlib import Path
 # must not be counted as uncovered. Tests are the point: they are what covers everything else.
 EXCLUDED_SOURCE_SETS = ("/src/test/", "/src/androidTest/", "/src/testFixtures/")
 
-# The one module here has a gate (F1), so none is exempt. encri exempts its `:app`; this repository is
+# The one module here has a gate (encri-files F1), so none is exempt. encri exempts its `:app`; this repository is
 # an app whose screens are tested, so it does not.
 EXCLUDED_MODULES: tuple[str, ...] = ()
 
@@ -106,7 +106,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", required=True, help="merge-base side of the comparison")
     parser.add_argument("--head", required=True, help="revision whose lines must be covered")
-    parser.add_argument("--min", type=float, default=85.0, help="percent required (F1 says 85)")
+    parser.add_argument("--min", type=float, default=85.0, help="percent required (encri-files F1 says 85)")
     parser.add_argument(
         "--report",
         action="append",
@@ -166,7 +166,7 @@ def main() -> int:
             print(f"  {path}: {', '.join(str(n) for n in numbers)}")
 
     if percent + 1e-9 < args.min:
-        print(f"::error::diff coverage {percent:.1f}% is below F1's {args.min:.0f}% on changed lines")
+        print(f"::error::diff coverage {percent:.1f}% is below encri-files F1's {args.min:.0f}% on changed lines")
         return 1
     return 0
 

@@ -4,6 +4,17 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### The gate and the privacy switches say what Encri Files says (2026-11-11)
+
+**Completed.** The screen in front of the gallery words each of its states as Encri Files does: not let in yet,
+access turned off in encri, encri not installed, not trusted and too old. *Allow screenshots* and *Show previews* now
+say what each does on and off in Encri Files' words, which I13 meant them to have: what a screenshot exposes, that
+previews are kept in memory alone and dropped at a lock, and that the switch changes this app alone. Encri Images
+still names no certificate or protocol version, which its gate has no argument for, and with previews off its cells
+stay empty rather than giving way to names. The notices' line ends with a full stop. `scripts/ci/diff-coverage.py`,
+copied from Encri Files, cited its F1 as though it were this repository's, and now cites encri-files F1. The unit
+suite and `:app:lintDebug` pass, 145 tests.
+
 ### The decision log leaves AGENTS.md, as encri's did (2026-11-11)
 
 **Completed (I21).** Each of I1 to I20 is a record of its own in `docs/decisions/`, its text unchanged, with an index

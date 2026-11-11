@@ -93,8 +93,8 @@ files. Releases are `release-and-signing`'s. This brief is level 1; full records
 - The inherited screens have no coverage and no ktlint or detekt; flagged (I1). Android lint's CI step came after the
   flag, and the flag does not mark it.
 - The workflows have not run on GitHub: the fork there holds only Glimpse's history (`docs/status.md`, I20).
-- Stale pointers left as they are: `scripts/ci/diff-coverage.py` cites "AGENTS.md F1", encri-files' number, where
-  this repository's is I1; `commit-policy.yml` points to "AGENTS.md, *Repo conventions*", now `docs/conventions.md`.
+- A stale pointer left as it is: `commit-policy.yml` points to "AGENTS.md, *Repo conventions*", now
+  `docs/conventions.md`. `scripts/ci/diff-coverage.py` cites encri-files' F1, which I1 takes on.
 - `.claude/rules/` is committed in a public repository; flagged (I21).
 
 ## Read next
