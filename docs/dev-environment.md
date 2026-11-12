@@ -1,7 +1,7 @@
 # encri-images — development environment
 
 > Moved out of `AGENTS.md` on 2026-11-11 (I21). The text below is unchanged; it was the
-> *Local development environment* section of that file.
+> *Local development environment* section of that file. What has changed since is struck through or dated in place.
 
 ## Local development environment
 
@@ -13,10 +13,28 @@ The same machine as encri-api and encri-files.
   it dies in its render threads (exit 139, seen 2026-11-04). Unset `DISPLAY`, set `QT_QPA_PLATFORM=offscreen`, and never
   pipe its output through `head`, whose closing pipe kills it. It has no encri.
 - **Waydroid on bigtab01 is API 33** (Android 13, read from it 2026-11-04, though bigtab01's own notes speak of Android
-  16), with no encri. Reach it by `ssh 10.42.0.137`, where `sshd` is started by hand after a reboot; its container is
+  16), ~~with no encri~~ with encri since 2026-11-11 and a test vault (below). It is LineageOS
+  `20.0-20260403-GAPPS-waydroid_x86_64`, x86_64, a `userdebug` build with `ro.debuggable=0`, so there is no `adb root`.
+  Reach it by `ssh 10.42.0.137`, where `sshd` is started by hand after a reboot; its container is
   `192.168.240.112:5555` on bigtab01's own bridge, so from here through a tunnel,
   `ssh -N -L 127.0.0.1:5562:192.168.240.112:5555 10.42.0.137`, then `adb connect 127.0.0.1:5562`. A new adb key is
-  allowed on the tablet's screen; this machine's was, 2026-11-04.
+  allowed on the tablet's screen; this machine's was, 2026-11-04, and again on 2026-11-11, because the container had
+  made its `/data/misc/adb` again, empty, when it started. A restart of the container may lose the key again.
+- **The tunnel to Waydroid drops.** Three times in the round of 2026-11-11 and 2026-11-12, ssh's keep-alive found
+  bigtab01 not answering for two minutes and more while bigtab01 stayed up, and once the tunnel stalled with ssh still
+  running and adb not answering. Restart it, then `adb disconnect 127.0.0.1:5562` and `adb connect 127.0.0.1:5562`.
+- **encri on Waydroid was installed on 2026-11-11**, the first time, with Encri Files, Encri Images and their test
+  APKs. bigtab01 has a pattern screen lock, so encri's create asked for the device's credential, which only its owner
+  can give, and cancelling would have abandoned the create (encri D35, D74); the owner drew it. The test vault there
+  has a device slot as well as a passphrase. **`run-as` is refused there** (*run-as: setegid(AID_PACKAGE_INFO) failed:
+  Operation not permitted*), so an app's own files cannot be read or removed over adb; `pm clear` removes them.
+- **The A20 is reached by wireless adb, and its vault was made again on 2026-11-12.** The old vault's passphrase was
+  on no file, so at the user's word `pm clear com.systemhalted.encri` destroyed it, and a test vault with a passphrase
+  alone was made in its place, since the A20 has no screen lock. Encri Images was let in again on encri's screen. Its
+  encri, Encri Files and Encri Images are debug builds signed with this machine's debug key, so `adb install -r` keeps
+  their data.
+- **The test vaults' passphrases are on file**, the A20's and Waydroid's beside the S9's and the G6's, in the file
+  `PASSPHRASES` names, kept outside the repository (I17).
 - **A shell here can be inside the code-server container**, which has a `/dev` and a `gpg-agent` of its own. A phone
   enumerated after the container's `/dev` was made is listed in `/sys/bus/usb/devices` but has no device node, so `adb`
   does not see it, and a key unlocked outside the container is still locked inside it (seen 2026-11-02).

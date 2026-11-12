@@ -75,6 +75,9 @@ This brief is level 1; full records are in `docs/decisions/`.
   31. (I8, I9)
 - Four at once, on the G6 over 2,000 photos in 50 folders: 440 ms, then 274–299, against 1,354, then 903–1,214, one at
   a time; eight at once 535, then 226–343. (I14)
+- Four at once on the A20, 2026-11-12, the same way: 414 ms, then 259–294, against 978, then 624–685, one at a time;
+  eight at once 456, then 319, a folder listed in 27–29 ms against 11 at four. A 180x180 preview of those 160x120
+  photos, median 21–25 ms; four at a time, about 175 a second. (I14, amended)
 - After browsing, playing and the info sheet on the A20, the app's data directory held five empty directories and no
   file (I3); with an 8000x6000 photo open, one file, ProfileInstaller's note (I8).
 - *Show previews* on the A20: a photo cell's brightness spread 44.9 with previews on, 0.0 off, 44.9 again. (I13)
@@ -96,9 +99,9 @@ This brief is level 1; full records are in `docs/decisions/`.
   (I4), and `ROADMAP.md`'s *A date a photo was taken*.
 - A first walk of a large library shows nothing until it ends: a second and a half at 5,000 on the A20; flagged.
   (I8)
-- Unmeasured: 20,000 photos; four folders at once on any phone but the G6; video (I8, I9, I14). I4's own
-  *Not measured* list predates I8, I9, I15 and I18, which measured most of it without a mark there; a motion photo
-  and a large video over the proxy descriptor remain unmeasured.
+- Unmeasured: 20,000 photos; four folders at once on ~~any phone but the G6~~ the S9 and the S24, the A20 measured
+  2026-11-12; video (I8, I9, I14). I4's own *Not measured* list predates I8, I9, I15 and I18, which measured most of
+  it without a mark there; a motion photo and a large video over the proxy descriptor remain unmeasured.
 
 ## Read next
 - Related briefs: `.claude/rules/vault-link.md`, `.claude/rules/viewer.md`, `.claude/rules/privacy-and-settings.md`

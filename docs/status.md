@@ -13,4 +13,5 @@ by hand on the A20 (API 30); see I4. Since 2026-11-03 it starts on API 28 and 29
 API 37 on 2026-11-04, and its gate on API 33 under Waydroid and on API 27 under an emulator; the A20, the S9, the G6
 and the S24 are measured at 5,000 photos (I8, I9). **The minified release build** was walked through again on
 2026-11-04, after I13 to I16 (below).
-The fork on GitHub still holds only Glimpse's history, and nothing is released. `ROADMAP.md` says what is next.
+~~The fork on GitHub still holds only Glimpse's history~~ The fork on GitHub has held this app's history since
+2026-11-11, when `master` was pushed at `e5ff5d8`, and nothing is released. `ROADMAP.md` says what is next.

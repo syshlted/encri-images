@@ -6,6 +6,12 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I14's "the other phones", not measured, are measured on the A20, amended 2026-11-12.** Over 2,000 photos in 50
+  folders, as on the G6, four at once walked in 414 ms, then 259–294, against 978, then 624–685, one at a time, and
+  eight no better than four: the G6's shape. The S9, the S24 and a library of 20,000 stay unmeasured.
+- **I17's suite, verified on the G6, ran on the A20 and under Waydroid, amended 2026-11-12.** All five passed, none
+  skipped, once this app had been let in on encri's consent screen. The suite does not let it in itself: on a vault
+  that had not, `WalkMeasurement` skipped with `no session to measure: Refused`.
 - **The repository conventions' "this one is the decision log" and "this file wins" are moved by I21
   (2026-11-11).** The decision log is `docs/decisions/`, one record to a file, and it wins over `ROADMAP.md`,
   `CHANGELOG.md` and the component briefs in `.claude/rules/`. `AGENTS.md` is the always-loaded map. Struck through

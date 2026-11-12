@@ -38,8 +38,10 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
   what it logs; the logs hold counts, times and outcomes, and no passphrase. (I12, I17)
 - **CI compiles the device tests' APKs and runs none**, since CI has no encri. There is no stand-in encri: encri-api's
   way in, `ServiceBinding.connect`, is internal to the client. (I6)
-- **Tests run against an encri installed on the phone**: on the test phones, its release build 0.1.0, signed by the
-  certificate `EncriTrust.RELEASE_CERTIFICATES` pins. Nothing of encri's repository is used. (I5, I9)
+- **Tests run against an encri installed on the phone**: on ~~the test phones~~ the S9, the G6 and the S24, its
+  release build 0.1.0, signed by the certificate `EncriTrust.RELEASE_CERTIFICATES` pins; on the A20 and under Waydroid,
+  a debug build signed with this machine's debug key, since 2026-11-11 one that has built encri D147. Nothing of
+  encri's repository is used. (I5, I9, `docs/dev-environment.md`)
 - **Measure the G6 with an opaque screen in front, such as Settings, and nothing else running.** Its live wallpaper
   takes a fifth of a core when the home screen shows, and its `interactive` governor lets anything else raise the
   clock and speed a walk up. (I9, `docs/dev-environment.md`)
@@ -48,6 +50,9 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
 
 ## Traps already paid for
 - The first run on the A20 failed on a screen that had timed out, with every activity stopped. (I6)
+- **The suite does not let the app in itself.** On a vault that has not let it in, a fresh one included, `suite`
+  skips `WalkMeasurement` with `no session to measure: Refused`, as on the A20 and under Waydroid on 2026-11-12. Let
+  the app in on encri's consent screen first. (I17, amended)
 - `scripts/device/scroll` drew no frames on the S9: it draws at an override of 1080x2220 on a 1440x2960 panel, input
   is given in the override, and every fling began below the screen. It takes the override now. (I9)
 - A shell loop on the G6 reading the clock every 200 ms cut a walk of 2,080 photos to a third. (I9)
@@ -59,9 +64,12 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
 
 ## Measured, not assumed
 - `GateOnPhoneTest` passes on the G6 (API 28), the S9 (API 29) and the A20 (API 30) (I6), under Waydroid at API 33
-  (I3, amended), and on an API 27 emulator with no encri, showing *encri is not installed* (I18).
+  (I3, amended), and on an API 27 emulator with no encri, showing *encri is not installed* (I18). Under Waydroid with
+  encri and no vault yet it shows *The vault is locked.* (2026-11-11; `vault-link`).
 - The suite on the G6: all five passed, in five minutes; the logs held counts, times and outcomes and no passphrase.
   (I17)
+- The suite on the A20 and under Waydroid, 2026-11-12: all five passed, none skipped, once the app was let in. (I17,
+  amended)
 - `GrantChanges` and `GrantGone` on the G6, the A20 and the S24, alike; a descriptor read across each consent on the
   S9 and the G6. (I12)
 - What `WalkMeasurement` and `scroll` measured is `vault-library`'s (I8, I9, I14).
@@ -84,6 +92,7 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
 - Flagged for veto: the passphrase is an instrumentation argument, so it is in the phone's process list while a run
   lasts; and the seed's package is let into the whole vault with the rights to write, by pressing *Allow* itself,
   on whichever phone it runs on. (I6)
+- The suite has run on the G6, the A20 and Waydroid; not on the S9 or the S24. (I17, amended)
 
 ## Read next
 - Related briefs: `.claude/rules/vault-link.md`, `.claude/rules/vault-library.md`

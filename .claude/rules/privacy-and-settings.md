@@ -66,6 +66,9 @@ media permission; every outlet it had was safe there and is a leak here. This br
 ## Measured, not assumed
 - On the A20 (API 30): `screencap` refused; then allowed on the settings screen at once and on the gallery behind it;
   then refused again on both. (I13)
+- On the A20, 2026-11-12: both switches' words of 2026-11-11 on the settings screen exactly as `strings.xml` has
+  them, `allow_screenshots_summary` (464 characters) and `show_previews_summary` (427), compared character for
+  character. Until then they had passed the unit suite and lint alone. (I13, `CHANGELOG.md`)
 - On the S9, the info sheet's window flags were `0x81810102` beside the activity's `0x81812100`, and `0x81812102`
   after the fix; a share dialog's window is `0x1822002` on the A20 and the S24. (I3, I10)
 - `allowAudioPlaybackCapture`'s flag is gone from the package's flags on Waydroid (API 33) and the S9. (I3)

@@ -66,6 +66,10 @@ tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installe
   viewer and showing the gate. (I4)
 - `GateOnPhoneTest` passes on the G6 (API 28) and the S9 (API 29), which then had no encri, and on the A20 (I6);
   under Waydroid at API 33 (I3, amended); and on an API 27 emulator, showing *encri is not installed* (I18).
+- The gate's words of 2026-11-11 (`CHANGELOG.md`), on a device: *The vault is locked.* with *Unlock* under Waydroid,
+  encri installed and no vault made yet (2026-11-11), and on the A20 before its vault was made again; and on the A20
+  with its new vault (2026-11-12), `vault_gate_not_authorized`, *Encri Images has not been let into your vault yet,
+  …*, with *Allow in encri*. Each read as `strings.xml` has it.
 - With the gallery in the background, encri's *Turn out Encri Images*, and back in the same process: the gate asked
   for permission. (I9)
 - An allowed consent: the old session hears `Ended` within three seconds and answers `ENDED` to everything, its grant
@@ -97,7 +101,9 @@ tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installe
 - The gate asks for `READ` alone, so a user turned out and let in again loses `DELETE` until they next delete;
   flagged for veto. (I11)
 - What each state's message says is to read the same in every companion (the suite's `docs/documentation.md`,
-  *Text in the apps*); the words are in `strings.xml`, which `glimpse-screens` covers.
+  *Text in the apps*); the words are in `strings.xml`, which `glimpse-screens` covers. Of the words of 2026-11-11,
+  *locked* and *not let in yet* are seen on a device; *access turned off*, *not installed*, *not trusted* and *too
+  old* (`vault_gate_access_off`, `_not_installed`, `_not_trusted`, `_too_old`) are not.
 
 ## Read next
 - Related briefs: `.claude/rules/vault-library.md`, `.claude/rules/share-and-delete.md`,

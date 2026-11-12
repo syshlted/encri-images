@@ -4,6 +4,22 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### On the A20 and Waydroid: the suite, four at once, and the new words (2026-11-12)
+
+**Completed.** Debug builds of this app at `d64a4c3`, with encri-api at its pin, ran on the A20 (API 30) and under
+Waydroid (API 33) against an encri that has built encri D147. Waydroid has encri and a test vault for the first time,
+and the A20's vault was made again (`docs/dev-environment.md`). **The suite** (I17, amended) passed all five classes on
+both, none skipped, once the app had been let in on encri's consent screen. **Four folders at once** (I14, amended) on
+the A20: 2,000 photos in 50 folders walked in 259–294 ms again, against 624–685 ms one at a time, and eight did no
+better than four, the G6's shape. **The words of 2026-11-11 on a device**, where they had passed the unit suite and
+lint alone: the gate's *The vault is locked.* under Waydroid and on the A20, and its *not let in yet*, with *Allow in
+encri*, on the A20; and the summaries of *Allow screenshots* and *Show previews* on the A20's settings screen exactly
+as `strings.xml` has them, compared character for character.
+
+**Known issues.** The suite does not let the app in itself, so on a vault that has not, `WalkMeasurement` skips
+(I17, amended). The gate's *access turned off*, *not installed*, *not trusted* and *too old* have not been seen on a
+device. Four at once is unmeasured on the S9 and the S24, and so is a library of 20,000 (I14).
+
 ### The app on GitHub, and its first CI runs (2026-11-11)
 
 **Completed.** The fork's `master` held only Glimpse's history. It was fast-forwarded to this app's work and pushed,
