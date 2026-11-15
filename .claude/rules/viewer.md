@@ -45,6 +45,8 @@ full records are in `docs/decisions/`.
   waiting up to the five seconds I11 waits. (I12)
 - **A clip loops only once it is ready and lasts** (`LoopWhatLasts`); every clip starts unlooped. (I4, amended)
 - **ExoPlayer has no cache, and Media3's DASH, HLS, RTSP and SmoothStreaming modules are gone.** (I3)
+- **ExoPlayer reports nothing to the platform** (`setUsePlatformDiagnostics(false)`): by default it reports each
+  playback to `MediaMetricsManager` from API 31, which Google may collect. It did, until 2026-11-15. (I3)
 - **The info sheet shows a location as numbers and nothing else**: nothing goes to `Geocoder`, which on most phones
   is a network service, or to a maps app. Like every dialog, it goes through `SecureWindows.secure`. (I3)
 - **A deleted video's saved playback position is removed**, before the pager moves on and would save it again. (I11)

@@ -4,6 +4,17 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### The viewer's player reports nothing to the platform (2026-11-15)
+
+**Completed.** ExoPlayer reports each playback to Android's `MediaMetricsManager` by default, from API 31, and
+Media3's own documentation says Google may collect what it reports where the user shares usage and diagnostics. The
+viewer's player never turned it off, so a video played from the vault was reported: its format, its length and how it
+played, though nothing of its picture. It is off (`setUsePlatformDiagnostics(false)`), as I3's *nothing sent about a
+picture* asks. Found while building crop and rotate, whose player and Transformer have it off too.
+
+**Known issues.** Not seen on a phone: `dumpsys media.metrics` on one at API 31 or later would show that a playback
+is no longer reported.
+
 ### On the A20 and Waydroid: the suite, four at once, and the new words (2026-11-12)
 
 **Completed.** Debug builds of this app at `d64a4c3`, with encri-api at its pin, ran on the A20 (API 30) and under

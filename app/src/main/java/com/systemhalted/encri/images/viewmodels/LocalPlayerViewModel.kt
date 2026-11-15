@@ -72,6 +72,8 @@ class LocalPlayerViewModel(
     val exoPlayer = ExoPlayer.Builder(applicationContext)
         // Nothing but the vault: no cache, and nothing that can reach a network (I3).
         .setMediaSourceFactory(ProgressiveMediaSource.Factory(VaultMediaSource.Factory(link)))
+        // Nor anything about what plays to the platform's media metrics, which Google may collect (I3).
+        .setUsePlatformDiagnostics(false)
         .setAudioAttributes(
             AudioAttributes.Builder()
                 .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)

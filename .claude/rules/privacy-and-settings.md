@@ -27,6 +27,9 @@ media permission; every outlet it had was safe there and is a leak here. This br
 - **Nothing the app keeps leaves with a backup or a transfer.** `allowBackup` is false, and `data_extraction_rules.xml`
   excludes every domain from both a cloud backup and a transfer to a new phone, because from API 31 `allowBackup`
   false stops only the first. `ShippedManifestTest` reads both. (I3, amended 2026-11-04)
+- **ExoPlayer reports nothing to the platform.** The viewer's player has `setUsePlatformDiagnostics(false)`: by
+  default it reports each playback to `MediaMetricsManager` from API 31, which Google may collect. It did until
+  2026-11-15. (I3)
 - **A video's sound is never another app's to record**: `allowAudioPlaybackCapture` is false, and it does not follow
   the screenshot setting, since a screenshot has no sound and a recording's would be the vault's. (I3, amended
   2026-11-04)
