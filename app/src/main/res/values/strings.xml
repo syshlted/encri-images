@@ -50,6 +50,32 @@
     <string name="delete_not_allowed">encri has not let Encri Images delete.</string>
     <string name="delete_failed">It was not deleted.</string>
 
+    <!-- I22: a photo or video cropped and turned into a copy beside it, the original left as it was; encri is asked to allow it the first time -->
+    <string name="file_action_edit">Edit</string>
+    <string name="edit_title">Crop and rotate</string>
+    <string name="edit_save">Save a copy</string>
+    <string name="edit_rotate">Rotate</string>
+    <string name="edit_reset">Reset</string>
+    <string name="edit_play">Play</string>
+    <string name="edit_pause">Pause</string>
+    <string name="edit_frame">The part of the picture to keep. Drag a corner or a side to change it, drag inside it to move it, and pinch to zoom.</string>
+    <string name="edit_aspects">The shape of the part to keep</string>
+    <string name="edit_aspect_free">Free</string>
+    <string name="edit_aspect_original">Original</string>
+    <string name="edit_aspect_square">Square</string>
+    <string name="edit_aspect_4_by_3" translatable="false">4:3</string>
+    <string name="edit_aspect_3_by_4" translatable="false">3:4</string>
+    <string name="edit_aspect_16_by_9" translatable="false">16:9</string>
+    <string name="edit_aspect_9_by_16" translatable="false">9:16</string>
+    <string name="edit_allow_title">Allow saving copies, in encri?</string>
+    <string name="edit_allow_explain">encri has let Encri Images look at what is in the vault, not save to it. encri asks you next whether to let it make documents and write them as well, so that a copy can be kept beside the original. What encri lets it do already is asked for again, so that nothing it allowed before is lost.</string>
+    <string name="edit_saving">Saving a copy…</string>
+    <string name="edit_saved">A copy was saved beside the original.</string>
+    <string name="edit_failed">The copy was not saved.</string>
+    <string name="edit_not_allowed">encri has not let Encri Images save copies.</string>
+    <string name="edit_too_large">This is too large to edit on this phone.</string>
+    <string name="edit_cannot_open">It could not be opened to edit.</string>
+
     <!-- Titles -->
     <string name="reels_title">Reels</string>
     <string name="albums_title">Albums</string>

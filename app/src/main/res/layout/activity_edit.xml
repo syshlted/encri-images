@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: SystemHalted
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- I22: a photo or video cropped and turned, to be kept as a copy beside the original. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/editRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="vertical"
+    tools:context=".edit.EditActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/activity_edit_toolbar"
+        app:navigationContentDescription="@android:string/cancel"
+        app:navigationIcon="@drawable/ic_close"
+        app:navigationIconTint="@android:color/white"
+        app:title="@string/edit_title"
+        app:titleTextColor="@android:color/white" />
+
+    <FrameLayout
+        android:id="@+id/stage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- A video is drawn here, under the frame; a photo is drawn by the frame's own view. -->
+        <TextureView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <com.systemhalted.encri.images.edit.CropView
+            android:id="@+id/cropView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/edit_frame" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/edit_aspects"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/aspects"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            app:checkedChip="@id/aspectFree"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspectFree"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_free" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspectOriginal"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_original" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspectSquare"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_square" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspect4by3"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_4_by_3" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspect3by4"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_3_by_4" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspect16by9"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_16_by_9" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aspect9by16"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_aspect_9_by_16" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rotateButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/edit_rotate"
+            android:drawableTop="@drawable/ic_rotate_right"
+            android:text="@string/edit_rotate" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/playButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/edit_play"
+            android:drawableTop="@drawable/ic_play_arrow"
+            android:text="@string/edit_play"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/resetButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/edit_reset"
+            android:drawableTop="@drawable/ic_restart"
+            android:text="@string/edit_reset" />
+
+    </LinearLayout>
+
+</LinearLayout>

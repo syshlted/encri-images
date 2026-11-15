@@ -33,9 +33,9 @@ files. Releases are `release-and-signing`'s. This brief is level 1; full records
   classpath, JDK 21, ktlint 1.8.0, detekt 1.23.8, Kover 0.9.9, JUnit 5.14.4 and Robolectric 4.17, with the same hooks,
   pinned action SHAs and encri-api pin. A bump is made in all of them together. (I1)
 - **The gates follow the two source trees.** ktlint excludes `src/main/java`; detekt reads `src/main/kotlin`,
-  `src/test/kotlin` and `src/androidTest/kotlin`; Kover measures the `vault` and `notices` packages, with a floor of
-  80% of lines, and CI holds a pull request's changed lines to 85%. A floor over the whole module would measure
-  Glimpse having no tests. Android lint runs over the whole app, errors only. (I1; `ci.yml`)
+  `src/test/kotlin` and `src/androidTest/kotlin`; Kover measures the `vault`, `notices` and `edit` packages, with a
+  floor of 80% of lines, and CI holds a pull request's changed lines to 85%. A floor over the whole module would
+  measure Glimpse having no tests. Android lint runs over the whole app, errors only. (I1, I22; `ci.yml`)
 - **Dependencies are pinned twice**, by sha256 in `gradle/verification-metadata.xml` and by the modules' lockfiles in
   STRICT mode. Regenerate the metadata from an empty file over every task a workflow runs, after adding or bumping
   anything; `./gradlew :app:dependencies --write-locks` when what a user receives changes. (I1, encri D7,
@@ -87,6 +87,7 @@ files. Releases are `release-and-signing`'s. This brief is level 1; full records
 | I19 | The notices gate in CI and before a push |
 | I20 | CI is Encri Files'; the wrapper's checksums |
 | I21 | What `.gitignore` keeps out, and `.claude/rules/` committed; two veto flags |
+| I22 | Media3's Transformer, Effect and Muxer; Guava's annotations excluded as Media3 excludes them; `edit` measured |
 
 ## Open here
 - Nothing in GitHub protects `master` yet: changing a repository's rules is the user's to say (I1, `ROADMAP.md`).

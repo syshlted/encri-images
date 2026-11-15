@@ -24,9 +24,17 @@ object VaultUris {
     fun folder(folderId: String): Uri = uri(FOLDER, folderId)
 
     /** The document [uri] names, or null when it names anything else. */
-    fun documentIdOf(uri: Uri): String? =
+    fun documentIdOf(uri: Uri): String? = idOf(uri, DOCUMENT)
+
+    /** The folder [uri] names, or null when it names anything else. */
+    fun folderIdOf(uri: Uri): String? = idOf(uri, FOLDER)
+
+    private fun idOf(
+        uri: Uri,
+        kind: String,
+    ): String? =
         uri
-            .takeIf { it.scheme == SCHEME && it.authority == DOCUMENT }
+            .takeIf { it.scheme == SCHEME && it.authority == kind }
             ?.lastPathSegment
 
     private fun uri(

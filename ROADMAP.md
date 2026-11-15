@@ -42,6 +42,13 @@ to do, each with a design of its own rather than Glimpse's.
    encri D147 on the test phones, since encri 0.1.0 speaks version 1; **the A20 and Waydroid have one, a debug build,
    since 2026-11-11**. Its words and its screen go in a record of this repository's when it is built (encri-api L24).
 
+6. **Crop and rotate on a phone** (I22). **Added 2026-11-15**, built and unit-tested, and run on no phone. On the A20
+   or the G6: a photo cropped, turned and saved after encri's consent screen for `CREATE` and `WRITE`, and a second
+   save going straight to it; a turn alone of a clip and a crop of one, played back in the viewer; the app's data
+   directory after both, which should hold no picture; memory over a long clip and a large photo. On a phone at API
+   31 or later, `dumpsys media.metrics` showing that neither a playback nor an edit is reported. Then whether a copy
+   should keep the original's dates, which waits on *A date a photo was taken* (3, above).
+
 ## Before the first release
 
 - **The icon** is still Glimpse's (I2).

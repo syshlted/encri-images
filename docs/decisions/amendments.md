@@ -6,6 +6,14 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I11's consent, for `READ` and `DELETE` alone, is amended by I22 (2026-11-15).** A consent asks for every right
+  the grant already holds as well as the one wanted (`Rights.toAsk`), because it replaces the grant with exactly what
+  it asks: `DELETE` asked alone would take away I22's `CREATE` and `WRITE`.
+- **I10's *Edit*, which was *Open with* and nothing of this app's own, is amended by I22 (2026-11-15).** Crop and
+  rotate are this app's own, and keep a copy beside the original in the vault. Any other edit is *Open with*, and its
+  warning, as it was.
+- **I3's edit, gone with Glimpse's outlets, is back by I22 (2026-11-15)**, as a design of this app's own: a photo or
+  video cropped and turned here, decoded and muxed in memory, and kept as a new document beside the original.
 - **I14's "the other phones", not measured, are measured on the A20, amended 2026-11-12.** Over 2,000 photos in 50
   folders, as on the G6, four at once walked in 414 ms, then 259–294, against 978, then 624–685, one at a time, and
   eight no better than four: the G6's shape. The S9, the S24 and a library of 20,000 stay unmeasured.

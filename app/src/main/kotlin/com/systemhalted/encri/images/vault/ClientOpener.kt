@@ -15,11 +15,13 @@ import com.systemhalted.encri.client.EncriDocument
 import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.EncriSession
+import com.systemhalted.encri.client.NameConflict
 import com.systemhalted.encri.client.SessionOutcome
 import com.systemhalted.encri.client.VaultEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.io.OutputStream
 
 /**
  * The [Opener] that asks the encri installed on this phone, through encri-client.
@@ -80,6 +82,17 @@ private class ClientSession(
     override suspend fun handOff(documentIds: List<String>): EncriResult<List<Uri>> = session.handOff(documentIds)
 
     override suspend fun delete(documentId: String): EncriResult<Unit> = session.delete(documentId)
+
+    override suspend fun create(
+        folderId: String,
+        name: String,
+        mimeType: String,
+    ): EncriResult<EncriDocument> = session.createFile(folderId, name, mimeType, NameConflict.PICK_FREE_NAME)
+
+    override suspend fun write(
+        documentId: String,
+        writer: suspend (OutputStream) -> Unit,
+    ): EncriResult<EncriDocument> = session.write(documentId, writer)
 
     override suspend fun grant(): EncriResult<EncriGrant> = session.refreshGrant()
 

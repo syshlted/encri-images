@@ -44,6 +44,7 @@ import com.systemhalted.encri.images.models.MotionPhoto
 import com.systemhalted.encri.images.models.RequestStatus
 import com.systemhalted.encri.images.ui.dialogs.MediaInfoBottomSheetDialog
 import com.systemhalted.encri.images.ui.recyclerview.MediaViewerAdapter
+import com.systemhalted.encri.images.edit.EditActivity
 import com.systemhalted.encri.images.ext.getParcelable
 import com.systemhalted.encri.images.ext.getSerializable
 import com.systemhalted.encri.images.vault.DeleteFlow
@@ -67,6 +68,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     private val appBarLayout by lazy { findViewById<AppBarLayout>(R.id.appBarLayout) }
     private val bottomSheetLinearLayout by lazy { findViewById<LinearLayout>(R.id.bottomSheetLinearLayout) }
     private val deleteButton by lazy { findViewById<MaterialButton>(R.id.deleteButton) }
+    private val editButton by lazy { findViewById<MaterialButton>(R.id.editButton) }
     private val infoButton by lazy { toolbar.menu.findItem(R.id.info) }
     private val motionPhotoToggleButton by lazy { findViewById<MaterialButton>(R.id.motionPhotoToggleButton) }
     private val openWithButton by lazy { toolbar.menu.findItem(R.id.openWith) }
@@ -75,6 +77,9 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     private val viewPager by lazy { findViewById<ViewPager2>(R.id.viewPager) }
 
     private var lastVideoUriPlayed: Uri? = null
+
+    // A copy the editor kept, to be shown once the library has it (I22)
+    private var savedCopyUri: Uri? = null
 
     // Through encri's handoff, said first (I10)
     private val handoffs by lazy {
@@ -97,6 +102,12 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
     private val askEncriForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             deleteFlow.answered(it.resultCode, it.data)
+        }
+
+    // Crop and rotate, which answers with the copy it kept (I22)
+    private val editForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            savedCopyUri = EditActivity.savedIn(it)
         }
 
     // Adapter
@@ -191,6 +202,10 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
             viewModel.displayedMedia.value?.let { deleteFlow.offer(it) }
         }
 
+        editButton.setOnClickListener {
+            viewModel.displayedMedia.value?.let { editForResult.launch(EditActivity.intentFor(this, it)) }
+        }
+
         viewPager.offscreenPageLimit = 2
         viewPager.registerOnPageChangeCallback(onPageChangeCallback)
 
@@ -254,7 +269,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
                         is RequestStatus.Success -> {
                             val (medias, initialPosition) = it.data
 
-                            mediaViewerAdapter.submitList(medias)
+                            mediaViewerAdapter.submitList(medias) { showSavedCopy(medias) }
 
                             initialPosition?.let { position ->
                                 viewPager.setCurrentItem(position, false)
@@ -321,6 +336,7 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
                     openWithButton.isVisible = displayedMedia != null
                     shareButton.isVisible = displayedMedia != null
                     deleteButton.isVisible = displayedMedia != null
+                    editButton.isVisible = displayedMedia?.let(EditActivity::canEdit) == true
 
                     // Reset motion photo toggle button
                     viewModel.toggleMotionPhotoEnabled(false)
@@ -379,6 +395,17 @@ class ViewActivity : AppCompatActivity(R.layout.activity_view) {
 
     private fun saveCurrentVideoPosition() {
         viewModel.saveCurrentVideoPosition(lastVideoUriPlayed)
+    }
+
+    /**
+     * The copy the editor kept, shown once the library has walked to it: the walk that finds it comes after the
+     * editor closes.
+     */
+    private fun showSavedCopy(medias: List<Media>) {
+        val position = savedCopyUri?.let { uri -> medias.indexOfFirst { it.uri == uri } } ?: return
+        if (position < 0) return
+        savedCopyUri = null
+        viewPager.setCurrentItem(position, false)
     }
 
     private fun askEncri(intent: Intent) {

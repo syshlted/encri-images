@@ -25,6 +25,8 @@ looking at the info sheet on the A20, the app's data directory held five empty d
 is a network service, without asking, and offered them to a maps app. Here it shows the numbers and nothing else.
 Share, edit and *use as* are gone, because they need encri's handoffs (encri D117), and the favourite and trash
 buttons are gone because encri has neither. *Amended by I10: share is back, and open with, through a handoff.*
+*Amended by I22: crop and rotate are back, as a design of this app's own: a copy kept beside the original, in the
+vault.*
 
 **Nothing shown while locked.** `VaultLibrary` forgets everything when the vault locks or the session goes, and Glide's
 memory is cleared. `MainActivity` hides the whole gallery behind a gate with one message and one button. **The viewer
@@ -66,6 +68,8 @@ there is nothing to forget.
 
 ## Amended since, as recorded in `amendments.md`
 
+- **I3's edit, gone with Glimpse's outlets, is back by I22 (2026-11-15)**, as a design of this app's own: a photo or
+  video cropped and turned here, decoded and muxed in memory, and kept as a new document beside the original.
 - **I3's screenshots, blocked always and with no setting, are amended by I13 (2026-11-04).** *Allow screenshots* is a
   setting, off by default, and every window and dialog follows it.
 - **I3's secure windows kept a video's picture out of a screen recording and not its sound, amended 2026-11-04.** From

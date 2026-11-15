@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: SystemHalted
+     SPDX-License-Identifier: Apache-2.0
+-->
+<!-- I22: the copy is saved beside the original, which is left as it was. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/save"
+        android:enabled="false"
+        android:title="@string/edit_save"
+        app:showAsAction="always" />
+
+</menu>

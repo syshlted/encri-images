@@ -3,6 +3,7 @@ paths:
   - "app/src/**/vault/VaultLink*.kt"
   - "app/src/**/vault/*VaultSession.kt"
   - "app/src/**/vault/ClientOpener.kt"
+  - "app/src/**/vault/VaultHost.kt"
   - "app/src/**/vault/Opening.kt"
   - "app/src/**/vault/VaultGate*.kt"
   - "app/src/main/java/**/MainActivity.kt"
@@ -16,7 +17,8 @@ The app's one session with encri, and what the gallery shows while it has none: 
 `LinkState`, and how it hears an answer), `VaultSession` (the part of an encri session this app uses, which the unit
 tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installed on the phone through encri-client),
 `Opening` (what asking came to) and `VaultGate` (the gate's message and action for each state), drawn by Glimpse's
-`MainActivity` and wired in `ImagesApplication`. This brief is level 1; full records are in `docs/decisions/`.
+`MainActivity` and wired in `ImagesApplication`, which is the `VaultHost` the editor reaches the link through (I22).
+This brief is level 1; full records are in `docs/decisions/`.
 
 ## Rules that hold here
 - **One session for the life of the process, held by the application**, not by a screen, so a rotation does not end
@@ -32,8 +34,9 @@ tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installe
 - **A link that believes the vault locked asks again.** `open()` runs on every return to the gallery and after
   encri's unlock screen answers; for a locked session it asks `grant()`, encri's `refreshGrant`, one small read. It
   never polls while the gate shows. (I7)
-- **The gate asks encri for `READ` alone.** `DELETE` is asked for when it is first used (`share-and-delete`), so the
-  gate never asks every user for a right most may never use. (I3, I11)
+- **The gate asks encri for `READ` alone.** `DELETE`, and `CREATE` and `WRITE` for a copy, are asked for when first
+  used, each with every right the grant holds (`Rights`; `share-and-delete`, `editor`), so the gate never asks every
+  user for a right most may never use. (I3, I11, I22)
 - **Nothing is shown while locked.** `MainActivity` hides the whole gallery behind the gate, with one message and
   one button. At a lock or the session's end the library forgets everything, and `ImagesApplication` clears Glide's
   memory, zoom's tiles with it (`VaultGlide.forget`). The viewer closes itself (`viewer`). (I3, I15)
@@ -42,7 +45,7 @@ tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installe
 - **encri's screens are started for a result**: encri learns which app asked from `getCallingPackage`, which only a
   start for a result sets. (encri D120, I11)
 - **A consent the user allows replaces the grant with exactly what was asked, and ends the session.** The link asks
-  for the next at once; whoever asked waits for it, up to five seconds (`Deletes.ALLOWING_MILLIS`). (I11, I12,
+  for the next at once; whoever asked waits for it, up to five seconds (`Rights.ALLOWING_MILLIS`). (I11, I12, I22,
   encri-api L23)
 - **A grant's root not found is the session's end**, not a folder deleted mid-walk, so the link asks encri again and
   the gate says why there is nothing. (I9, I12)
@@ -92,6 +95,7 @@ tests fake as `FakeVaultSession`), `ClientOpener` (which asks the encri installe
 | I4 | The gate checked by hand on the A20 |
 | I18 | The gate on API 27 |
 | I15 | Zoom's tiles are in Glide's memory, cleared at a lock |
+| I22 | `create` and `write` on the session; `VaultHost`; every right held asked for again |
 
 ## Open here
 - encri 0.1.0 does not end the session of a grant whose folder is deleted, which encri-api L23 promises and encri

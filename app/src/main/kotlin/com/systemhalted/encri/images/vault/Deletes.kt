@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.systemhalted.encri.client.Encri
-import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.Right
@@ -19,9 +18,7 @@ import com.systemhalted.encri.images.R
 import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.MediaType
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 
 /** What became of a delete. */
 enum class Deleted {
@@ -45,8 +42,13 @@ class Deletes(
     private val link: VaultLink,
     private val library: VaultLibrary,
 ) {
+    private val rights = Rights(link)
+
+    /** The rights encri's grant holds now; null when encri did not say. */
+    suspend fun held(): Set<Right>? = rights.held()
+
     /** Whether encri's grant lets this app delete, as encri holds it now; null when encri did not say. */
-    suspend fun allowed(): Boolean? = allowedBy(link.ask { it.grant() })
+    suspend fun allowed(): Boolean? = held()?.contains(Right.DELETE)
 
     /** Deletes [media]; once it is gone, it leaves the library at once. */
     suspend fun delete(media: Media): Deleted {
@@ -62,29 +64,11 @@ class Deletes(
         }
     }
 
-    /**
-     * Whether encri lets this app delete, once its consent screen said it would. encri ends the session whose grant
-     * it replaces, and the link asks for the next one at once (encri-files F5), so this waits up to [ALLOWING_MILLIS]
-     * for a session whose grant says so, rather than asking the one encri is ending.
-     */
-    suspend fun awaitAllowed(): Boolean =
-        withTimeoutOrNull(ALLOWING_MILLIS) {
-            var asked: VaultSession? = null
-            var allowed = false
-            while (!allowed) {
-                val open = link.state.first { it is LinkState.Open && !it.locked && it.session !== asked }
-                asked = (open as LinkState.Open).session
-                allowed = allowedBy(link.ask(asked) { it.grant() }) == true
-            }
-            allowed
-        } ?: false
-
-    private fun allowedBy(grant: EncriResult<EncriGrant>): Boolean? =
-        (grant as? EncriResult.Ok)?.value?.rights?.contains(Right.DELETE)
+    /** Whether encri lets this app delete, once its consent screen said it would (`Rights.awaitHeld`). */
+    suspend fun awaitAllowed(): Boolean = rights.awaitHeld(setOf(Right.DELETE))
 
     internal companion object {
-        /** encri answers its consent screen in well under a second; this is for a phone that is slow to. */
-        const val ALLOWING_MILLIS = 5_000L
+        const val ALLOWING_MILLIS = Rights.ALLOWING_MILLIS
     }
 }
 
@@ -112,10 +96,11 @@ class DeleteFlow(
     fun offer(medias: List<Media>) {
         if (medias.isEmpty()) return
         scope.launch {
-            when (deletes.allowed()) {
-                true -> confirm(medias)
-                false -> askToAllow(medias)
-                null -> say(R.string.delete_failed)
+            val held = deletes.held()
+            when {
+                held == null -> say(R.string.delete_failed)
+                Right.DELETE in held -> confirm(medias)
+                else -> askToAllow(medias, held)
             }
         }
     }
@@ -162,22 +147,25 @@ class DeleteFlow(
         val left = answers.filterValues { it != Deleted.GONE }.keys.toList()
         when {
             left.isEmpty() -> Unit
-            Deleted.NOT_ALLOWED in answers.values -> askToAllow(left)
+            Deleted.NOT_ALLOWED in answers.values -> askToAllow(left, deletes.held().orEmpty())
             medias.size == 1 -> say(R.string.delete_failed)
             else -> say(activity.resources.getQuantityString(R.plurals.delete_some_failed, left.size, left.size))
         }
     }
 
-    private fun askToAllow(medias: List<Media>) =
-        show(
-            MaterialAlertDialogBuilder(activity)
-                .setTitle(R.string.delete_allow_title)
-                .setMessage(R.string.delete_allow_explain)
-                .setPositiveButton(R.string.vault_gate_allow) { _, _ ->
-                    waiting = medias
-                    askEncri(Encri.authorizationIntent(setOf(Right.READ, Right.DELETE)))
-                },
-        )
+    /** Offers encri's consent screen, for deleting and for every right [held] already, which a consent replaces. */
+    private fun askToAllow(
+        medias: List<Media>,
+        held: Set<Right>,
+    ) = show(
+        MaterialAlertDialogBuilder(activity)
+            .setTitle(R.string.delete_allow_title)
+            .setMessage(R.string.delete_allow_explain)
+            .setPositiveButton(R.string.vault_gate_allow) { _, _ ->
+                waiting = medias
+                askEncri(Encri.authorizationIntent(Rights.toAsk(held, setOf(Right.DELETE))))
+            },
+    )
 
     private fun show(builder: MaterialAlertDialogBuilder) =
         SecureWindows.secure(builder.setNegativeButton(android.R.string.cancel, null).create()).show()

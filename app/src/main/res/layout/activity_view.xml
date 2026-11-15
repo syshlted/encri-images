@@ -67,6 +67,14 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
+        <!-- I22: crop and rotate, into a copy beside it -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/editButton"
+            style="@style/Theme.Images.MediaViewer.BottomSheet.Button"
+            android:contentDescription="@string/file_action_edit"
+            android:drawableTop="@drawable/ic_crop"
+            android:text="@string/file_action_edit" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/deleteButton"
             style="@style/Theme.Images.MediaViewer.BottomSheet.Button"

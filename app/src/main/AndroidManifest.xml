@@ -59,6 +59,13 @@
             android:exported="false"
             android:theme="@style/Theme.Images.MediaViewer" />
 
+        <!-- I22: crop and rotate, opened from the viewer alone, which hands it the photo or video. -->
+        <activity
+            android:name=".edit.EditActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:theme="@style/Theme.Images.MediaViewer" />
+
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize|keyboardHidden"

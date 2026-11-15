@@ -163,7 +163,7 @@ class VaultMediaSource(
     }
 
     internal companion object {
-        /** As long as [Deletes] waits for the session encri's consent screen leads to, for the same reason. */
-        const val NEXT_SESSION_MILLIS = Deletes.ALLOWING_MILLIS
+        /** As long as [Rights] waits for the session encri's consent screen leads to, for the same reason. */
+        const val NEXT_SESSION_MILLIS = Rights.ALLOWING_MILLIS
     }
 }

@@ -15,17 +15,18 @@ import com.systemhalted.encri.images.vault.PrivacySettings
 import com.systemhalted.encri.images.vault.SecureWindows
 import com.systemhalted.encri.images.vault.VaultDataSource
 import com.systemhalted.encri.images.vault.VaultGlide
+import com.systemhalted.encri.images.vault.VaultHost
 import com.systemhalted.encri.images.vault.VaultLibrary
 import com.systemhalted.encri.images.vault.VaultLink
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-class ImagesApplication : Application() {
+class ImagesApplication : Application(), VaultHost {
     private val scope = MainScope()
 
-    val link by lazy { VaultLink(ClientOpener(this), scope) }
-    val library by lazy { VaultLibrary(link, scope) }
+    override val link by lazy { VaultLink(ClientOpener(this), scope) }
+    override val library by lazy { VaultLibrary(link, scope) }
     val mediaRepository by lazy { MediaRepository(VaultDataSource(library)) }
 
     override fun onCreate() {

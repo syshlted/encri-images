@@ -273,6 +273,21 @@ class DeletesTest {
     }
 
     @Test
+    fun `the consent screen is asked for every right the grant holds as well, which it would replace (I22)`() {
+        val rig = uiRig()
+        rig.session.grant = grantOf(Right.READ, Right.CREATE, Right.WRITE)
+
+        flowOf(rig).offer(rig.media("photo"))
+        idle()
+        press(AlertDialog.BUTTON_POSITIVE)
+
+        assertEquals(
+            setOf(Right.READ, Right.CREATE, Right.WRITE, Right.DELETE),
+            Encri.authorizationResult(Activity.RESULT_OK, asked.single()),
+        )
+    }
+
+    @Test
     fun `once encri allows it, the delete is said, and nothing is deleted before`() {
         val rig = uiRig()
         val flow = flowOf(rig)

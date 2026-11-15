@@ -38,18 +38,19 @@ This brief is level 1; full records are in `docs/decisions/`.
   `ACTION_SEND_MULTIPLE`, every URI in the stream and in the clip, with the read grant, typed as what they share,
   `image/*` or `video/*` when they are all one, or anything. A handoff that comes back short opens nothing. *Open
   with* stays one at a time, because `ACTION_VIEW` takes one. (I16)
-- **No *Use as*, and no edit of its own.** A wallpaper or a contact's photo is a picture from the vault shown outside
-  it for as long as it is set; *Edit* is *Open with* and its warning, since an editor given a read grant saves
-  elsewhere either way. (I10, I3)
+- **No *Use as*.** A wallpaper or a contact's photo is a picture from the vault shown outside it for as long as it is
+  set. **Crop and rotate are this app's own** and keep a copy in the vault (`editor`); any other edit is *Open with*
+  and its warning, since an editor given a read grant saves elsewhere either way. (I10, I3, I22)
 - **Delete is for a photo or a video, in the viewer or chosen in a grid, never an album**, because encri deletes a
   folder with everything in it. (I11, I16)
 - **The right is asked for when it is first used.** *Delete* asks encri for the grant as it is now (`refreshGrant`,
   since the user can change it in encri) and, without `DELETE`, says so and offers *Allow in encri*: encri's consent
-  screen for `READ` and `DELETE`, started for a result. A consent replaces the grant with exactly what was asked, so
-  ask for every right the app means to keep. (I11, I12, encri-api L23)
-- **After a consent, wait up to five seconds (`ALLOWING_MILLIS`) for a session whose grant has the right**, because
-  encri ends the session whose grant it replaces and the link asks for the next at once. A `NOT_AUTHORIZED` from the
-  delete itself, a grant narrowed in between, offers the consent screen again. (I11, I12)
+  screen for `DELETE` and every right the grant already holds (`Rights.toAsk`), started for a result. A consent
+  replaces the grant with exactly what was asked, so ask for every right the app means to keep. (I11, I12, I22,
+  encri-api L23)
+- **After a consent, wait up to five seconds (`Rights.ALLOWING_MILLIS`) for a session whose grant has the right**,
+  because encri ends the session whose grant it replaces and the link asks for the next at once. A `NOT_AUTHORIZED`
+  from the delete itself, a grant narrowed in between, offers the consent screen again. (I11, I12)
 - **A delete is said first, every time**: deleted from the vault, not put in a bin, cannot be undone, and a backup
   encri made before may still hold a copy (encri-files F5's words). The dialog names the kind, *photo* or *video*,
   never the file; several are *Delete these N photos and videos?* (I11, I16)
@@ -97,6 +98,7 @@ This brief is level 1; full records are in `docs/decisions/`.
 | I7 | A handoff or a delete is asked through the link |
 | I13 | The dialogs follow the screenshot setting |
 | I18 | The release build chooses, shares and deletes |
+| I22 | A delete's consent asks for every right held too; crop and rotate are the editor's, not *Open with* |
 
 ## Open here
 - **The *Send its name* tick** (encri D148, encri-api L24 and L25): unticked every time, in the dialog shown before a

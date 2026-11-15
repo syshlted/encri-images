@@ -13,8 +13,12 @@ import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.client.VaultEvent
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
+import java.io.OutputStream
 
 /** A stand-in for encri: a tree of documents, and a record of what was asked of it. */
 class FakeVaultSession(
@@ -46,6 +50,21 @@ class FakeVaultSession(
     /** What a delete of one document in particular answers, ahead of [delete]. */
     val deleteFailures = mutableMapOf<String, Failure>()
     var closed = false
+
+    /** Every document asked for: its folder, its name and its type. */
+    val created = mutableListOf<Triple<String, String, String>>()
+
+    /** What a create answers; null makes a document, `made-1`, `made-2`, …, with the name asked. */
+    var create: EncriResult<EncriDocument>? = null
+
+    /** What each write wrote, by document. */
+    val written = mutableMapOf<String, ByteArray>()
+
+    /** What a write answers instead of writing, when not null. */
+    var writeFailure: Failure? = null
+
+    /** What a write waits for before it writes, when not null: a write a test can stop part way. */
+    var writing: CompletableDeferred<Unit>? = null
 
     override suspend fun list(folderId: String): EncriResult<List<EncriDocument>> {
         listed += folderId
@@ -90,6 +109,39 @@ class FakeVaultSession(
     override suspend fun delete(documentId: String): EncriResult<Unit> {
         deleted += documentId
         return deleteFailures[documentId]?.let { EncriResult.Failed(it, "told to fail") } ?: delete
+    }
+
+    override suspend fun create(
+        folderId: String,
+        name: String,
+        mimeType: String,
+    ): EncriResult<EncriDocument> {
+        created += Triple(folderId, name, mimeType)
+        return create
+            ?: EncriResult.Ok(
+                EncriDocument("made-${created.size}", folderId, name, mimeType, false, 0, 0, 0, null, true),
+            )
+    }
+
+    /** As the client writes: a writer that fails saves nothing (encri-api L11). */
+    override suspend fun write(
+        documentId: String,
+        writer: suspend (OutputStream) -> Unit,
+    ): EncriResult<EncriDocument> {
+        val failure = writeFailure
+        if (failure != null) return EncriResult.Failed(failure, "told to fail")
+        writing?.await()
+        val out = ByteArrayOutputStream()
+        val stopped =
+            try {
+                writer(out)
+                null
+            } catch (stopped: IOException) {
+                stopped
+            }
+        if (stopped == null) written[documentId] = out.toByteArray()
+        return stopped?.let { EncriResult.Failed(Failure.CANCELLED, it.message ?: "the writer stopped") }
+            ?: EncriResult.Ok(document(documentId, size = out.size().toLong()))
     }
 
     override suspend fun grant(): EncriResult<EncriGrant> {

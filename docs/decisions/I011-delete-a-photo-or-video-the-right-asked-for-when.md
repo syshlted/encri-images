@@ -7,7 +7,8 @@ and nothing else: albums do not offer it, because encri deletes a folder with ev
 
 **The right is asked for when it is first used.** The gate still asks encri for `READ` alone. *Delete* asks encri for
 the grant as it is now (`refreshGrant`, not what it was when the session opened, since the user can change it in
-encri) and, without `DELETE`, says so and offers *Allow in encri*: encri's consent screen for `READ` and `DELETE`,
+encri) and, without `DELETE`, says so and offers *Allow in encri*: encri's consent screen for `READ` and `DELETE`
+(*amended by I22: and for every right the grant already holds, which a consent replaces*),
 started for a result as encri requires. Once that answers with `DELETE`, the app waits up to five seconds for a session
 whose grant says so, because encri ends the session whose grant it replaces (encri-files F5) and the link asks for the
 next at once; then it asks again whether to delete. A `NOT_AUTHORIZED` from the delete itself, a grant narrowed in
@@ -56,6 +57,9 @@ library, not the viewer's playback position.
 
 ## Amended since, as recorded in `amendments.md`
 
+- **I11's consent, for `READ` and `DELETE` alone, is amended by I22 (2026-11-15).** A consent asks for every right
+  the grant already holds as well as the one wanted (`Rights.toAsk`), because it replaces the grant with exactly what
+  it asks: `DELETE` asked alone would take away I22's `CREATE` and `WRITE`.
 - **I10 and I11's one photo or video at a time is amended by I16 (2026-11-04).** Several chosen in a grid are shared
   through one handoff and deleted after one question. *Open with* stays one at a time.
 - **I11's open question, whether encri ends the old session or widens its grant in place, is answered by I12

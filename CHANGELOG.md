@@ -4,6 +4,24 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### Crop and rotate, into a copy beside the original (2026-11-15)
+
+**Completed.** The viewer's *Edit* opens *Crop and rotate* for a photo or a video, not a GIF (I22). A dotted frame
+over the picture is dragged by a corner or a side and moved from inside, and two fingers zoom the picture under it, up
+to eight times, so the frame can be put on a detail. It can be held to *Free*, *Original*, *Square*, *4:3*, *3:4*,
+*16:9* or *9:16*, and *Rotate* turns the picture a quarter clockwise, the frame and its shape with it. *Save a copy*
+keeps a new document beside the original, `IMG_1 (edited).jpg`, and never changes the original; the first time, it
+asks encri for `CREATE` and `WRITE`, with every right the grant holds, and a delete's consent now asks the same way
+(amends I11). A photo is decoded only where it is kept, a band at a time, and encoded straight into encri's pipe. A
+video is made by Media3's Transformer and muxed into memory, never a file, and a turn alone is written as its
+orientation without decoding it. Neither copy carries the original's metadata. Media3 Transformer, Effect and Muxer
+1.10.0 and kotlinx-coroutines-guava now ship, with Guava's annotations left out as Media3 leaves them, and the notices
+name them. The unit suite, `:app:lintDebug` and the notices gate pass, 233 tests, 88 of them new, at 89.5% of lines.
+
+**Known issues.** Nothing of it has run on a phone (I22, *Not measured*). A copy keeps no EXIF, so no location and no
+time taken, and reads as today's in Reels. A video is held whole in memory while it is made, up to an eighth of the
+phone's memory or 1 GiB. A copy encri made and this app could not fill stays, empty, where the grant cannot delete.
+
 ### The viewer's player reports nothing to the platform (2026-11-15)
 
 **Completed.** ExoPlayer reports each playback to Android's `MediaMetricsManager` by default, from API 31, and

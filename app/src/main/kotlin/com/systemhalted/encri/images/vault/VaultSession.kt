@@ -13,13 +13,15 @@ import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.VaultEvent
 import kotlinx.coroutines.flow.Flow
+import java.io.OutputStream
 
 /**
  * The part of an encri session this app uses (AGENTS.md I3).
  *
  * Narrower than the client's session on purpose, so this interface is the list of what the gallery asks
  * encri for: it reads, hands a document to another app only through encri's handoff once the user has agreed
- * (I10), and deletes a photo or video the user chose, once encri has let it (I11).
+ * (I10), deletes a photo or video the user chose, once encri has let it (I11), and keeps a copy of one the user
+ * cropped or turned, beside it, once encri has let it (I22).
  */
 interface VaultSession : AutoCloseable {
     /** The folder the user let this app into, above which it cannot go. */
@@ -52,6 +54,25 @@ interface VaultSession : AutoCloseable {
 
     /** Deletes [documentId]. A folder would go with everything in it, which this app never asks. */
     suspend fun delete(documentId: String): EncriResult<Unit>
+
+    /**
+     * A new, empty document in [folderId], named [name] or, where that is taken, the first free name encri finds
+     * (`name (1).jpg`). A copy's name is this app's, never the user's, so a name taken is not refused (I22).
+     */
+    suspend fun create(
+        folderId: String,
+        name: String,
+        mimeType: String,
+    ): EncriResult<EncriDocument>
+
+    /**
+     * [documentId]'s content replaced by what [writer] writes, over encri's pipe, which does not seek. A writer that
+     * throws saves nothing, and the document is left as it was (encri-api L11).
+     */
+    suspend fun write(
+        documentId: String,
+        writer: suspend (OutputStream) -> Unit,
+    ): EncriResult<EncriDocument>
 
     /**
      * The grant as encri holds it now. One small read, which a locked vault answers [Failure.LOCKED] like any

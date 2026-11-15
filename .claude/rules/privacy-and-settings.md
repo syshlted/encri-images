@@ -27,9 +27,9 @@ media permission; every outlet it had was safe there and is a leak here. This br
 - **Nothing the app keeps leaves with a backup or a transfer.** `allowBackup` is false, and `data_extraction_rules.xml`
   excludes every domain from both a cloud backup and a transfer to a new phone, because from API 31 `allowBackup`
   false stops only the first. `ShippedManifestTest` reads both. (I3, amended 2026-11-04)
-- **ExoPlayer reports nothing to the platform.** The viewer's player has `setUsePlatformDiagnostics(false)`: by
-  default it reports each playback to `MediaMetricsManager` from API 31, which Google may collect. It did until
-  2026-11-15. (I3)
+- **Media3 reports nothing to the platform.** Every `ExoPlayer` and `Transformer` this app builds has
+  `setUsePlatformDiagnostics(false)`: by default each reports to `MediaMetricsManager` from API 31, which Google may
+  collect. The viewer's player did until 2026-11-15. (I3, I22)
 - **A video's sound is never another app's to record**: `allowAudioPlaybackCapture` is false, and it does not follow
   the screenshot setting, since a screenshot has no sound and a recording's would be the vault's. (I3, amended
   2026-11-04)
@@ -90,6 +90,7 @@ media permission; every outlet it had was safe there and is a leak here. This br
 | I10 | Dialogs before a handoff are secure windows too |
 | I4 | The release APK's permissions |
 | I18 | Both switches on the release build |
+| I22 | Media3's platform reports off; the editor unexported, closing at a lock |
 
 ## Open here
 - Screenshots are blocked by default, encri-files F3's flag again (I13). A location is shown as numbers, the only way

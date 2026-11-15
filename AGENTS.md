@@ -57,6 +57,7 @@ lists the corrections `docs/decisions/amendments.md` holds.
 | `vault-link` | the link to encri: `VaultLink`, `VaultSession`, `ClientOpener`, and the gate in front of the gallery |
 | `vault-library` | the vault as Glimpse's data source: the walk, the library in memory, the URIs, Glide and previews |
 | `viewer` | a photo, zoom in tiles, a video over a descriptor, the info sheet |
+| `editor` | crop and rotate, into a copy beside the original: the frame, a photo's bands, a video in memory |
 | `share-and-delete` | handing to another app, deleting, and choosing several in a grid |
 | `privacy-and-settings` | the manifest, secure windows, the settings screen and its two switches |
 | `glimpse-screens` | the code and resources inherited from Glimpse, and how they may change |
@@ -101,14 +102,14 @@ Violating any of these is a design bug, not a tradeoff.
 - **One way in, the launcher.** Nothing else is exported, and the viewer takes its request from this app's own
   extras (I3).
 - **No picture is written to disk.** Glide's disk cache is a no-op and its loads answer `DataSource.LOCAL`; ExoPlayer
-  has no cache; what the app does keep, its preferences and saved playback positions, is excluded from every backup
-  and transfer (I3, encri D112).
+  has no cache; an edited video is muxed in memory (I22); what the app does keep, its preferences and saved playback
+  positions, is excluded from every backup and transfer (I3, encri D112).
 - **Nothing shown while locked.** The library forgets everything at a lock or the session's end, Glide's memory and
   zoom's tiles with it; the gate hides the gallery; and the viewer closes itself (I3, I15).
 - **Every window and every dialog is kept out of screenshots unless the user allows them**, through `SecureWindows`,
   and a video's sound is never another app's to record (I3, I13).
 - **Nothing leaves but by encri's handoff, after a dialog that says what it costs, every time**, with encri left out
-  of the chooser (I10, I16). Nothing about a picture is sent to a service: a location is shown as numbers (I3).
+  of the chooser (I10, I16). Nothing about a picture goes to a service, a location or the platform's metrics (I3, I22).
 - **A delete is said first, every time, and cannot be undone here** (I11).
 - **A grid cell is encri's preview, never a decode here.** A full photo, its tiles and a video's stream are decoded
   in this process, which holds no keys (I4, I15).
@@ -162,8 +163,8 @@ Violating any of these is a design bug, not a tradeoff.
   allows, so that upstream's fixes still apply. ktlint, detekt and the coverage floor do not reach it (I1); Android
   lint does, for errors (`ci.yml`, since 2026-11-04). A changed inherited file carries a copyright line of its own
   beneath The LineageOS Project's (I2).
-- **What is written here goes in `src/main/kotlin`**, in the `vault` or `notices` package, and passes ktlint, detekt
-  and Kover's floor of 80% of lines (I1).
+- **What is written here goes in `src/main/kotlin`**, in the `vault`, `notices` or `edit` package, and passes ktlint,
+  detekt and Kover's floor of 80% of lines (I1, I22).
 - **An upstream fix comes across as a signed cherry-pick**, `git cherry-pick -x -S`, never as a merge (I1).
 - **Read off the main thread**: a read of a descriptor encri serves can take a while (I4).
 - **Unit tests stand in at this app's own seam, `VaultSession`**, not with a stand-in encri (I6).

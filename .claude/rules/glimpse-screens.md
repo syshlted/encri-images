@@ -27,8 +27,8 @@ one says how inherited code may change at all. This brief is level 1; full recor
 - **Glimpse's strings are left as upstream wrote them**, so that its fixes still apply (I1). This app's own strings
   follow the suite's *Text in the apps* (`docs/documentation.md` in the superproject).
 - **What Glimpse had that is gone stays gone until it has a design of its own**: the picker, *Set as wallpaper*,
-  showing media over the keyguard, the `Geocoder` lookup, edit, *use as*, favourites, trash and MediaStore itself.
-  Share and delete came back by designs of their own. (I3, I10, I11)
+  showing media over the keyguard, the `Geocoder` lookup, *use as*, favourites, trash and MediaStore itself. Share,
+  delete, and crop and rotate came back by designs of their own. (I3, I10, I11, I22)
 - **minSdk is 27, down from Glimpse's 30**, encri's floor. (I1)
 - **The cutout mode**: `values/themes.xml` asks for `shortEdges`, and `values-v30/` keeps Glimpse's `always`, which
   API 28 and 29 refuse when an activity starts. A change to a theme, or to anything an API level decides, is checked
@@ -67,6 +67,7 @@ one says how inherited code may change at all. This brief is level 1; full recor
 | I4 | Glimpse's data-source seam; the viewer's start |
 | I16 | The selection drawn as Glimpse drew it, and held by this app |
 | I18 | API 27 starts |
+| I22 | The viewer's *Edit*, a screen of this app's own beside Glimpse's |
 
 ## Open here
 - The inherited screens have no coverage and no ktlint or detekt; flagged (I1). Android lint now runs over them in

@@ -23,7 +23,8 @@ asked through the link (I7), so one that finds the vault locked is the lock.
 built, for a share*). *Use as* (Glimpse's
 `ATTACH_DATA`) stays out: a wallpaper or a contact's photo is a picture from the vault shown outside it for as long as
 it is set (I3). *Edit* (Glimpse's `ACTION_EDIT`) is *Open with* and its warning, since an editor given a read grant
-saves elsewhere either way.
+saves elsewhere either way. *Amended by I22: crop and rotate are this app's own, and keep a copy in the vault; any
+other edit is still* Open with.
 
 *Rejected:* a decrypted copy through a `FileProvider` of this app's own, which writes the plaintext to this app's
 storage (I3, encri-files F7). *Rejected:* `ACTION_VIEW` without a chooser, which would hand every photo opened to
@@ -58,6 +59,9 @@ handoff and logged no error; the photo was not looked at, since nothing is captu
 
 ## Amended since, as recorded in `amendments.md`
 
+- **I10's *Edit*, which was *Open with* and nothing of this app's own, is amended by I22 (2026-11-15).** Crop and
+  rotate are this app's own, and keep a copy beside the original in the vault. Any other edit is *Open with*, and its
+  warning, as it was.
 - **I10 and I11's one photo or video at a time is amended by I16 (2026-11-04).** Several chosen in a grid are shared
   through one handoff and deleted after one question. *Open with* stays one at a time.
 

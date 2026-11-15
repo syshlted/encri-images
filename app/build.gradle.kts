@@ -104,7 +104,11 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.media3.effect) { withoutGuavaAnnotations() }
     implementation(libs.androidx.media3.exoplayer)
+    // I22: a video cropped or turned into a copy, held in memory rather than written to a file.
+    implementation(libs.androidx.media3.muxer)
+    implementation(libs.androidx.media3.transformer) { withoutGuavaAnnotations() }
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
@@ -131,6 +135,18 @@ dependencies {
     androidTestImplementation(libs.androidx.test.junit)
 }
 
+/**
+ * Guava's annotations, which matter to a compiler and not at run time. Media3 leaves them out of the Guava it brings;
+ * kotlinx-coroutines-guava, which media3-effect brings, does not, so they are left out here as Media3 leaves them
+ * (I22), and the app ships what it shipped before Transformer.
+ */
+fun ModuleDependency.withoutGuavaAnnotations() {
+    exclude(group = "com.google.code.findbugs", module = "jsr305")
+    exclude(group = "com.google.errorprone", module = "error_prone_annotations")
+    exclude(group = "com.google.j2objc", module = "j2objc-annotations")
+    exclude(group = "org.checkerframework", module = "checker-qual")
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     // Robolectric at SDK 36 on JDK 21 (encri-api L8).
@@ -143,7 +159,11 @@ kover {
     reports {
         filters {
             includes {
-                classes("com.systemhalted.encri.images.vault.*", "com.systemhalted.encri.images.notices.*")
+                classes(
+                    "com.systemhalted.encri.images.vault.*",
+                    "com.systemhalted.encri.images.notices.*",
+                    "com.systemhalted.encri.images.edit.*",
+                )
             }
         }
         verify {

@@ -46,7 +46,9 @@ full records are in `docs/decisions/`.
 - **A clip loops only once it is ready and lasts** (`LoopWhatLasts`); every clip starts unlooped. (I4, amended)
 - **ExoPlayer has no cache, and Media3's DASH, HLS, RTSP and SmoothStreaming modules are gone.** (I3)
 - **ExoPlayer reports nothing to the platform** (`setUsePlatformDiagnostics(false)`): by default it reports each
-  playback to `MediaMetricsManager` from API 31, which Google may collect. It did, until 2026-11-15. (I3)
+  playback to `MediaMetricsManager` from API 31, which Google may collect. It did, until 2026-11-15. (I3, I22)
+- ***Edit* opens the editor** for a photo or a video, not a GIF, started for a result; the viewer moves to the copy it
+  kept once the walk finds it (`editor`). (I22)
 - **The info sheet shows a location as numbers and nothing else**: nothing goes to `Geocoder`, which on most phones
   is a network service, or to a maps app. Like every dialog, it goes through `SecureWindows.secure`. (I3)
 - **A deleted video's saved playback position is removed**, before the pager moves on and would save it again. (I11)
@@ -89,6 +91,7 @@ full records are in `docs/decisions/`.
 | I3 | The viewer unexported and closing at a lock; the location as numbers; the dialog secure; three veto flags |
 | I11 | A deleted video's saved position |
 | I18 | The release build zooms and loops |
+| I22 | *Edit* and the copy it keeps; nothing reported to the platform |
 
 ## Open here
 - A full image is decoded in this app's process, not an isolated one. It holds no keys, but it does hold whatever
