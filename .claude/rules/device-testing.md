@@ -38,10 +38,11 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
   what it logs; the logs hold counts, times and outcomes, and no passphrase. (I12, I17)
 - **CI compiles the device tests' APKs and runs none**, since CI has no encri. There is no stand-in encri: encri-api's
   way in, `ServiceBinding.connect`, is internal to the client. (I6)
-- **Tests run against an encri installed on the phone**: on ~~the test phones~~ the S9, the G6 and the S24, its
-  release build 0.1.0, signed by the certificate `EncriTrust.RELEASE_CERTIFICATES` pins; on the A20 and under Waydroid,
-  a debug build signed with this machine's debug key, since 2026-11-11 one that has built encri D147. Nothing of
-  encri's repository is used. (I5, I9, `docs/dev-environment.md`)
+- **Tests run against an encri installed on the phone**: on ~~the test phones~~ the S9, the G6 ~~and the S24~~, its
+  release build 0.1.0, signed by the certificate `EncriTrust.RELEASE_CERTIFICATES` pins; on the A20, under Waydroid and,
+  since 2026-11-17, on the S24, a debug build signed with this machine's debug key, since 2026-11-11 one that has built
+  encri D147. The S24 has no vault until its owner makes one. Nothing of encri's repository is used. (I5, amended, I9,
+  `docs/dev-environment.md`)
 - **Measure the G6 with an opaque screen in front, such as Settings, and nothing else running.** Its live wallpaper
   takes a fifth of a core when the home screen shows, and its `interactive` governor lets anything else raise the
   clock and speed a walk up. (I9, `docs/dev-environment.md`)

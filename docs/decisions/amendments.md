@@ -6,6 +6,10 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I5's S24, whose encri is the release build, is amended 2026-11-17.** At the user's word, the S24's encri, Encri
+  Files and this app are debug builds signed with this machine's debug key, as on the A20 and under Waydroid, so this
+  app trusts that encri as one signed by its own key (encri-api L12). The release build's uninstall destroyed the
+  S24's vault. The S9 and the G6 keep encri's release build (I9).
 - **I11's consent, for `READ` and `DELETE` alone, is amended by I22 (2026-11-15).** A consent asks for every right
   the grant already holds as well as the one wanted (`Rights.toAsk`), because it replaces the grant with exactly what
   it asks: `DELETE` asked alone would take away I22's `CREATE` and `WRITE`.

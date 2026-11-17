@@ -49,10 +49,17 @@ The same machine as encri-api and encri-files.
   fifth of a core whenever the home screen shows, and `WalkMeasurement` has no screen of its own. Its CPU governor is
   `interactive`, so anything else running raises the clock and speeds a walk up: a shell loop reading the clock every
   200 ms cut one to a third (I9).
-- **The S24 is a phone in daily use with a test vault on it** (the user's word, 2026-11-03). Read only encri's and this
-  app's text from its screen, and capture nothing: other apps' windows hold what is not a test's. Its vault's
-  passphrase is the user's and is not on file; the phone's fingerprint unlocks it. encri 0.1.0 can neither change nor
-  remove a passphrase: *Ways into this vault* only renames one.
+- **The S24 is a phone in daily use ~~with a test vault on it~~** (the user's word, 2026-11-03). Read only encri's and
+  this app's text from its screen, and capture nothing: other apps' windows hold what is not a test's. ~~Its vault's
+  passphrase is the user's and is not on file; the phone's fingerprint unlocks it.~~ Its vault was destroyed on
+  2026-11-17 (below), and none has been made in its place yet. encri 0.1.0 can neither change nor remove a passphrase:
+  *Ways into this vault* only renames one.
+- **The S24's encri, Encri Files and this app are debug builds since 2026-11-17**, at the user's word, all signed with
+  this machine's debug key. Its encri had been the release build, which a debug build cannot be installed over, so it
+  was uninstalled and its vault went with it: the 5,080 photos I9 was measured over, and this app's grant and the
+  seed's. This app, already a debug build, was updated at `d116f22` with `adb install -r` and kept its own data. It
+  trusts that encri as one signed by its own key (encri-api L12), not by the certificate I5 names (I5, amended). A new
+  vault is its owner's to make, and its create will ask for the phone's screen lock as well (encri D35, D74).
 - **Norton Mobile Security on the S24 opened a *malware found* screen** during the first install of the test vault's
   APK (2026-11-04). What it named was not read, because a run's own UI automation keeps `uiautomator dump` out; it had
   closed by the time the run ended, and nothing was removed.

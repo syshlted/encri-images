@@ -4,6 +4,16 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### On the S24: debug builds, and its vault gone (2026-11-17)
+
+**Completed.** A debug build of this app at `d116f22`, with encri-api at its pin, was installed on the S24 over the
+one before with `adb install -r`, and kept its data. At the user's word, the S24's encri and Encri Files, release
+builds, were uninstalled and debug builds put in their place, and encri's vault went with the uninstall
+(`docs/dev-environment.md`, I5 amended). Nothing was run.
+
+**Known issues.** The S24 has no vault until its owner makes one, and no library until one is seeded again, so what
+it owes, four folders at once among it (I14), waits on both.
+
 ### Crop and rotate, into a copy beside the original (2026-11-15)
 
 **Completed.** The viewer's *Edit* opens *Crop and rotate* for a photo or a video, not a GIF (I22). A dotted frame

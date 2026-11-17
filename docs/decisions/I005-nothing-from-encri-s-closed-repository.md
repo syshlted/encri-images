@@ -19,6 +19,10 @@ encri's release build, installed at the user's direction.*
 
 ## Amended since, as recorded in `amendments.md`
 
+- **I5's S24, whose encri is the release build, is amended 2026-11-17.** At the user's word, the S24's encri, Encri
+  Files and this app are debug builds signed with this machine's debug key, as on the A20 and under Waydroid, so this
+  app trusts that encri as one signed by its own key (encri-api L12). The release build's uninstall destroyed the
+  S24's vault. The S9 and the G6 keep encri's release build (I9).
 - **I5's test phones' encri is amended by I9 (2026-11-03).** The S9 and the G6 have encri's release build, installed
   at the user's direction.
 
