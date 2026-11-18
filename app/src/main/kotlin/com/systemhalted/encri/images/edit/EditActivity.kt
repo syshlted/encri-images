@@ -35,6 +35,8 @@ import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.MediaType
 import com.systemhalted.encri.images.vault.Copies
 import com.systemhalted.encri.images.vault.LinkState
+import com.systemhalted.encri.images.vault.SaveFlow
+import com.systemhalted.encri.images.vault.VaultEditStore
 import com.systemhalted.encri.images.vault.VaultHost
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -45,11 +47,16 @@ import java.io.IOException
  *
  * Not exported: it takes the photo or video from this app's own extras, as the viewer does (I3). Like the viewer it
  * closes when the vault locks or the session goes, since what it has open goes on serving across a lock (encri D103).
+ *
+ * The one part of the editor that knows the vault (I23): it chooses the store, [VaultEditStore], asks encri's leave
+ * to keep copies through [SaveFlow], and closes at a lock. The rest reads and keeps through [EditStore].
  */
 class EditActivity : AppCompatActivity(R.layout.activity_edit) {
     private val host by lazy { application as VaultHost }
     private val media by lazy { intent.extras?.getParcelable(EXTRA_MEDIA, Media::class) }
-    private val making by lazy { Making(this, host.link, requireNotNull(media)) }
+    private val copies by lazy { Copies(host.link, host.library) }
+    private val store: EditStore by lazy { VaultEditStore(host.link, copies) }
+    private val making by lazy { Making(this, store, requireNotNull(media)) }
 
     private val cropView by lazy { findViewById<CropView>(R.id.cropView) }
     private val toolbar by lazy { findViewById<MaterialToolbar>(R.id.toolbar) }
@@ -64,7 +71,8 @@ class EditActivity : AppCompatActivity(R.layout.activity_edit) {
         SaveFlow(
             this,
             requireNotNull(media),
-            Copies(host.link, host.library),
+            copies,
+            store,
             lifecycleScope,
             ::askEncri,
             { onProgress ->
@@ -151,7 +159,7 @@ class EditActivity : AppCompatActivity(R.layout.activity_edit) {
         if (media.mediaType == MediaType.VIDEO) {
             val surface = findViewById<TextureView>(R.id.videoView).apply { isVisible = true }
             val button = findViewById<MaterialButton>(R.id.playButton).apply { isVisible = true }
-            val stage = VideoStage(this, host.link, surface, button).also { stage = it }
+            val stage = VideoStage(this, store.videos, surface, button).also { stage = it }
             cropView.onPlacementChanged = { placement -> cropView.edit?.let { stage.place(placement, it.source) } }
             stage.show(media.uri, { size ->
                 if (cropView.edit == null) {

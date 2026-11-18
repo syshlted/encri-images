@@ -11,6 +11,7 @@ import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.client.VaultEvent
+import com.systemhalted.encri.images.edit.Saved
 import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.RequestStatus
 import kotlinx.coroutines.CompletableDeferred
@@ -161,18 +162,6 @@ class CopiesTest {
             rig.session.grant = EncriResult.Failed(Failure.LOCKED, "locked")
             assertNull(rig.copies.held())
         }
-
-    @Test
-    fun `a copy is named after the original, marked once, with its own extension`() {
-        assertEquals("IMG_1 (edited).jpg", Copies.nameOf("IMG_1.jpg", "jpg"))
-        assertEquals("IMG_1 (edited).jpg", Copies.nameOf("IMG_1.HEIC", "jpg"))
-        assertEquals("IMG_1 (edited).jpg", Copies.nameOf("IMG_1 (edited).jpg", "jpg"))
-        assertEquals("IMG_1 (edited).jpg", Copies.nameOf("IMG_1 (edited) (3).jpg", "jpg"))
-        assertEquals("clip.v2 (edited).mp4", Copies.nameOf("clip.v2.mov", "mp4"))
-        assertEquals("notes (edited).png", Copies.nameOf("notes", "png"))
-        assertEquals(".hidden (edited).png", Copies.nameOf(".hidden", "png"))
-        assertEquals("copy (edited).jpg", Copies.nameOf("", "jpg"))
-    }
 
     @Test
     fun `a consent asks for what is wanted and every right held, reading always`() {

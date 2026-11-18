@@ -4,6 +4,23 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### Crop and rotate read and keep through a store, ready for Glimpse (2026-11-18)
+
+**Completed.** The editor reads a photo or video and keeps its copy through an `EditStore` (I23): where a video is
+read, how a photo is opened, and where a copy is kept. The vault's is `VaultEditStore`, the link to read and `Copies` to
+keep. What every store shares, the dialog, *Cancel*, keeping and the toasts, is `Saving`; encri's leave to keep copies
+is asked by `SaveFlow`, which moved to the vault's package. Only `EditActivity` knows the vault, and `EditorSeamTest`,
+watched fail, holds it there. Under Robolectric the editor turned a photo and kept it in a store that is not the vault,
+files in a folder. Nothing the user sees changed. The unit suite: 241 tests, 89.8% of lines.
+
+The first change offered to Glimpse is ready, not uploaded: Glimpse's player reporting nothing to the platform, as this
+app's has since 2026-11-15, a branch of one signed commit in the user's Glimpse checkout (I23,
+`docs/dev-environment.md`).
+
+**Known issues.** Not run on a phone after the change. Glimpse's change is unmeasured on a phone at API 31 or later,
+and uploading it waits on a Gerrit account. Everything of Glimpse's own, a MediaStore store among it, is deferred
+(`ROADMAP.md`, *Later*).
+
 ### An edited video held outside the Java heap (2026-11-18)
 
 **Fixed.** **S2 — A video past the Java heap's room ended the app while its copy was made.** `MemoryOutput` held it

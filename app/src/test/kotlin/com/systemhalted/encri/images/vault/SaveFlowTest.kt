@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.systemhalted.encri.images.edit
+package com.systemhalted.encri.images.vault
 
 import android.app.Activity
 import android.app.Application
@@ -20,16 +20,10 @@ import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.Right
 import com.systemhalted.encri.images.R
+import com.systemhalted.encri.images.edit.Made
+import com.systemhalted.encri.images.edit.TooLargeToEdit
 import com.systemhalted.encri.images.models.Media
 import com.systemhalted.encri.images.models.MediaType
-import com.systemhalted.encri.images.vault.Copies
-import com.systemhalted.encri.images.vault.FakeVaultSession
-import com.systemhalted.encri.images.vault.Opening
-import com.systemhalted.encri.images.vault.VaultLibrary
-import com.systemhalted.encri.images.vault.VaultLink
-import com.systemhalted.encri.images.vault.VaultUris
-import com.systemhalted.encri.images.vault.document
-import com.systemhalted.encri.images.vault.folder
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,8 +81,9 @@ class SaveFlowTest {
             sizeBytes = 10,
         )
 
+    private val copies = Copies(link, library)
     private val flow =
-        SaveFlow(activity, beach, Copies(link, library), scope, asked::add, { report ->
+        SaveFlow(activity, beach, copies, VaultEditStore(link, copies), scope, asked::add, { report ->
             report(50)
             progress += 50
             making()

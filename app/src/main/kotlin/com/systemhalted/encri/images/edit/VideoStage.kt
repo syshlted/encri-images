@@ -16,21 +16,20 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.systemhalted.encri.images.R
 import com.systemhalted.encri.images.vault.LoopWhatLasts
-import com.systemhalted.encri.images.vault.VaultLink
-import com.systemhalted.encri.images.vault.VaultMediaSource
 
 /**
- * A video under the editor's frame (I22): played into [surface] by ExoPlayer over [VaultMediaSource], as the viewer
- * plays it, with nothing reported to the platform (I3), and started and stopped by [button].
+ * A video under the editor's frame (I22): played into [surface] by ExoPlayer from [videos], the store's (I23), with
+ * nothing reported to the platform (I3), and started and stopped by [button].
  */
 @OptIn(UnstableApi::class)
 class VideoStage(
     context: Context,
-    link: VaultLink,
+    videos: DataSource.Factory,
     private val surface: TextureView,
     private val button: Button,
 ) {
@@ -38,7 +37,7 @@ class VideoStage(
         ExoPlayer
             .Builder(context)
             .setUsePlatformDiagnostics(false)
-            .setMediaSourceFactory(ProgressiveMediaSource.Factory(VaultMediaSource.Factory(link)))
+            .setMediaSourceFactory(ProgressiveMediaSource.Factory(videos))
             .build()
 
     /** The size [uri]'s video is shown at, given to [onSized] once ExoPlayer knows it; [onFailed] if it cannot play. */

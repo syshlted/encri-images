@@ -14,6 +14,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.BitmapLoader
 import androidx.media3.common.util.Clock
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
 import androidx.media3.effect.Crop
 import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -28,8 +29,6 @@ import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import com.systemhalted.encri.images.vault.VaultLink
-import com.systemhalted.encri.images.vault.VaultMediaSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -48,15 +47,15 @@ class TooLargeToEdit(
 /**
  * A video cropped or turned (I22), made by Media3's Transformer into memory.
  *
- * It reads the video through [VaultMediaSource], as the viewer's player does, decodes and encodes it on this phone,
- * and muxes it into a [MemoryOutput], so nothing of it reaches a file. A turn and nothing else is not decoded at all:
+ * It reads the video from [videos], the store's (I23), decodes and encodes it on this phone, and muxes it into a
+ * [MemoryOutput], so nothing of it reaches a file. A turn and nothing else is not decoded at all:
  * Transformer writes the turn into the track's orientation. Transformer's reports to the platform, which Google may
  * collect, are off.
  */
 @OptIn(UnstableApi::class)
 class VideoEdits(
     private val context: Context,
-    private val link: VaultLink,
+    private val videos: DataSource.Factory,
 ) {
     /**
      * The video [uri] names, edited as [edit] asks, held in memory no larger than [limit]; [onProgress] is told how far
@@ -111,8 +110,8 @@ class VideoEdits(
                     context,
                     DefaultDecoderFactory.Builder(context).build(),
                     Clock.DEFAULT,
-                    // Nothing but the vault, as the viewer's player reads it (I3, I4).
-                    ProgressiveMediaSource.Factory(VaultMediaSource.Factory(link)),
+                    // Nothing but the store: in the vault, as the viewer's player reads it (I3, I4).
+                    ProgressiveMediaSource.Factory(videos),
                     NoPictures,
                 ),
             ).addListener(

@@ -10,28 +10,16 @@ import com.systemhalted.encri.client.EncriDocument
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Failure
 import com.systemhalted.encri.client.Right
+import com.systemhalted.encri.images.edit.Saved
 import com.systemhalted.encri.images.models.Media
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import java.io.OutputStream
 
-/** What became of a copy. */
-sealed interface Saved {
-    /** It is in the vault, beside the original, as [uri]. */
-    data class Kept(
-        val uri: Uri,
-    ) : Saved
-
-    /** encri's grant does not let this app make a document, or write one. */
-    data object NotAllowed : Saved
-
-    /** encri would not, or could not be asked. */
-    data object Failed : Saved
-}
-
 /**
- * A copy of a photo or video, kept in the vault beside the original (AGENTS.md I22). The original is never changed.
+ * A copy of a photo or video, kept in the vault beside the original (I22), for [VaultEditStore]. The original is never
+ * changed.
  *
  * Making a document is [Right.CREATE] and filling it is [Right.WRITE], which the app asks encri for the first time a
  * copy is saved, with every right the grant already holds ([Rights.toAsk]).
@@ -106,23 +94,5 @@ class Copies(
     companion object {
         /** What saving a copy needs of encri's grant: making a document, and writing it. */
         val NEEDED: Set<Right> = setOf(Right.CREATE, Right.WRITE)
-
-        private const val EDITED = " (edited)"
-
-        /** `IMG_1 (edited) (1)`: a copy's own mark, and the number encri gave a name that was taken. */
-        private val MARKED = Regex("""${Regex.escape(EDITED)}( \(\d+\))?$""")
-
-        /**
-         * The name a copy of [original] is asked for: the original's, marked as edited, with [extension]. A copy of a
-         * copy is not marked twice; encri numbers a name already taken (`IMG_1 (edited) (1).jpg`).
-         */
-        fun nameOf(
-            original: String,
-            extension: String,
-        ): String {
-            val dot = original.lastIndexOf('.').takeIf { it > 0 } ?: original.length
-            val base = original.substring(0, dot).replace(MARKED, "").ifBlank { "copy" }
-            return "$base$EDITED.$extension"
-        }
     }
 }

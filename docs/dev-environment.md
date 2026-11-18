@@ -66,3 +66,9 @@ The same machine as encri-api and encri-files.
   closed by the time the run ended, and nothing was removed.
 - **`uiautomator dump` hangs while a video plays**, and a window with `FLAG_SECURE` cannot be captured (`screencap`
   exits 1). A throwaway local build with `SecureWindows` emptied is how the screens were looked at. Never commit one.
+- **Glimpse's own checkout is `~/git/android_packages_apps_Glimpse`** (seen 2026-11-18), with Glimpse's GitHub mirror
+  as `origin` and a branch of one signed commit for each change waiting to be offered to Glimpse (I23,
+  `ROADMAP.md`). Its hooks check that commits are signed. It has no Gerrit remote and no `commit-msg` hook, so each
+  commit's `Change-Id` was written by hand, and this machine has no Gerrit account or key in `~/.ssh/config`. Gerrit
+  takes a change by a push to `refs/for/lineage-24.0` on review.lineageos.org; check LineageOS's own instructions for
+  the address before the first.

@@ -69,3 +69,31 @@ to do, each with a design of its own rather than Glimpse's.
   `NOT_AUTHORIZED` (I12). encri-api L23 now promises the end, which the link already hears; this waits on an encri
   that sends it, and the newest build, 0.1.0 of 2026-10-29, does not. **encri's roadmap files the fix as encri B143
   (2026-11-11).**
+
+## Later
+
+- **Crop and rotate in Glimpse** (I23), photos first. The editor reads and keeps through `EditStore` since
+  2026-11-18, so what goes to Glimpse can come back with the vault's store in place of Glimpse's. In order:
+  1. **Ask Glimpse's maintainers**, the user's to do: whether they want an editor of Glimpse's own beside
+     `ACTION_EDIT`, whether photos first will do, and whether a copy keeps the original's metadata.
+  2. **The photo editor in Glimpse's shape**: in `org.lineageos.glimpse` under `src/main/java`, in Glimpse's
+     formatting, with SPDX headers, asking which copyright line a contributor's new file carries. A store over
+     MediaStore: a pending item in the original's folder, written, then `IS_PENDING` cleared, and deleted where it
+     could not be filled; MediaStore numbers a name that is taken. How the built-in editor and `ACTION_EDIT` share
+     *Edit*. Strings in `values/strings.xml` alone, without the vault's words. Whether Glimpse takes Robolectric
+     tests, or they stay here. A Gerrit chain of small changes: the geometry and the frame, the view and its gestures,
+     the photo's screen, the save. Each run on a phone at API 30 or later, Glimpse's floor, with `generateBp` run and
+     REUSE lint passing before it is uploaded.
+  3. **A video's crop and turn, later and on its own, looking and working almost exactly as the photo's do**: the same
+     screen, frame, shapes, turn and *Save a copy*, with the video playing under the frame as `VideoStage` plays it.
+     First, how much Media3 Transformer, Effect and Muxer add to Glimpse's APK, measured on this app's release builds
+     before and after `d116f22`. Muxed into MediaStore's file rather than into memory, which drops I22's ceiling of
+     an eighth of the phone's memory or 1 GiB. And whether `kotlinx-coroutines-guava` and `concurrent-futures` are
+     among what Glimpse's `generateBp` takes the platform to have.
+  4. **Then take it back**: Glimpse's editor cherry-picked with `git cherry-pick -x -S` (I1), with only the vault's
+     store, `SaveFlow` and the lock kept in `src/main/kotlin`, and I23 and the editor's brief amended.
+- **Changes waiting for Glimpse**, each a branch of one signed commit off `lineage-24.0` in the user's Glimpse checkout
+  (`docs/dev-environment.md`): `platform-diagnostics-off`, the viewer's player reporting nothing to the platform
+  (2026-11-18, I23), and `info-sheet-exif-io`, `media3-unstable-api-opt-in` and `zero-length-video-loop`
+  (2026-11-04). None is uploaded: that waits on a Gerrit account at review.lineageos.org. `platform-diagnostics-off` is
+  unmeasured on a phone at API 31 or later, where the reports begin; Waydroid and the S24 are the two.

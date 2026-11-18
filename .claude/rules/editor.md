@@ -3,6 +3,8 @@ paths:
   - "app/src/**/edit/**"
   - "app/src/**/vault/Copies*.kt"
   - "app/src/**/vault/Rights*.kt"
+  - "app/src/**/vault/SaveFlow*.kt"
+  - "app/src/**/vault/VaultEditStore*.kt"
   - "app/src/main/res/layout/activity_edit.xml"
   - "app/src/main/res/menu/activity_edit_toolbar.xml"
 ---
@@ -13,11 +15,17 @@ paths:
 dotted frame and takes the fingers, with `Viewport` (zoom and pan), `Frames` (fitting and dragging the frame),
 `FramePainter` and `Edit` (what is asked). `Geometry`'s `Placement` is a quarter turn or a mirror, EXIF's and the
 user's alike. `PhotoEdits` makes a photo's copy and `VideoEdits` a video's, the latter into `MemoryOutput` through
-`MemoryMuxer`; `VideoStage` plays a video under the frame, `Making` picks between them, and `SaveFlow` asks and saves.
-In the `vault` package, `Copies` keeps a copy beside the original, and `Rights` asks for a right with every right held.
+`MemoryMuxer`; `VideoStage` plays a video under the frame, `Making` picks between them, and `Saving` makes and keeps a
+copy. All of it reads and keeps through `EditStore` (I23). In the `vault` package, `VaultEditStore` is the vault's
+store, `Copies` keeps a copy beside the original, `Rights` asks for a right with every right held, and `SaveFlow` asks
+encri's leave before `Saving` starts.
 This brief is level 1; full records are in `docs/decisions/`.
 
 ## Rules that hold here
+- **Only `EditActivity` knows the vault.** Everything else in `edit` reads a photo or video and keeps a copy through
+  `EditStore`, so it can go to Glimpse and come back with the vault's store in place of Glimpse's. `EditorSeamTest`
+  fails when another file names the vault's package or encri's client; `LoopWhatLasts`, which knows nothing of the
+  vault, is let through by name. Leave to keep copies is the vault's (`SaveFlow`), not the store's. (I23)
 - **A copy, never the original.** An edit is a new document in the original's folder, `IMG_1 (edited).jpg`, with
   encri picking a free name where that is taken (`VaultSession.create`, `FLAG_FREE_NAME`). A copy of a copy is not
   marked twice. (I22)
@@ -78,6 +86,7 @@ This brief is level 1; full records are in `docs/decisions/`.
 | | Why it matters here |
 |---|---|
 | I22 | Crop and rotate into a copy; the rights; memory, not files; no metadata; six veto flags |
+| I23 | The editor reads and keeps through `EditStore`; only `EditActivity` knows the vault; Glimpse later |
 | I11 | `DELETE` asked when first used, which a consent for these rights would otherwise take away |
 | I12 | A consent replaces the grant and ends the session; the wait for the next |
 | I4 | A full photo and a video are decoded here; reading off the main thread |
@@ -85,6 +94,8 @@ This brief is level 1; full records are in `docs/decisions/`.
 | I19 | The notices name exactly what ships |
 
 ## Open here
+- Glimpse: the photo editor in Glimpse's shape with a MediaStore store, then a video's, looking and working as the
+  photo's does, then taken back. Deferred at the user's word. (I23, `ROADMAP.md`)
 - Everything on a phone but the S24's run (above). The first is the A20 or the G6: a photo cropped, turned and saved after encri's
   consent screen; a turn alone of a clip, and a crop of one, played back in the viewer; and the app's data directory
   after both, which should hold no picture.
