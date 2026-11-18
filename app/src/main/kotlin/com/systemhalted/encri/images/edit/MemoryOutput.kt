@@ -7,6 +7,8 @@ package com.systemhalted.encri.images.edit
 
 import android.app.ActivityManager
 import android.content.Context
+import android.os.SharedMemory
+import android.system.ErrnoException
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.muxer.SeekableMuxerOutput
@@ -21,15 +23,18 @@ import kotlin.math.min
  *
  * An MP4 is written, then gone back over, so the muxer needs somewhere that seeks, and encri's pipe does not; a file
  * would put the video on this phone's storage in plaintext (I3). So the whole video is held here, up to [limit] bytes,
- * and then written to encri in order ([writeTo]). The pieces are direct buffers, outside the Java heap, and are
- * dropped by [release].
+ * and then written to encri in order ([writeTo]).
+ *
+ * The pieces are [SharedMemory], outside the Java heap, and are dropped by [release]. Not direct buffers: on Android
+ * those are arrays in the Java heap, which a video ran out of long before [limit], and Transformer catches no
+ * `OutOfMemoryError`. A piece is memory only where it has been written, so the last costs no more than what is in it.
  */
 @OptIn(UnstableApi::class)
 class MemoryOutput(
     private val limit: Long,
     private val piece: Int = PIECE,
 ) : SeekableMuxerOutput {
-    private val pieces = ArrayList<ByteBuffer>()
+    private val pieces = ArrayList<Piece>()
     private var position = 0L
     private var size = 0L
     private var open = true
@@ -55,8 +60,8 @@ class MemoryOutput(
             into.put(from)
             src.position(src.position() + taken)
             position += taken
+            size = maxOf(size, position)
         }
-        size = maxOf(size, position)
         return count
     }
 
@@ -110,6 +115,7 @@ class MemoryOutput(
     /** Drops every piece. */
     fun release() {
         open = false
+        pieces.forEach(Piece::release)
         pieces.clear()
         size = 0
         position = 0
@@ -117,12 +123,47 @@ class MemoryOutput(
 
     private fun pieceAt(at: Long): ByteBuffer {
         val index = (at / piece).toInt()
-        while (pieces.size <= index) pieces += ByteBuffer.allocateDirect(piece)
-        return pieces[index]
+        while (pieces.size <= index) {
+            // The phone would not give memory for the next piece: as good as past the limit.
+            pieces += Piece.of(piece) ?: throw IOException("no memory for a video past $size bytes").also {
+                overflowed = true
+            }
+        }
+        return pieces[index].buffer
+    }
+
+    /** [buffer], mapped from [memory] into this process. */
+    private class Piece(
+        private val memory: SharedMemory,
+        val buffer: ByteBuffer,
+    ) {
+        fun release() {
+            SharedMemory.unmap(buffer)
+            memory.close()
+        }
+
+        companion object {
+            /** A piece [size] bytes long, or null when the phone has no memory for it. */
+            fun of(size: Int): Piece? {
+                val memory =
+                    try {
+                        SharedMemory.create(null, size)
+                    } catch (_: ErrnoException) {
+                        return null
+                    }
+                return try {
+                    Piece(memory, memory.mapReadWrite())
+                } catch (_: ErrnoException) {
+                    memory.close()
+                    null
+                }
+            }
+        }
     }
 
     companion object {
-        private const val PIECE = 1 shl 20
+        /** 1 GiB is 64 of them, a descriptor each, of the 32,768 an app may hold on the G6 and the A20. */
+        private const val PIECE = 16 shl 20
         private const val COPY = 64 * 1024
 
         /** No more than an eighth of this phone's memory, and no more than 1 GiB, is held for one video. */

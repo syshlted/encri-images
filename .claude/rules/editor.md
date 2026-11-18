@@ -27,7 +27,7 @@ This brief is level 1; full records are in `docs/decisions/`.
 - **Make the copy before encri is asked to keep it**, so a copy that cannot be made leaves nothing. A document made and
   not filled, or stopped while filling, is deleted again where the grant lets it delete. (I22)
 - **No picture reaches a file.** A photo's copy is encoded into encri's pipe as it is written; a video's is muxed into
-  `MemoryOutput`, direct buffers, and then written in order. Never `InAppMp4Muxer` or `DefaultMuxer`, which open the
+  `MemoryOutput`, ~~direct buffers~~ `SharedMemory` outside the Java heap, and then written in order. Never `InAppMp4Muxer` or `DefaultMuxer`, which open the
   path Transformer names; `MemoryMuxer.Factory` ignores it. (I22, I3)
 - **Only the part kept of a photo is decoded**, a band of `BAND_ROWS` at a time, each drawn turned into the one bitmap
   the copy is; sampled down by powers of two past `MOST_PIXELS`, and again on an `OutOfMemoryError`. Each reader gets
@@ -47,6 +47,10 @@ This brief is level 1; full records are in `docs/decisions/`.
   Media3 excludes them, so the APK ships nothing more than the notices name. (I22, I19)
 
 ## Traps already paid for
+- **A direct buffer is in the Java heap on Android**, an array `newNonMovableArray` made, not outside it as on a
+  desktop JVM. `MemoryOutput` held a video in them, and one past 512 MiB, the G6's and the A20's heap with
+  `largeHeap`, ended the app: Transformer catches no `OutOfMemoryError`. The unit tests run on the JVM and could not
+  see it; `EditMemoryOnPhone` does. Its pieces are `SharedMemory` now. (I22, amended)
 - Two fingers began as a drag: the first finger landed inside the frame and took hold of it, and two fingers moving
   together, which never become a pinch, moved the frame. A second finger now ends whatever the first held, and two
   fingers not pinching move the picture. A test that spread the fingers did not catch it, since a pinch takes them at
@@ -66,6 +70,9 @@ This brief is level 1; full records are in `docs/decisions/`.
 - ~~**Nothing on a phone.**~~ **Run by the user on the S24 (API 37), who reports it worked** (2026-11-18); what was
   edited was not said. Unmeasured still: encri's consent for `CREATE` and `WRITE`, Transformer on other phones'
   encoders, memory with large photos and long videos, HDR video and the platform's reports. (I22, amended)
+
+- `EditMemoryOnPhone` (2026-11-18): 576 MiB held and read back whole, 64 MiB past a heap of 512 MiB, on the G6 in
+  3.5 s and the A20 in 3.0 s. With direct buffers the G6 failed at its heap's 512 MiB. (I22, amended)
 
 ## Decisions
 | | Why it matters here |

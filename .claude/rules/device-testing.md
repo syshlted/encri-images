@@ -8,7 +8,7 @@ paths:
 # Device testing — component brief
 
 The tests that run on a phone against the encri installed there: the app's own instrumented tests in
-`app/src/androidTest` (`GateOnPhoneTest`, `WalkMeasurement`, `GrantGone`), `:testvault`, a library module whose test
+`app/src/androidTest` (`GateOnPhoneTest`, `WalkMeasurement`, `GrantGone`, `EditMemoryOnPhone`), `:testvault`, a library module whose test
 APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `scripts/device/` (`instrument`,
 `suite`, `scroll`). This brief is level 1; full records are in `docs/decisions/`.
 
@@ -26,6 +26,9 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
   The APKs are built once, and each class goes through `instrument`. What each logged is kept under
   `build/device-runs/<time>/<serial>/` with a summary, so nothing of a run is committed. (I17)
 - **`GrantGone` is run by hand**: it needs the app let into one folder and a removal run beside it. (I12, I17)
+- **`EditMemoryOnPhone` is run by hand too**: it holds the heap's size and 64 MiB more of the phone's memory for a few
+  seconds, and touches nothing of the vault. It is where an edited video's memory is seen to be outside the Java
+  heap, which the unit tests, on the JVM, cannot show. (I22, amended)
 - **encri's screens are pressed as encri-api's device tests press them**: through the accessibility tree, only in
   encri's own window, matched on the English words encri-api's tests name. Not `UiAutomator`. (I6, encri-api L13)
 - **A passphrase is the argument `encriPassphrase`**, which `instrument` takes from `ENCRI_PASSPHRASE`, and `suite`
@@ -71,6 +74,8 @@ APK writes to the vault (`SeedLibrary`, `RemoveLibrary`, `GrantChanges`), and `s
   (I17)
 - The suite on the A20 and under Waydroid, 2026-11-12: all five passed, none skipped, once the app was let in. (I17,
   amended)
+- `EditMemoryOnPhone` on the G6 and the A20, 2026-11-18: 576 MiB held past a heap of 512 MiB; it failed on the G6
+  against the direct buffers it replaced. (I22, amended)
 - `GrantChanges` and `GrantGone` on the G6, the A20 and the S24, alike; a descriptor read across each consent on the
   S9 and the G6. (I12)
 - What `WalkMeasurement` and `scroll` measured is `vault-library`'s (I8, I9, I14).

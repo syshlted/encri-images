@@ -4,6 +4,21 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### An edited video held outside the Java heap (2026-11-18)
+
+**Fixed.** **S2 — A video past the Java heap's room ended the app while its copy was made.** `MemoryOutput` held it
+in direct buffers, which I22 took to be outside the Java heap; on Android they are arrays in it. The heap is 512 MiB
+on the G6 and the A20, with `largeHeap`, while I22 lets a video take an eighth of the phone's memory, up to 1 GiB, so
+a clip within that could still run out of heap, and Transformer, which catches no `Error`, let the
+`OutOfMemoryError` end the app rather than say *This is too large to edit on this phone.* The pieces are
+`SharedMemory` now, 16 MiB each, and a phone that will not give one says the video is too large (I22, amended).
+`EditMemoryOnPhone`, a device test run by hand, held 576 MiB and read it back whole on the G6 and the A20; against the
+direct buffers it failed on the G6 at 512 MiB. The unit tests of `MemoryOutput` run under Robolectric now, with one
+more for a phone that has no memory to give.
+
+**Known issues.** A whole edit of a long clip, through Transformer, is still unmeasured on a phone, and so is what
+the phone does to other apps while 1 GiB is held.
+
 ### Crop and rotate on the S24 (2026-11-18)
 
 **Completed.** The user ran crop and rotate on the S24 (API 37), the debug build at `d116f22` installed on

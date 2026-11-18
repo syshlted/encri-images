@@ -5,17 +5,28 @@
 
 package com.systemhalted.encri.images.edit
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import android.app.Application
+import android.system.ErrnoException
+import android.system.OsConstants
+import org.junit.After
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowSharedMemory
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.ClosedChannelException
 
+/** Under Robolectric, whose `SharedMemory` is a file of its own: the app's is memory (I22). */
+@RunWith(RobolectricTestRunner::class)
+@Config(application = Application::class)
 class MemoryOutputTest {
     /** Pieces of four bytes, so that every test crosses from one to the next. */
     private val output = MemoryOutput(limit = 64, piece = 4)
@@ -23,6 +34,12 @@ class MemoryOutputTest {
     private fun bytes(vararg values: Int) = ByteArray(values.size) { values[it].toByte() }
 
     private fun written(): ByteArray = ByteArrayOutputStream().also(output::writeTo).toByteArray()
+
+    @After
+    fun release() {
+        ShadowSharedMemory.setCreateShouldThrow(null)
+        output.release()
+    }
 
     @Test
     fun `what is written across pieces reads back in order`() {
@@ -38,7 +55,7 @@ class MemoryOutputTest {
         output.position = 3
         output.write(ByteBuffer.wrap(bytes(7, 7, 7)))
         assertEquals(6L, output.position)
-        assertEquals(9L, output.size, "the size is as far as anything was written")
+        assertEquals("the size is as far as anything was written", 9L, output.size)
         assertArrayEquals(bytes(0, 0, 0, 7, 7, 7, 0, 0, 0), written())
     }
 
@@ -62,7 +79,7 @@ class MemoryOutputTest {
         output.write(ByteBuffer.wrap(bytes(1)))
         assertArrayEquals(bytes(9, 9, 9, 9, 9, 0, 0, 0, 1), written())
         output.truncate(20)
-        assertEquals(9L, output.size, "a truncate past the end changes nothing")
+        assertEquals("a truncate past the end changes nothing", 9L, output.size)
     }
 
     @Test
@@ -72,6 +89,15 @@ class MemoryOutputTest {
         assertThrows(IOException::class.java) { output.write(ByteBuffer.wrap(ByteArray(5))) }
         assertTrue(output.overflowed)
         assertEquals(60L, output.size)
+    }
+
+    @Test
+    fun `when the phone has no memory for the next piece, it says it is too large`() {
+        output.write(ByteBuffer.wrap(ByteArray(4)))
+        ShadowSharedMemory.setCreateShouldThrow(ErrnoException("SharedMemory.create", OsConstants.ENOMEM))
+        assertThrows(IOException::class.java) { output.write(ByteBuffer.wrap(ByteArray(4))) }
+        assertTrue(output.overflowed)
+        assertEquals(4L, output.size)
     }
 
     @Test

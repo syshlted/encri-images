@@ -6,6 +6,12 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I22's direct buffers, *outside the Java heap*, are amended 2026-11-18.** On Android a direct buffer is an array
+  in the Java heap (`DirectByteBuffer` takes a `newNonMovableArray`), which is 512 MiB on the G6 and the A20 with
+  `largeHeap`, so a video within I22's eighth of the phone's memory or 1 GiB could still run out of it. Transformer
+  catches no `Error`, so the `OutOfMemoryError` ended the app. `MemoryOutput`'s pieces are `SharedMemory` now, 16 MiB
+  each, outside the heap, and the budget is unchanged. `EditMemoryOnPhone` held 576 MiB, 64 MiB past the heap, and
+  read it back whole on the G6 and the A20; with direct buffers it failed on the G6 at the heap's 512 MiB.
 - **I22's *Not measured: anything on a phone* is amended 2026-11-18.** The user ran crop and rotate on the S24 (API
   37), the debug build at `d116f22`, and reports *"It worked perfectly."* What was edited there was not said, so what
   I22 lists as unseen stays unmeasured, and so does every phone below API 37.
