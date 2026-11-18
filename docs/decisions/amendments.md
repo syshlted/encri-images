@@ -6,6 +6,9 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I22's *Not measured: anything on a phone* is amended 2026-11-18.** The user ran crop and rotate on the S24 (API
+  37), the debug build at `d116f22`, and reports *"It worked perfectly."* What was edited there was not said, so what
+  I22 lists as unseen stays unmeasured, and so does every phone below API 37.
 - **I5's S24, whose encri is the release build, is amended 2026-11-17.** At the user's word, the S24's encri, Encri
   Files and this app are debug builds signed with this machine's debug key, as on the A20 and under Waydroid, so this
   app trusts that encri as one signed by its own key (encri-api L12). The release build's uninstall destroyed the

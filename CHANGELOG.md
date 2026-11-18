@@ -4,6 +4,16 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### Crop and rotate on the S24 (2026-11-18)
+
+**Completed.** The user ran crop and rotate on the S24 (API 37), the debug build at `d116f22` installed on
+2026-11-17, and reports *"It worked perfectly."* It is the first phone the editor has run on (I22, amended). For it to
+open anything, the S24 has a vault again, which its owner made.
+
+**Known issues.** What was edited and saved, a photo, a video or both, was not said, so what I22 lists as unseen stays
+unmeasured: the app's data directory after a copy, memory over a long clip or a large photo, `dumpsys media.metrics`,
+and every phone below API 37.
+
 ### On the S24: debug builds, and its vault gone (2026-11-17)
 
 **Completed.** A debug build of this app at `d116f22`, with encri-api at its pin, was installed on the S24 over the

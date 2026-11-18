@@ -52,7 +52,8 @@ The same machine as encri-api and encri-files.
 - **The S24 is a phone in daily use ~~with a test vault on it~~** (the user's word, 2026-11-03). Read only encri's and
   this app's text from its screen, and capture nothing: other apps' windows hold what is not a test's. ~~Its vault's
   passphrase is the user's and is not on file; the phone's fingerprint unlocks it.~~ Its vault was destroyed on
-  2026-11-17 (below), and none has been made in its place yet. encri 0.1.0 can neither change nor remove a passphrase:
+  2026-11-17 (below), ~~and none has been made in its place yet~~ and its owner has made one since, which crop and
+  rotate ran over by 2026-11-18 (`CHANGELOG.md`). encri 0.1.0 can neither change nor remove a passphrase:
   *Ways into this vault* only renames one.
 - **The S24's encri, Encri Files and this app are debug builds since 2026-11-17**, at the user's word, all signed with
   this machine's debug key. Its encri had been the release build, which a debug build cannot be installed over, so it

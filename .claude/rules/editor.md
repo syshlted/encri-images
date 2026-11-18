@@ -63,8 +63,9 @@ This brief is level 1; full records are in `docs/decisions/`.
   photo of 2,500 rows decoded in three bands with nothing lost where they meet, a BMP decoded whole, and each format's
   copy. `Mp4Muxer` writes a location it is offered and `MemoryMuxer` does not; each of four turns is the track's
   matrix. (I22)
-- **Nothing on a phone.** The editor, encri's consent for `CREATE` and `WRITE`, Transformer on real encoders, memory
-  with large photos and long videos, HDR video and the platform's reports are unmeasured. (I22)
+- ~~**Nothing on a phone.**~~ **Run by the user on the S24 (API 37), who reports it worked** (2026-11-18); what was
+  edited was not said. Unmeasured still: encri's consent for `CREATE` and `WRITE`, Transformer on other phones'
+  encoders, memory with large photos and long videos, HDR video and the platform's reports. (I22, amended)
 
 ## Decisions
 | | Why it matters here |
@@ -77,7 +78,7 @@ This brief is level 1; full records are in `docs/decisions/`.
 | I19 | The notices name exactly what ships |
 
 ## Open here
-- Everything on a phone (above). The first is the A20 or the G6: a photo cropped, turned and saved after encri's
+- Everything on a phone but the S24's run (above). The first is the A20 or the G6: a photo cropped, turned and saved after encri's
   consent screen; a turn alone of a clip, and a crop of one, played back in the viewer; and the app's data directory
   after both, which should hold no picture.
 - A video is held whole in memory, up to an eighth of the phone's memory or 1 GiB, and a larger one is not edited; a
