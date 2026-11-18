@@ -80,9 +80,10 @@ This brief is level 1; full records are in `docs/decisions/`.
   photo of 2,500 rows decoded in three bands with nothing lost where they meet, a BMP decoded whole, and each format's
   copy. `Mp4Muxer` writes a location it is offered and `MemoryMuxer` does not; each of four turns is the track's
   matrix. (I22)
-- ~~**Nothing on a phone.**~~ **Run by the user on the S24 (API 37), who reports it worked** (2026-11-18); what was
-  edited was not said. Unmeasured still: encri's consent for `CREATE` and `WRITE`, Transformer on other phones'
-  encoders, memory with large photos and long videos, HDR video and the platform's reports. (I22, amended)
+- ~~**Nothing on a phone.**~~ **Run by the user on the S24 (API 37), who reports it worked** (2026-11-18): a photo
+  cropped and saved, past encri's consent for `CREATE` and `WRITE`. Unmeasured still: a turn, a video, Transformer on
+  any phone's encoders, memory with large photos and long videos, HDR video and the platform's reports. (I22,
+  amended)
 
 - `EditMemoryOnPhone` (2026-11-18): 576 MiB held and read back whole, 64 MiB past a heap of 512 MiB, on the G6 in
   3.5 s and the A20 in 3.0 s. With direct buffers the G6 failed at its heap's 512 MiB. (I22, amended)

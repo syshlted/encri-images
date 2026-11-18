@@ -105,10 +105,13 @@ regenerated from an empty file, the release bundle and the device tests' APKs in
 
 **Not measured: anything on a phone** ~~.~~ but the S24 (API 37), where the user ran the debug build at `d116f22` and
 reports *"It worked perfectly."* ~~No build of this was installed on one: the installs were not made in the session
-that built it.~~ What was edited there was not said. So unseen are the editor's screens and gestures, encri's consent screen for `CREATE` and `WRITE` and
-the five-second wait after it, encri's free name, encri's preview of a copy, Transformer on any phone's encoders,
-memory with a large photo or a long video, an HDR video, EXIF orientation from a real camera, and whether the
-platform reports stop on API 31 and later. *Amended 2026-11-18: run on the S24, above.*
+that built it.~~ There a photo was cropped and saved; a turn and a video were not said. So seen, on the S24 alone,
+are the editor's screen and gestures over a photo, and encri's consent screen for `CREATE` and `WRITE` and the wait
+after it, which the first save on that new vault asks for. ~~So unseen are the editor's screens and gestures, encri's
+consent screen for `CREATE` and `WRITE` and the five-second wait after it,~~ Unseen still are a turn, encri's free
+name, encri's preview of a copy, Transformer on any phone's encoders, memory with a large photo or a long video, an
+HDR video, EXIF orientation from a real camera, and whether the platform reports stop on API 31 and later. *Amended
+2026-11-18: run on the S24, above.*
 
 **Flagged for veto:**
 
@@ -136,7 +139,8 @@ platform reports stop on API 31 and later. *Amended 2026-11-18: run on the S24, 
   each, outside the heap, and the budget is unchanged. `EditMemoryOnPhone` held 576 MiB, 64 MiB past the heap, and
   read it back whole on the G6 and the A20; with direct buffers it failed on the G6 at the heap's 512 MiB.
 - **I22's *Not measured: anything on a phone* is amended 2026-11-18.** The user ran crop and rotate on the S24 (API
-  37), the debug build at `d116f22`, and reports *"It worked perfectly."* What was edited there was not said, so what
-  I22 lists as unseen stays unmeasured, and so does every phone below API 37.
+  37), the debug build at `d116f22`, and reports *"It worked perfectly."* There a photo was cropped and saved, past
+  encri's consent screen for `CREATE` and `WRITE`, which the first save on that new vault asks for; a turn and a video
+  were not said. The rest of what I22 lists as unseen stays unmeasured, and so does every phone below API 37.
 
 <!-- /amendments -->

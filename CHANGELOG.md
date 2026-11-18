@@ -57,9 +57,12 @@ the phone does to other apps while 1 GiB is held.
 2026-11-17, and reports *"It worked perfectly."* It is the first phone the editor has run on (I22, amended). For it to
 open anything, the S24 has a vault again, which its owner made.
 
-**Known issues.** What was edited and saved, a photo, a video or both, was not said, so what I22 lists as unseen stays
-unmeasured: the app's data directory after a copy, memory over a long clip or a large photo, `dumpsys media.metrics`,
-and every phone below API 37.
+A photo was cropped and saved, the user said afterwards, which passed encri's consent screen for `CREATE` and `WRITE`:
+the first save on a new vault asks for them.
+
+**Known issues.** A turn and a video were not said, so they stay unmeasured, with the rest of what I22 lists as unseen:
+the app's data directory after a copy, memory over a long clip or a large photo, `dumpsys media.metrics`, and every
+phone below API 37.
 
 ### On the S24: debug builds, and its vault gone (2026-11-17)
 

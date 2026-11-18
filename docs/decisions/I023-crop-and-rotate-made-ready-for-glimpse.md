@@ -1,6 +1,7 @@
 # I23 — Crop and rotate made ready for Glimpse: a store the editor reads and keeps through
 *2026-11-18 · accepted at the user's direction ("Let's do all of the "In the fork, so it pays off later" items in this
-session", and "Defer everything else"); **flagged for veto on four points** (below). **Amends I22.***
+session", and "Defer everything else"); **flagged for veto on four points, all confirmed by the user the same day**
+("I23 looks good to me"; below). **Amends I22.***
 
 **Crop and rotate are to be offered to Glimpse, photos first and video later.** Glimpse's newest branch,
 `lineage-24.0`, has no editor of its own: its *Edit* sends `ACTION_EDIT` to another app. About 970 lines of I22, the
@@ -87,7 +88,7 @@ measures, the `edit` package 88.7%, and every gate CI runs passed, the release b
 it does; the S24's run (I22, amended) was of the build before. Glimpse's change was not run on a phone at API 31 or
 later, where the reports begin: Waydroid's tablet could not be reached from this session.
 
-**Flagged for veto:**
+**Flagged for veto, and confirmed:**
 
 1. **The store is three things**: where a video is read, how a photo is opened, and where a copy is kept. Leave to
    keep a copy is the vault's, outside it, in `SaveFlow`.
