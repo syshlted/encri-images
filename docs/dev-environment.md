@@ -71,4 +71,10 @@ The same machine as encri-api and encri-files.
   `ROADMAP.md`). Its hooks check that commits are signed. It has no Gerrit remote and no `commit-msg` hook, so each
   commit's `Change-Id` was written by hand, and this machine has no Gerrit account or key in `~/.ssh/config`. Gerrit
   takes a change by a push to `refs/for/lineage-24.0` on review.lineageos.org; check LineageOS's own instructions for
-  the address before the first.
+  the address before the first. **The branches are on GitHub** since 2026-11-18, at the user's word, in a public fork
+  of Glimpse under the user's `zish` account, `zish/android_packages_apps_Glimpse`, the checkout's remote `zish`
+  through the `zish-github` host of `~/.ssh/config`; GitHub verified each commit's signature. `syshlted` could not
+  hold them: its one fork of Glimpse is this repository.
+- **`../encri-api` may hold commits newer than the pin**, as it did on 2026-11-18 (`057a9d6`, on no remote branch),
+  and then the pre-push hook refuses a push here. That day `master` was pushed with `../encri-api` checked out at the
+  pin, detached, for the push alone, its tree clean and no Gradle running, and put back on its `master` after.

@@ -4,6 +4,17 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### Pushed to GitHub, and the changes for Glimpse on a fork (2026-11-18)
+
+**Completed.** At the user's word, `master` was pushed to GitHub, `a6f8f85..3f4f396`: the S24's run, the heap fix,
+the editor's store, what a copy carries, and I23. The pre-push hook's 248 unit tests ran against the encri-api pin,
+with `../encri-api`, which holds a newer commit of its own, put at the pin for the push and back after
+(`docs/dev-environment.md`). CI's `ci` and `commit-policy` passed on `3f4f396`. The four changes waiting for Glimpse
+are on GitHub too, in a public fork of Glimpse under the user's `zish` account, each commit verified by GitHub
+(`ROADMAP.md`, *Later*).
+
+**Known issues.** None of the four is uploaded to Gerrit, which waits on an account there.
+
 ### What a copy carries is its store's to say (2026-11-18)
 
 **Completed.** A store says what a copy carries of the original's metadata (I23, amends I22): `NOTHING`, the vault's,

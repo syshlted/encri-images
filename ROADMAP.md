@@ -97,5 +97,6 @@ to do, each with a design of its own rather than Glimpse's.
 - **Changes waiting for Glimpse**, each a branch of one signed commit off `lineage-24.0` in the user's Glimpse checkout
   (`docs/dev-environment.md`): `platform-diagnostics-off`, the viewer's player reporting nothing to the platform
   (2026-11-18, I23), and `info-sheet-exif-io`, `media3-unstable-api-opt-in` and `zero-length-video-loop`
-  (2026-11-04). None is uploaded: that waits on a Gerrit account at review.lineageos.org. `platform-diagnostics-off` is
+  (2026-11-04). All four are on GitHub, in the public fork `zish/android_packages_apps_Glimpse` (2026-11-18). None
+  is uploaded to Gerrit: that waits on a Gerrit account at review.lineageos.org. `platform-diagnostics-off` is
   unmeasured on a phone at API 31 or later, where the reports begin; Waydroid and the S24 are the two.
