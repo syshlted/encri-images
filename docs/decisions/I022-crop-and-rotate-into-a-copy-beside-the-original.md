@@ -69,7 +69,8 @@ this app's cache, deleted afterwards, which is a picture on disk (I3).
 
 **A copy carries nothing of the original but its picture and its sound.** A photo's copy has no EXIF, so no location,
 camera or time it was taken; a video's carries its orientation and nothing else of the original's metadata. A copy
-reads as newest in Reels, which sorts by last change (I4).
+reads as newest in Reels, which sorts by last change (I4). *Amended 2026-11-18 by I23: what a copy carries is its
+store's to say, and the vault's carries nothing, as above, since EXIF could be written only through a temporary file.*
 
 **Nothing is reported to the platform.** Transformer and ExoPlayer each report to `MediaMetricsManager` by default,
 from API 31, and their own documentation says Google may collect it where the user shares usage data. The editor's
@@ -112,7 +113,8 @@ platform reports stop on API 31 and later. *Amended 2026-11-18: run on the S24, 
 **Flagged for veto:**
 
 1. **A copy, never the original**: there is no *Save* over it.
-2. **A copy keeps none of the original's metadata**: no location, camera or time taken, so it reads as today's.
+2. **A copy keeps none of the original's metadata**: no location, camera or time taken, so it reads as today's. *In
+   the vault's store, which can do no other (I23).*
 3. **A video is held whole in memory while it is made**, up to an eighth of the phone's memory or 1 GiB, and a larger
    one is not edited here.
 4. **The shapes offered**: *Free*, *Original*, *Square*, *4:3*, *3:4*, *16:9* and *9:16*; and JPEG at 95.
@@ -123,6 +125,10 @@ platform reports stop on API 31 and later. *Amended 2026-11-18: run on the S24, 
 
 ## Amended since, as recorded in `amendments.md`
 
+- **I22's *A copy carries nothing of the original*, and its second flag, are amended by I23 (2026-11-18).** What a
+  copy carries is its store's to say (`Carried`). The vault's store carries nothing, as I22 decided, and can do no
+  other: `ExifInterface` writes EXIF only onto a file that seeks, through a temporary copy of the picture, and encri's
+  pipe does not seek. A store whose copy is a file, as Glimpse's would be, may carry all but the orientation.
 - **I22's direct buffers, *outside the Java heap*, are amended 2026-11-18.** On Android a direct buffer is an array
   in the Java heap (`DirectByteBuffer` takes a `newNonMovableArray`), which is 512 MiB on the G6 and the A20 with
   `largeHeap`, so a video within I22's eighth of the phone's memory or 1 GiB could still run out of it. Transformer

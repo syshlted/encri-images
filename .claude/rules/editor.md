@@ -35,8 +35,9 @@ This brief is level 1; full records are in `docs/decisions/`.
 - **Make the copy before encri is asked to keep it**, so a copy that cannot be made leaves nothing. A document made and
   not filled, or stopped while filling, is deleted again where the grant lets it delete. (I22)
 - **No picture reaches a file.** A photo's copy is encoded into encri's pipe as it is written; a video's is muxed into
-  `MemoryOutput`, ~~direct buffers~~ `SharedMemory` outside the Java heap, and then written in order. Never `InAppMp4Muxer` or `DefaultMuxer`, which open the
-  path Transformer names; `MemoryMuxer.Factory` ignores it. (I22, I3)
+  `MemoryOutput`, ~~direct buffers~~ `SharedMemory` outside the Java heap, and then written in order. Never
+  `InAppMp4Muxer` or `DefaultMuxer`, which open the path Transformer names; `MemoryMuxer.Factory` ignores it. (I22,
+  I3)
 - **Only the part kept of a photo is decoded**, a band of `BAND_ROWS` at a time, each drawn turned into the one bitmap
   the copy is; sampled down by powers of two past `MOST_PIXELS`, and again on an `OutOfMemoryError`. Each reader gets
   a descriptor of its own (`Making.open`), because a descriptor's position is shared. (I22, I4)
@@ -44,7 +45,11 @@ This brief is level 1; full records are in `docs/decisions/`.
   `Crop` effect is given, made before the turn. A turn alone is a `ScaleAndRotateTransformation` alone, so Transformer
   writes it as the orientation and decodes nothing. (I22)
 - **EXIF orientation is applied as shown**: `Placement.ofExif` then the user's turns, inverted to find the photo's own
-  pixels. The copy carries no EXIF and a video's copy no metadata but its orientation (`MemoryMuxer`). (I22)
+  pixels. What a copy carries of the original's metadata is its store's `Carried`: the vault's carries nothing, no
+  EXIF and nothing of a video's but its orientation. A store whose copy is a file may carry `ALL_BUT_ORIENTATION`,
+  whose photo tags `Made.exif` takes to the store to write, and a video's are `MemoryMuxer`'s. (I22, I23)
+- **The vault's store never takes EXIF.** `ExifInterface` writes only through a temporary copy of the picture, onto a
+  file that seeks; `VaultEditStore.keep` refuses a copy offered tags rather than drop them unsaid. (I23, I3)
 - **Nothing is reported to the platform**: `setUsePlatformDiagnostics(false)` on every `ExoPlayer` and `Transformer`
   this app builds, the viewer's too, since Google may collect `MediaMetricsManager`'s reports. (I22, I3)
 - **The editor closes at a lock or the session's end**, as the viewer does, and cancelling a save stops Transformer
@@ -86,7 +91,7 @@ This brief is level 1; full records are in `docs/decisions/`.
 | | Why it matters here |
 |---|---|
 | I22 | Crop and rotate into a copy; the rights; memory, not files; no metadata; six veto flags |
-| I23 | The editor reads and keeps through `EditStore`; only `EditActivity` knows the vault; Glimpse later |
+| I23 | `EditStore`; only `EditActivity` knows the vault; what a copy carries; Glimpse later |
 | I11 | `DELETE` asked when first used, which a consent for these rights would otherwise take away |
 | I12 | A consent replaces the grant and ends the session; the wait for the next |
 | I4 | A full photo and a video are decoded here; reading off the main thread |
@@ -96,12 +101,13 @@ This brief is level 1; full records are in `docs/decisions/`.
 ## Open here
 - Glimpse: the photo editor in Glimpse's shape with a MediaStore store, then a video's, looking and working as the
   photo's does, then taken back. Deferred at the user's word. (I23, `ROADMAP.md`)
-- Everything on a phone but the S24's run (above). The first is the A20 or the G6: a photo cropped, turned and saved after encri's
-  consent screen; a turn alone of a clip, and a crop of one, played back in the viewer; and the app's data directory
-  after both, which should hold no picture.
+- Everything on a phone but the S24's run (above). The first is the A20 or the G6: a photo cropped, turned and saved
+  after encri's consent screen; a turn alone of a clip, and a crop of one, played back in the viewer; and the app's
+  data directory after both, which should hold no picture.
 - A video is held whole in memory, up to an eighth of the phone's memory or 1 GiB, and a larger one is not edited; a
   turn alone of one is refused before it starts, a crop only when its memory runs out. Flagged. (I22)
-- A copy keeps no EXIF, so no location and no time taken, and reads as today's in Reels (I4, I22). Flagged.
+- A copy keeps no EXIF, so no location and no time taken, and reads as today's in Reels (I4, I22). Flagged. In the
+  vault it cannot, as EXIF (I23).
 - An empty document stays in the vault when a copy could not be filled and the grant cannot delete. (I22)
 
 ## Read next

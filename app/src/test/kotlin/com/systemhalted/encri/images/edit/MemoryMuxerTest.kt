@@ -11,9 +11,11 @@ import androidx.media3.common.Format
 import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.container.Mp4LocationData
+import androidx.media3.container.Mp4OrientationData
 import androidx.media3.muxer.BufferInfo
 import androidx.media3.muxer.Mp4Muxer
 import androidx.media3.muxer.Muxer
+import com.systemhalted.encri.images.edit.Carried.ALL_BUT_ORIENTATION
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -59,9 +61,10 @@ class MemoryMuxerTest {
         rotation: Int = 0,
         metadata: List<Metadata.Entry> = emptyList(),
         path: String = "unused",
+        carried: Carried = Carried.NOTHING,
     ): ByteArray {
         val output = MemoryOutput(limit = 1L shl 20)
-        mux(MemoryMuxer.Factory(output).create(path), rotation, metadata)
+        mux(MemoryMuxer.Factory(output, carried).create(path), rotation, metadata)
         return ByteArrayOutputStream().also(output::writeTo).toByteArray()
     }
 
@@ -111,8 +114,17 @@ class MemoryMuxerTest {
     }
 
     @Test
+    fun `a store that carries all but the orientation gets the place, and the turn is the copy's own`() {
+        val place = Mp4LocationData(51.5f, -0.12f)
+        val mp4 = muxed(rotation = 90, metadata = listOf(place, Mp4OrientationData(180)), carried = ALL_BUT_ORIENTATION)
+        assertTrue(mp4.holds("+51.5000-0.1200/".toByteArray()))
+        assertTrue("the track's own turn, not the one offered", mp4.holds(matrixFor(90)))
+        assertFalse(mp4.holds(matrixFor(180)))
+    }
+
+    @Test
     fun `it takes what Media3's MP4 muxer takes, and edit lists that start before zero`() {
-        val factory = MemoryMuxer.Factory(MemoryOutput(limit = 1))
+        val factory = MemoryMuxer.Factory(MemoryOutput(limit = 1), Carried.NOTHING)
         assertEquals(
             Mp4Muxer.SUPPORTED_VIDEO_SAMPLE_MIME_TYPES,
             factory.getSupportedSampleMimeTypes(C.TRACK_TYPE_VIDEO),

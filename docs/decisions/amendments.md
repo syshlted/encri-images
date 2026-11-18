@@ -6,6 +6,10 @@ written that day (I21), one for each amendment a record already states in its ow
 
 ## Amendments
 
+- **I22's *A copy carries nothing of the original*, and its second flag, are amended by I23 (2026-11-18).** What a
+  copy carries is its store's to say (`Carried`). The vault's store carries nothing, as I22 decided, and can do no
+  other: `ExifInterface` writes EXIF only onto a file that seeks, through a temporary copy of the picture, and encri's
+  pipe does not seek. A store whose copy is a file, as Glimpse's would be, may carry all but the orientation.
 - **I22's direct buffers, *outside the Java heap*, are amended 2026-11-18.** On Android a direct buffer is an array
   in the Java heap (`DirectByteBuffer` takes a `newNonMovableArray`), which is 512 MiB on the G6 and the A20 with
   `largeHeap`, so a video within I22's eighth of the phone's memory or 1 GiB could still run out of it. Transformer

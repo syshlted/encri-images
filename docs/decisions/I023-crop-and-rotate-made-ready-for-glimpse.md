@@ -1,6 +1,6 @@
 # I23 — Crop and rotate made ready for Glimpse: a store the editor reads and keeps through
 *2026-11-18 · accepted at the user's direction ("Let's do all of the "In the fork, so it pays off later" items in this
-session", and "Defer everything else"); **flagged for veto on three points** (below).*
+session", and "Defer everything else"); **flagged for veto on four points** (below). **Amends I22.***
 
 **Crop and rotate are to be offered to Glimpse, photos first and video later.** Glimpse's newest branch,
 `lineage-24.0`, has no editor of its own: its *Edit* sends `ACTION_EDIT` to another app. About 970 lines of I22, the
@@ -33,6 +33,23 @@ encri's client. `LoopWhatLasts` is let through: a player's listener that loops a
 package and knowing nothing of it. *Rejected:* moving the editor to a module of its own, which would hold the line in
 the build, for a change to Gradle, the gates and Kover's packages that the cherry-pick back does not need.
 
+**What a copy carries of the original's metadata is its store's to say** (`Carried`), as the user asked it be: none
+in the vault, all but the orientation for Glimpse. `NOTHING` is I22's. `ALL_BUT_ORIENTATION` is all that still
+describes the copy: when and where it was taken, what took it and how, and its words. Not its orientation, size or
+thumbnail, which are the copy's own; not where a subject was in it, which a crop moves; not the original's unique id,
+the software that wrote it, or XMP. A photo's tags are named one by one, 84 of them, since `ExifInterface` lists none.
+A video keeps what Media3's MP4 muxer takes, location, times, Android's `mdta` keys and XMP, but for an orientation
+offered with them: the copy's track has its own.
+
+**A photo's EXIF is written by its store, a video's by its muxer.** `ExifInterface` writes only onto a file that
+seeks, and copies the whole picture to a temporary file of its own as it does (`saveAttributes`, 1.4.2, read). So
+`Making` reads the tags the store's `Carried` names from the original, `Made.exif` takes them to the store, and a store
+whose copy is a file writes them there once it is whole, as a MediaStore store would. **The vault's store carries
+nothing, and can do no other**: encri's pipe does not seek, and a temporary file is a picture on this phone's storage
+(I3). It refuses a copy offered tags, rather than drop them unsaid. A video's tags are the muxer's to write, which holds
+the whole video anyway (`MemoryMuxer`). *Rejected:* writing a JPEG's EXIF segment into the stream here, which would be
+an EXIF writer of this app's own, for JPEG alone, for a store that keeps nothing.
+
 **Deferred, at the user's word**, everything that is Glimpse's own: the code in Glimpse's package, `src/main/java`
 and formatting; a store over MediaStore; its strings; how the built-in editor and `ACTION_EDIT` share *Edit*; whether
 Glimpse takes the tests; a chain of small changes on Gerrit; and a video's crop and turn, after the photo's, **looking
@@ -53,8 +70,18 @@ photo read from it, turned and kept there, red on top where it was on the left; 
 so, telling whoever asked of a refusal, and saying a failure. `VaultEditStore` reads a photo through the link, a new
 descriptor each time, reads a video from `VaultMediaSource` alone, and keeps through `Copies`. `SaveFlow`'s seven tests
 pass unchanged but for how it is built, and so do the editor's own. `EditorSeamTest` was watched fail, naming
-`Making.kt`, with one import of `VaultUris` put back into it. The unit suite: 241 tests, 89.8% of the lines Kover
-measures, the `edit` package 87.6%, and every gate CI runs passed. Glimpse's change: `lintDebug` and `assembleDebug`.
+`Making.kt`, with one import of `VaultUris` put back into it. Glimpse's change: `lintDebug` and `assembleDebug`.
+
+**What a copy carries, verified** under Robolectric. Of a JPEG with EXIF of each kind, `ALL_BUT_ORIENTATION` names the
+time and its offset, the place, the maker, the aperture and the artist, and not the orientation, the size, the
+subject's area, the unique id or the software; `NOTHING` names nothing. Over `FolderStore`, a JPEG taken turned a
+quarter, with a time and a place, is copied upright under both: with `ALL_BUT_ORIENTATION` its copy has the time and
+the place and is not to be turned again, and with `NOTHING` it has neither. `MemoryMuxer` writes a place it is offered
+under `ALL_BUT_ORIENTATION`, and keeps the track's own turn over an orientation offered with it. `VaultEditStore`
+carries nothing and refuses a copy offered tags. **Two guarantees were broken and watched fail**: the photo's
+orientation carried, which failed three tests, among them a copy turned 90 degrees again that was already upright;
+and a video's offered orientation taken, which failed two. The unit suite: 248 tests, 90.3% of the lines Kover
+measures, the `edit` package 88.7%, and every gate CI runs passed, the release build among them.
 
 **Not measured.** The editor was not run on a phone after this change, which moves what it is built from and not what
 it does; the S24's run (I22, amended) was of the build before. Glimpse's change was not run on a phone at API 31 or
@@ -68,3 +95,5 @@ later, where the reports begin: Waydroid's tablet could not be reached from this
    with `LoopWhatLasts` let through by name.
 3. **The first change for Glimpse opts in to Media3's unstable API on the whole of `LocalPlayerViewModel`**, rather
    than moving the player's builder into a function of its own.
+4. **What `ALL_BUT_ORIENTATION` carries**: the 84 EXIF tags named, and all a video's muxer takes but its orientation.
+   Its serial numbers and its owner's name are carried with the rest, as the original's.

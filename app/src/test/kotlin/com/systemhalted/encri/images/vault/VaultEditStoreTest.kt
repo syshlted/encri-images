@@ -11,6 +11,7 @@ import androidx.media3.common.util.UnstableApi
 import com.systemhalted.encri.client.EncriGrant
 import com.systemhalted.encri.client.EncriResult
 import com.systemhalted.encri.client.Right
+import com.systemhalted.encri.images.edit.Carried
 import com.systemhalted.encri.images.edit.Made
 import com.systemhalted.encri.images.edit.Saved
 import com.systemhalted.encri.images.models.Media
@@ -76,6 +77,14 @@ class VaultEditStoreTest {
     @Test
     fun `a video is read from the vault and nowhere else`() {
         assertTrue(store.videos.createDataSource() is VaultMediaSource)
+    }
+
+    @Test
+    fun `a copy in the vault carries nothing of the original's metadata, and EXIF offered it is refused`() {
+        assertEquals(Carried.NOTHING, store.carried)
+        val tagged = Made("beach (edited).jpg", "image/jpeg", {}, {}, mapOf("Make" to "Maker"))
+        assertThrows(IllegalArgumentException::class.java) { runBlocking { store.keep(media(), tagged) } }
+        assertTrue(session.created.isEmpty())
     }
 
     @Test

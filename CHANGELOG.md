@@ -4,6 +4,21 @@ What happened, newest first. Why is in `docs/decisions/`, and what is next is in
 
 ## Unreleased
 
+### What a copy carries is its store's to say (2026-11-18)
+
+**Completed.** A store says what a copy carries of the original's metadata (I23, amends I22): `NOTHING`, the vault's,
+or `ALL_BUT_ORIENTATION`, for a store whose copy is a file, as Glimpse's would be. The latter carries when and where a
+photo was taken, what took it and how, and its words, 84 EXIF tags named, and all of a video's metadata Media3's muxer
+takes, but never an orientation, a size, a thumbnail or where a subject was. A photo's tags go to the store to write;
+a video's are written by `MemoryMuxer`. The vault's store carries nothing, as before, and refuses tags it is offered:
+`ExifInterface` writes only through a temporary copy of the picture, which would be one on this phone's storage
+(I3). Under Robolectric, a photo taken turned a quarter was copied upright over a folder store under each, with its
+time and place or without them; two guarantees were broken and watched fail. Nothing the user sees changed. The unit
+suite: 248 tests, 90.3% of lines.
+
+**Known issues.** Nothing here writes EXIF but a test's store; a MediaStore store, which would, is deferred
+(`ROADMAP.md`, *Later*).
+
 ### Crop and rotate read and keep through a store, ready for Glimpse (2026-11-18)
 
 **Completed.** The editor reads a photo or video and keeps its copy through an `EditStore` (I23): where a video is

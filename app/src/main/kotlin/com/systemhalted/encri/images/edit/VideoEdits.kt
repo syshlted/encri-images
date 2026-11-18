@@ -56,6 +56,7 @@ class TooLargeToEdit(
 class VideoEdits(
     private val context: Context,
     private val videos: DataSource.Factory,
+    private val carried: Carried,
 ) {
     /**
      * The video [uri] names, edited as [edit] asks, held in memory no larger than [limit]; [onProgress] is told how far
@@ -104,7 +105,7 @@ class VideoEdits(
         Transformer
             .Builder(context)
             .setUsePlatformDiagnostics(false)
-            .setMuxerFactory(MemoryMuxer.Factory(output))
+            .setMuxerFactory(MemoryMuxer.Factory(output, carried))
             .setAssetLoaderFactory(
                 DefaultAssetLoaderFactory(
                     context,

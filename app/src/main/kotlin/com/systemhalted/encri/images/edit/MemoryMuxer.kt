@@ -22,12 +22,13 @@ import java.nio.ByteBuffer
  * Media3's MP4 muxer over [MemoryOutput], for Transformer (I22): its own `InAppMp4Muxer` without the file it opens.
  *
  * A video's orientation is written as its track's, which is how a quarter turn alone is saved without decoding the
- * video at all. **Nothing else of the original's metadata is carried**: no location, no time it was made. A copy says
- * no more about where it was taken than a copy of a photo does.
+ * video at all. **What else of the original's metadata is carried is [carried]'s to say** (I23): in the vault, nothing,
+ * no location and no time it was made, so a copy says no more about where it was taken than a copy of a photo does.
  */
 @OptIn(UnstableApi::class)
 class MemoryMuxer private constructor(
     private val muxer: Mp4Muxer,
+    private val carried: Carried,
 ) : Muxer {
     override fun addTrack(format: Format): Int {
         val track = muxer.addTrack(format)
@@ -41,15 +42,18 @@ class MemoryMuxer private constructor(
         bufferInfo: BufferInfo,
     ) = muxer.writeSampleData(trackId, byteBuffer, bufferInfo)
 
-    override fun addMetadataEntry(metadataEntry: Metadata.Entry) = Unit
+    override fun addMetadataEntry(metadataEntry: Metadata.Entry) {
+        if (carried.keeps(metadataEntry)) muxer.addMetadataEntry(metadataEntry)
+    }
 
     override fun close() = muxer.close()
 
     /** Every muxer it makes writes to [output], whatever path Transformer names: there is no file. */
     class Factory(
         private val output: MemoryOutput,
+        private val carried: Carried,
     ) : Muxer.Factory {
-        override fun create(path: String): Muxer = MemoryMuxer(Mp4Muxer.Builder(output).build())
+        override fun create(path: String): Muxer = MemoryMuxer(Mp4Muxer.Builder(output).build(), carried)
 
         override fun getSupportedSampleMimeTypes(trackType: Int): ImmutableList<String> =
             when (trackType) {

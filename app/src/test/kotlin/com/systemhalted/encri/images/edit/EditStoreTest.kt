@@ -14,6 +14,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.exifinterface.media.ExifInterface
 import androidx.test.core.app.ApplicationProvider
 import com.systemhalted.encri.images.R
 import com.systemhalted.encri.images.models.Media
@@ -24,6 +25,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -74,6 +77,21 @@ class EditStoreTest {
         )
     }
 
+    /** A JPEG 40 by 30, taken turned a quarter (EXIF orientation 6), with a time and a place. */
+    private fun taken(): Media {
+        val file = File(folder, "taken.jpg")
+        file.outputStream().use {
+            Bitmap.createBitmap(40, 30, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 90, it)
+        }
+        ExifInterface(file)
+            .apply {
+                setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_ROTATE_90.toString())
+                setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, "2026:07:04 12:30:00")
+                setLatLong(51.5, -0.12)
+            }.saveAttributes()
+        return beach().copy(uri = Uri.fromFile(file), mimeType = "image/jpeg", displayName = file.name)
+    }
+
     private fun activity(): Activity =
         Robolectric
             .buildActivity(AppCompatActivity::class.java)
@@ -101,6 +119,32 @@ class EditStoreTest {
         // Turned clockwise, the left half is on top.
         assertEquals(Color.RED, turned.getPixel(15, 5))
         assertEquals(Color.BLUE, turned.getPixel(15, 35))
+    }
+
+    @Test
+    fun `a store that carries the original's metadata gives the copy its time and place, but not its orientation`() {
+        for (carried in Carried.entries) {
+            val store = FolderStore(folder, carried)
+            val taken = taken()
+            // Shown upright, the photo is 30 wide and 40 high, and so is its copy.
+            val making = Making(ApplicationProvider.getApplicationContext(), store, taken)
+            val made = runBlocking { making.make(Edit(Size(30f, 40f))) {} }
+            runBlocking { store.keep(taken, made) }
+            made.release()
+
+            val copy = store.kept.single()
+            assertEquals(30, BitmapFactory.decodeFile(copy.path).width)
+            val exif = ExifInterface(copy)
+            assertEquals("$carried: upright already, and not to be turned again", 0, exif.rotationDegrees)
+            if (carried == Carried.NOTHING) {
+                assertNull(exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL))
+                assertNull(exif.latLong)
+            } else {
+                assertEquals("2026:07:04 12:30:00", exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL))
+                assertNotNull(exif.latLong)
+            }
+            copy.delete()
+        }
     }
 
     @Test

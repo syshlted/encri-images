@@ -49,7 +49,8 @@ to do, each with a design of its own rather than Glimpse's.
    save going straight to it; a turn alone of a clip and a crop of one, played back in the viewer; the app's data
    directory after both, which should hold no picture; memory over a long clip and a large photo. On a phone at API
    31 or later, the S24 among them, `dumpsys media.metrics` showing that neither a playback nor an edit is reported.
-   Then whether a copy should keep the original's dates, which waits on *A date a photo was taken* (3, above).
+   Then whether a copy should keep the original's dates, which waits on *A date a photo was taken* (3, above): not
+   as EXIF, which `ExifInterface` writes only through a temporary copy of the picture (I23).
 
 ## Before the first release
 
